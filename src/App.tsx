@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Codex } from './ui/Codex';
 import { LocalGame } from './ui/LocalGame';
+import { OnlineGame } from './ui/OnlineGame';
 
-type Screen = 'menu' | 'local' | 'codex';
+type Screen = 'menu' | 'local' | 'online' | 'codex';
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('menu');
+  // Opening an invite link (?room=XYZ) jumps straight into the online flow.
+  const [screen, setScreen] = useState<Screen>(() =>
+    new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
+  );
 
   return (
     <div className="flex h-screen flex-col text-slate-100">
@@ -38,6 +42,12 @@ export default function App() {
             🎲 Lokálna hra (Pass &amp; Play)
           </button>
           <button
+            onClick={() => setScreen('online')}
+            className="w-64 rounded-xl bg-sky-800 px-6 py-3 font-semibold text-sky-50 shadow-lg hover:bg-sky-700"
+          >
+            🌐 Online hra
+          </button>
+          <button
             onClick={() => setScreen('codex')}
             className="w-64 rounded-xl bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-700"
           >
@@ -47,6 +57,7 @@ export default function App() {
       )}
 
       {screen === 'local' && <LocalGame key="local" />}
+      {screen === 'online' && <OnlineGame onExit={() => setScreen('menu')} />}
       {screen === 'codex' && <Codex onBack={() => setScreen('menu')} />}
     </div>
   );

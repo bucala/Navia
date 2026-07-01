@@ -1,0 +1,22 @@
+# Pantheon: Dice of Destiny — Cloudflare Worker + Durable Objects (GDD §5.2)
+name = "pantheon-dice-of-destiny"
+main = "src/worker/index.ts"
+compatibility_date = "2025-11-01"
+
+# Built React frontend served from the edge.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# One GameRoom instance per match — the authoritative game state and RNG.
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+[observability]
+enabled = true
