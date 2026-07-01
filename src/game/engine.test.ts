@@ -261,6 +261,39 @@ describe('dice-boosted attacks', () => {
     expect(g.players.p2.lanes.vanguard[0]!.hp).toBe(4); // no AoE splash
   });
 
+  it('Medvebor cleave (4+) hits left/right neighbours in the same lane only', () => {
+    let g = newGame();
+    place(g, 'p1', 'vanguard', 0, 'medvebor'); // attack 3
+    place(g, 'p2', 'vanguard', 0, 'gorila', { armor: 0 }); // left neighbour, 6 HP
+    place(g, 'p2', 'vanguard', 1, 'mahisa', { armor: 0 }); // primary, 7 HP
+    place(g, 'p2', 'vanguard', 2, 'kamenny_strazca', { armor: 0 }); // right neighbour, 4 HP
+    place(g, 'p2', 'sanctum', 1, 'nebesky_vrabec'); // aligned back slot must stay safe
+    g.players.p1.mana = 5;
+    g = inCombat(g);
+    g = applyAction(
+      g,
+      { type: 'ATTACK', player: 'p1', attacker: { lane: 'vanguard', slot: 0 }, target: { kind: 'unit', player: 'p2', lane: 'vanguard', slot: 1 }, useDice: true },
+      d6seq(4), // success vs 4+
+    );
+    expect(g.players.p2.lanes.vanguard[0]!.hp).toBe(3);
+    expect(g.players.p2.lanes.vanguard[1]!.hp).toBe(4);
+    expect(g.players.p2.lanes.vanguard[2]!.hp).toBe(1);
+    expect(g.players.p2.lanes.sanctum[1]!.hp).toBe(2); // cleave never reaches the back line
+  });
+
+  it('Rysoslav stormcall (4+) zaps every enemy unit on the board', () => {
+    let g = newGame();
+    place(g, 'p1', 'sanctum', 0, 'rysoslav');
+    place(g, 'p2', 'vanguard', 0, 'kamenny_strazca', { armor: 1 }); // armor absorbs the bolt
+    place(g, 'p2', 'sanctum', 2, 'nebesky_vrabec'); // 2 HP
+    g.players.p1.mana = 4;
+    g = applyAction(g, { type: 'ACTIVATE', player: 'p1', unit: { lane: 'sanctum', slot: 0 } }, d6seq(5));
+    const guard = g.players.p2.lanes.vanguard[0]!;
+    expect(guard.armor).toBe(0);
+    expect(guard.hp).toBe(guard.maxHp);
+    expect(g.players.p2.lanes.sanctum[2]!.hp).toBe(1);
+  });
+
   it('Gorila fortifies with advantage (2d6, keep better)', () => {
     let g = newGame();
     place(g, 'p1', 'vanguard', 0, 'gorila', { hp: 2, armor: 0 });

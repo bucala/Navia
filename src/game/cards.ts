@@ -189,7 +189,7 @@ export const BOJOVY_KOHUT = define<UnitCardDef>({
 export const OPICI_KRAL = define<UnitCardDef>({
   type: 'unit',
   id: 'opici_kral',
-  name: 'Opičí Kráľ',
+  name: 'Wukong, Opičí Kráľ',
   faction: 'celestial',
   rarity: 'rare',
   cost: 3,
@@ -200,6 +200,98 @@ export const OPICI_KRAL = define<UnitCardDef>({
   keywords: ['agile'],
   text: 'Agilná: raz za ťah sa počas bojovej fázy môže presunúť medzi Vanguardom a Sanctom (uhýba sa AoE útokom).',
   glyph: '🐒',
+});
+
+export const MEDVEBOR = define<UnitCardDef>({
+  type: 'unit',
+  id: 'medvebor',
+  name: 'Medvebor, Velesov Šampión',
+  faction: 'nature',
+  rarity: 'legendary',
+  cost: 5,
+  attack: 3,
+  maxHp: 7,
+  armor: 1,
+  lane: 'vanguard',
+  keywords: [],
+  dice: {
+    label: 'Rozťatie kolovratom',
+    threshold: 4,
+    manaCost: 2,
+    activation: false,
+    effect: { kind: 'cleave' },
+  },
+  text: 'Kocka 4+ (2 many): sekera zasiahne aj jednotky naľavo a napravo od cieľa v tej istej línii.',
+  glyph: '🐻',
+});
+
+export const MAHISA = define<UnitCardDef>({
+  type: 'unit',
+  id: 'mahisa',
+  name: 'Mahiša, Chrámový Býk',
+  faction: 'nature',
+  rarity: 'rare',
+  cost: 5,
+  attack: 3,
+  maxHp: 7,
+  armor: 1,
+  lane: 'vanguard',
+  keywords: [],
+  dice: {
+    label: 'Splašený výpad',
+    threshold: 4,
+    manaCost: 1,
+    activation: false,
+    effect: { kind: 'berserk', bonusDamage: 3 },
+  },
+  text: 'Kocka 4+ (1 mana): rozbehnutý býk udelí cieľu +3 poškodenie navyše.',
+  glyph: '🐃',
+});
+
+export const CHEPRI = define<UnitCardDef>({
+  type: 'unit',
+  id: 'chepri',
+  name: 'Chepri, Skarabejský Strážca',
+  faction: 'nature',
+  rarity: 'rare',
+  cost: 4,
+  attack: 2,
+  maxHp: 5,
+  armor: 2,
+  lane: 'vanguard',
+  keywords: ['flying'],
+  dice: {
+    label: 'Znovuzrodenie slnka',
+    threshold: 3,
+    manaCost: 1,
+    activation: true,
+    effect: { kind: 'fortify', heal: 2, armor: 2 },
+  },
+  text: 'Letec. Kocka 3+ (1 mana): chitínový pancier sa obnoví — vylieči si 2 HP a získa 2 brnenie.',
+  glyph: '🪲',
+});
+
+export const RYSOSLAV = define<UnitCardDef>({
+  type: 'unit',
+  id: 'rysoslav',
+  name: 'Rysoslav, Žrec Perúna',
+  faction: 'celestial',
+  rarity: 'legendary',
+  cost: 4,
+  attack: 1,
+  maxHp: 4,
+  armor: 0,
+  lane: 'sanctum',
+  keywords: [],
+  dice: {
+    label: 'Perúnov hnev',
+    threshold: 4,
+    manaCost: 2,
+    activation: true,
+    effect: { kind: 'stormcall', damage: 1 },
+  },
+  text: 'Kocka 4+ (2 many): zvolá búrku — každá nepriateľská jednotka na ploche utrpí 1 poškodenie.',
+  glyph: '🐆',
 });
 
 export const NEBESKY_VRABEC = define<UnitCardDef>({
@@ -234,6 +326,10 @@ export const STARTER_DECK: string[] = [
   'zlaty_gryf',
   'bojovy_kohut',
   'bojovy_kohut',
+  'chepri',
+  'mahisa',
+  'medvebor',
+  'rysoslav',
   'megadrak',
   'gorila',
   'papagaj',

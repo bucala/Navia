@@ -35,6 +35,10 @@ export type Keyword =
 export type DiceEffect =
   /** Attack becomes a cross-shaped AoE (piškvorková mriežka). */
   | { kind: 'aoe' }
+  /** Attack also hits the target's left/right neighbours in the same lane (Medvebor). */
+  | { kind: 'cleave' }
+  /** Storm strike — damages every enemy unit on the board (Rysoslav) — activation. */
+  | { kind: 'stormcall'; damage: number }
   /** Extra acid stacks on the target (Papagáj). */
   | { kind: 'acidBlast'; stacks: number }
   /** Bonus damage on the target (Bojový Kohút). */
