@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCard, getUnitCard } from '../game/cards';
 import { effectiveThreshold, opponentOf } from '../game/engine';
-import type { Action, GameState, LaneId, SlotRef, TargetRef, UnitState } from '../game/types';
+import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
+import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
 
 type Selection =
   | { mode: 'idle' }
@@ -15,12 +16,29 @@ type Selection =
 interface Props {
   state: GameState;
   dispatch: (action: Action) => boolean;
+  /** Whose seat this client renders — locally the active player, online the assigned seat. */
+  viewpoint: PlayerId;
+  /** False while it's the opponent's turn (or an action awaits the server). */
+  canAct: boolean;
 }
 
 const LANE_LABEL: Record<LaneId, string> = { vanguard: 'Vanguard', sanctum: 'Sanctum' };
 
 function sameSlot(a: SlotRef, b: SlotRef): boolean {
   return a.lane === b.lane && a.slot === b.slot;
+}
+
+function NexusPopup({ popup }: { popup?: Popup }) {
+  if (!popup) return null;
+  return (
+    <span
+      className={`animate-popup pointer-events-none absolute inset-x-0 -top-2 z-10 text-center text-xl font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
+        popup.kind === 'damage' ? 'text-red-400' : 'text-emerald-300'
+      }`}
+    >
+      {popup.kind === 'damage' ? `−${popup.amount}` : `+${popup.amount}`}
+    </span>
+  );
 }
 
 function ManaBar({ mana, maxMana }: { mana: number; maxMana: number }) {
@@ -36,12 +54,16 @@ function ManaBar({ mana, maxMana }: { mana: number; maxMana: number }) {
   );
 }
 
-/** The Pass & Play arena — always rendered from the active player's seat. */
-export function Board({ state, dispatch }: Props) {
+/** The arena, rendered from the given seat's perspective. */
+export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const [selection, setSelection] = useState<Selection>({ mode: 'idle' });
-  const me = state.players[state.active];
-  const foe = state.players[opponentOf(state.active)];
+  const me = state.players[viewpoint];
+  const foe = state.players[opponentOf(viewpoint)];
   const foeHasVanguard = foe.lanes.vanguard.some((u) => u !== null);
+  const { fx, nexusFx } = useCombatFx(state);
+
+  // Drop stale selections when the turn or seat changes.
+  useEffect(() => setSelection({ mode: 'idle' }), [state.active, viewpoint]);
 
   const reset = () => setSelection({ mode: 'idle' });
   const act = (action: Action) => {
@@ -80,11 +102,12 @@ export function Board({ state, dispatch }: Props) {
   // ── Click handlers ────────────────────────────────────────────────────────
 
   const clickHandCard = (index: number) => {
-    if (state.phase !== 'main') return;
+    if (!canAct || state.phase !== 'main') return;
     setSelection(selection.mode === 'hand' && selection.index === index ? { mode: 'idle' } : { mode: 'hand', index });
   };
 
   const clickMySlot = (lane: LaneId, slot: number) => {
+    if (!canAct) return;
     if (selection.mode === 'hand' && canPlaceAt(lane, slot)) {
       act({ type: 'PLAY_CARD', player: me.id, handIndex: selection.index, lane, slot });
       return;
@@ -105,7 +128,7 @@ export function Board({ state, dispatch }: Props) {
   };
 
   const clickFoeSlot = (lane: LaneId, slot: number) => {
-    if (!foe.lanes[lane][slot]) return;
+    if (!canAct || !foe.lanes[lane][slot]) return;
     const target: TargetRef = { kind: 'unit', player: foe.id, lane, slot };
     if (selection.mode === 'hand' && selectedHandCard?.type === 'spell') {
       act({ type: 'PLAY_CARD', player: me.id, handIndex: selection.index, target });
@@ -117,6 +140,7 @@ export function Board({ state, dispatch }: Props) {
   };
 
   const clickFoeNexus = () => {
+    if (!canAct) return;
     if (selection.mode === 'unit' && nexusTargetable) {
       startAttack(selection.ref, { kind: 'nexus', player: foe.id });
     }
@@ -160,6 +184,8 @@ export function Board({ state, dispatch }: Props) {
               key={slot}
               unit={unit}
               highlight={highlight}
+              enemySide={owner === 'foe'}
+              fx={fx[slotFxKey(player.id, lane, slot)]}
               onClick={() => (owner === 'me' ? clickMySlot(lane, slot) : clickFoeSlot(lane, slot))}
             />
           );
@@ -185,7 +211,7 @@ export function Board({ state, dispatch }: Props) {
         <ManaBar mana={foe.mana} maxMana={foe.maxMana} />
         <button
           onClick={clickFoeNexus}
-          className={`rounded-lg border px-3 py-1 text-sm font-bold ${
+          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${
             nexusTargetable
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
               : 'border-slate-700 bg-slate-900 text-red-300'
@@ -193,11 +219,12 @@ export function Board({ state, dispatch }: Props) {
           title="Nexus súpera"
         >
           ❤️ {foe.nexusHp}
+          <NexusPopup popup={nexusFx[foe.id]} />
         </button>
       </div>
 
       {/* Arena */}
-      <div className="flex flex-1 flex-col justify-center">
+      <div className="arena-bg flex flex-1 flex-col justify-center">
         {renderLane('foe', 'sanctum')}
         {renderLane('foe', 'vanguard')}
 
@@ -212,14 +239,16 @@ export function Board({ state, dispatch }: Props) {
           {state.phase === 'main' && (
             <button
               onClick={() => act({ type: 'ENTER_COMBAT', player: me.id })}
-              className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700"
+              disabled={!canAct}
+              className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40"
             >
               ⚔ Bojová fáza
             </button>
           )}
           <button
             onClick={() => act({ type: 'END_TURN', player: me.id })}
-            className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600"
+            disabled={!canAct}
+            className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40"
           >
             Ukončiť ťah ➤
           </button>
@@ -272,8 +301,9 @@ export function Board({ state, dispatch }: Props) {
         <div className="mb-2 flex items-center justify-between">
           <span className="font-semibold text-slate-200">{me.name}</span>
           <ManaBar mana={me.mana} maxMana={me.maxMana} />
-          <span className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
+          <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
             ❤️ {me.nexusHp}
+            <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
         <div className="flex justify-center gap-2 overflow-x-auto pb-1">
@@ -283,7 +313,7 @@ export function Board({ state, dispatch }: Props) {
               key={`${cardId}-${i}`}
               cardId={cardId}
               selected={selection.mode === 'hand' && selection.index === i}
-              affordable={getCard(cardId).cost <= me.mana && state.phase === 'main'}
+              affordable={canAct && getCard(cardId).cost <= me.mana && state.phase === 'main'}
               onClick={() => clickHandCard(i)}
             />
           ))}

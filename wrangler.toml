@@ -1,0 +1,39 @@
+# Pantheon: Dice of Destiny — Cloudflare Worker + Durable Objects (GDD §5.2)
+name = "pantheon-dice-of-destiny"
+main = "src/worker/index.ts"
+compatibility_date = "2025-11-01"
+
+# Built React frontend served from the edge.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# One GameRoom instance per match — the authoritative game state and RNG.
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+
+# Single global instance pairing quick-play seekers.
+[[durable_objects.bindings]]
+name = "MATCHMAKER"
+class_name = "Matchmaker"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Matchmaker"]
+
+# Účty, ELO, balíčky (GDD §5.2). Lokálne funguje hneď (wrangler dev);
+# pred nasadením spusti `wrangler d1 create pantheon-db` a vlož database_id.
+[[d1_databases]]
+binding = "DB"
+database_name = "pantheon-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true

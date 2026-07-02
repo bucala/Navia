@@ -38,6 +38,7 @@ export const MEGADRAK = define<UnitCardDef>({
   },
   text: 'Láva ∞: útoky zapaľujú. Kyselina ∞: útoky trvalo znižujú brnenie. Vyhubenie: tokeny zabíja okamžite. Kocka 3+ (2 many): útok zasiahne aj susedné sloty do kríža.',
   glyph: '🐉',
+  art: '/art/megadrak.jpg',
 });
 
 export const PEKELNE_ZAKLINADLO = define<CardDef>({
@@ -55,6 +56,7 @@ export const PEKELNE_ZAKLINADLO = define<CardDef>({
   },
   text: 'Hádž kockou: pri 3–5 udelí cieľu 2 poškodenie, vráti ti 1 HP a hádžeš znova. Pri 1–2 sa reťaz ukončí bez postihu. Pri 6 reťaz končí a tvoj Nexus utrpí 3 poškodenie (Overload).',
   glyph: '🔥',
+  art: '/art/pekelne_zaklinadlo.jpg',
 });
 
 export const LAVOVY_SKRIATOK = define<UnitCardDef>({
@@ -72,6 +74,7 @@ export const LAVOVY_SKRIATOK = define<UnitCardDef>({
   keywords: ['lavaTouch'],
   text: 'Token. Láva ∞: útoky zapaľujú cieľ.',
   glyph: '👺',
+  art: '/art/lavovy_skriatok.jpg',
 });
 
 // ── Frakcia: Prírodný a Zemský Pakt (Obrana a Stabilita) ────────────────────
@@ -97,6 +100,7 @@ export const GORILA = define<UnitCardDef>({
   },
   text: 'Výhoda: pri hodoch hádže 2× D6 a berie lepší výsledok. Kocka 5+ (1 mana): vylieči si 3 HP a získa 3 brnenie.',
   glyph: '🦍',
+  art: '/art/gorila.jpg',
 });
 
 export const KAMENNY_STRAZCA = define<UnitCardDef>({
@@ -113,6 +117,7 @@ export const KAMENNY_STRAZCA = define<UnitCardDef>({
   keywords: [],
   text: 'Pevný obranca predného voja.',
   glyph: '🗿',
+  art: '/art/kamenny_strazca.jpg',
 });
 
 export const ZLATY_GRYF = define<UnitCardDef>({
@@ -136,6 +141,7 @@ export const ZLATY_GRYF = define<UnitCardDef>({
   },
   text: 'Kocka 3+ (2 many): každá tvoja jednotka vo Vanguarde si vylieči 2 HP a získa 1 brnenie.',
   glyph: '🦅',
+  art: '/art/zlaty_gryf.jpg',
 });
 
 // ── Frakcia: Nebeský Zbor (Mobilita a Podfuky) ──────────────────────────────
@@ -161,6 +167,7 @@ export const PAPAGAJ = define<UnitCardDef>({
   },
   text: 'Letec. Kyselina ∞: útoky trvalo znižujú brnenie. Stabilita — Kocka 1+ (1 mana): spŕška 2 kyseliny navyše, hod prakticky nemôže zlyhať.',
   glyph: '🦜',
+  art: '/art/papagaj.jpg',
 });
 
 export const BOJOVY_KOHUT = define<UnitCardDef>({
@@ -184,12 +191,13 @@ export const BOJOVY_KOHUT = define<UnitCardDef>({
   },
   text: 'Berserker — Kocka (1 mana): +4 poškodenie. Požiadavka klesá so zraneniami: plné HP 5+, každé chýbajúce HP ju znižuje o 1 (najmenej 2+).',
   glyph: '🐓',
+  art: '/art/bojovy_kohut.jpg',
 });
 
 export const OPICI_KRAL = define<UnitCardDef>({
   type: 'unit',
   id: 'opici_kral',
-  name: 'Opičí Kráľ',
+  name: 'Wukong, Opičí Kráľ',
   faction: 'celestial',
   rarity: 'rare',
   cost: 3,
@@ -200,6 +208,103 @@ export const OPICI_KRAL = define<UnitCardDef>({
   keywords: ['agile'],
   text: 'Agilná: raz za ťah sa počas bojovej fázy môže presunúť medzi Vanguardom a Sanctom (uhýba sa AoE útokom).',
   glyph: '🐒',
+  art: '/art/wukong.jpg',
+});
+
+export const MEDVEBOR = define<UnitCardDef>({
+  type: 'unit',
+  id: 'medvebor',
+  name: 'Medvebor, Velesov Šampión',
+  faction: 'nature',
+  rarity: 'legendary',
+  cost: 5,
+  attack: 3,
+  maxHp: 7,
+  armor: 1,
+  lane: 'vanguard',
+  keywords: [],
+  dice: {
+    label: 'Rozťatie kolovratom',
+    threshold: 4,
+    manaCost: 2,
+    activation: false,
+    effect: { kind: 'cleave' },
+  },
+  text: 'Kocka 4+ (2 many): sekera zasiahne aj jednotky naľavo a napravo od cieľa v tej istej línii.',
+  glyph: '🐻',
+  art: '/art/medvebor.jpg',
+});
+
+export const MAHISA = define<UnitCardDef>({
+  type: 'unit',
+  id: 'mahisa',
+  name: 'Mahiša, Chrámový Býk',
+  faction: 'nature',
+  rarity: 'rare',
+  cost: 5,
+  attack: 3,
+  maxHp: 7,
+  armor: 1,
+  lane: 'vanguard',
+  keywords: [],
+  dice: {
+    label: 'Splašený výpad',
+    threshold: 4,
+    manaCost: 1,
+    activation: false,
+    effect: { kind: 'berserk', bonusDamage: 3 },
+  },
+  text: 'Kocka 4+ (1 mana): rozbehnutý býk udelí cieľu +3 poškodenie navyše.',
+  glyph: '🐃',
+  art: '/art/mahisa.jpg',
+});
+
+export const CHEPRI = define<UnitCardDef>({
+  type: 'unit',
+  id: 'chepri',
+  name: 'Chepri, Skarabejský Strážca',
+  faction: 'nature',
+  rarity: 'rare',
+  cost: 4,
+  attack: 2,
+  maxHp: 5,
+  armor: 2,
+  lane: 'vanguard',
+  keywords: ['flying'],
+  dice: {
+    label: 'Znovuzrodenie slnka',
+    threshold: 3,
+    manaCost: 1,
+    activation: true,
+    effect: { kind: 'fortify', heal: 2, armor: 2 },
+  },
+  text: 'Letec. Kocka 3+ (1 mana): chitínový pancier sa obnoví — vylieči si 2 HP a získa 2 brnenie.',
+  glyph: '🪲',
+  art: '/art/chepri.jpg',
+});
+
+export const RYSOSLAV = define<UnitCardDef>({
+  type: 'unit',
+  id: 'rysoslav',
+  name: 'Rysoslav, Žrec Perúna',
+  faction: 'celestial',
+  rarity: 'legendary',
+  cost: 4,
+  attack: 1,
+  maxHp: 4,
+  armor: 0,
+  lane: 'sanctum',
+  keywords: [],
+  dice: {
+    label: 'Perúnov hnev',
+    threshold: 4,
+    manaCost: 2,
+    activation: true,
+    effect: { kind: 'stormcall', damage: 1 },
+  },
+  text: 'Kocka 4+ (2 many): zvolá búrku — každá nepriateľská jednotka na ploche utrpí 1 poškodenie.',
+  glyph: '🐆',
+  art: '/art/rysoslav.jpg',
 });
 
 export const NEBESKY_VRABEC = define<UnitCardDef>({
@@ -216,6 +321,7 @@ export const NEBESKY_VRABEC = define<UnitCardDef>({
   keywords: ['flying'],
   text: 'Letec. Rýchly prieskumník Nebeského zboru.',
   glyph: '🐦',
+  art: '/art/nebesky_vrabec.jpg',
 });
 
 /** Shared Fáza 1 test deck — both Pass & Play players run the same list. */
@@ -234,6 +340,10 @@ export const STARTER_DECK: string[] = [
   'zlaty_gryf',
   'bojovy_kohut',
   'bojovy_kohut',
+  'chepri',
+  'mahisa',
+  'medvebor',
+  'rysoslav',
   'megadrak',
   'gorila',
   'papagaj',

@@ -6,16 +6,23 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "dev:worker": "wrangler dev --port 8787",
+    "build": "tsc --noEmit && tsc -p tsconfig.worker.json --noEmit && NODE_ENV=production vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "framer-motion": "^12.42.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.1",
+    "@cloudflare/workers-types": "^4.20260701.1",
     "@tailwindcss/vite": "^4.1.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -23,6 +30,7 @@
     "tailwindcss": "^4.1.0",
     "typescript": "^5.6.3",
     "vite": "^6.0.0",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "wrangler": "^4.106.0"
   }
 }

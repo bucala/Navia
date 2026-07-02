@@ -40,8 +40,8 @@ function shuffle<T>(items: T[], rng: Rng): T[] {
   return arr;
 }
 
-function createPlayer(id: PlayerId, name: string, rng: Rng): PlayerState {
-  const deck = shuffle(STARTER_DECK, rng);
+function createPlayer(id: PlayerId, name: string, rng: Rng, deckList?: string[]): PlayerState {
+  const deck = shuffle(deckList ?? STARTER_DECK, rng);
   return {
     id,
     name,
@@ -57,11 +57,15 @@ function createPlayer(id: PlayerId, name: string, rng: Rng): PlayerState {
   };
 }
 
-export function createGame(rng: Rng, names: [string, string] = ['Hráč 1', 'Hráč 2']): GameState {
+export function createGame(
+  rng: Rng,
+  names: [string, string] = ['Hráč 1', 'Hráč 2'],
+  decks?: [string[] | undefined, string[] | undefined],
+): GameState {
   const state: GameState = {
     players: {
-      p1: createPlayer('p1', names[0], rng),
-      p2: createPlayer('p2', names[1], rng),
+      p1: createPlayer('p1', names[0], rng, decks?.[0]),
+      p2: createPlayer('p2', names[1], rng, decks?.[1]),
     },
     active: 'p1',
     turn: 1,
@@ -177,15 +181,19 @@ function cleanupIfDead(state: GameState, owner: PlayerId, ref: SlotRef): void {
   }
 }
 
-/** Cross-shaped AoE neighbours (piškvorková mriežka): left, right, and the aligned slot in the other lane. */
-export function crossNeighbors(ref: SlotRef): SlotRef[] {
-  const otherLane: LaneId = ref.lane === 'vanguard' ? 'sanctum' : 'vanguard';
+/** Left/right neighbours in the same lane (cleave sweep). */
+export function laneNeighbors(ref: SlotRef): SlotRef[] {
   const laneSize = ref.lane === 'vanguard' ? VANGUARD_SLOTS : SANCTUM_SLOTS;
   const neighbors: SlotRef[] = [];
   if (ref.slot > 0) neighbors.push({ lane: ref.lane, slot: ref.slot - 1 });
   if (ref.slot < laneSize - 1) neighbors.push({ lane: ref.lane, slot: ref.slot + 1 });
-  neighbors.push({ lane: otherLane, slot: ref.slot });
   return neighbors;
+}
+
+/** Cross-shaped AoE neighbours (piškvorková mriežka): left, right, and the aligned slot in the other lane. */
+export function crossNeighbors(ref: SlotRef): SlotRef[] {
+  const otherLane: LaneId = ref.lane === 'vanguard' ? 'sanctum' : 'vanguard';
+  return [...laneNeighbors(ref), { lane: otherLane, slot: ref.slot }];
 }
 
 /** The vanguard wall: while it stands, sanctum and Nexus cannot be attacked. */
@@ -391,6 +399,13 @@ function attack(
   }
 
   attacker.ready = false;
+  state.log.push({
+    id: state.nextLogId++,
+    kind: 'attack',
+    player: state.active,
+    from: attackerRef,
+    target,
+  });
 
   if (target.kind === 'nexus') {
     let damage = card.attack;
@@ -406,6 +421,9 @@ function attack(
   if (diceSuccess && card.dice?.effect.kind === 'aoe') {
     logText(state, `💥 ${card.name} spúšťa plošný útok do kríža!`);
     targets.push(...crossNeighbors(primary));
+  } else if (diceSuccess && card.dice?.effect.kind === 'cleave') {
+    logText(state, `🪓 ${card.name} rozťatím zasahuje aj susedov v línii!`);
+    targets.push(...laneNeighbors(primary));
   }
 
   for (const ref of targets) {
@@ -475,6 +493,15 @@ function activate(state: GameState, ref: SlotRef, rng: Rng): void {
       ally.armor += effect.armor;
     }
     logText(state, `✨ ${card.name} žehná predný voj: +${effect.heal} HP, +${effect.armor} brnenie pre Vanguard.`);
+  } else if (effect.kind === 'stormcall') {
+    logText(state, `⚡ ${card.name} zvoláva búrku — blesky bijú do všetkých nepriateľov!`);
+    const enemyId = opponentOf(state.active);
+    const enemy = state.players[enemyId];
+    for (const lane of ['vanguard', 'sanctum'] as const) {
+      for (let slot = 0; slot < enemy.lanes[lane].length; slot++) {
+        if (enemy.lanes[lane][slot]) damageUnit(state, enemyId, { lane, slot }, effect.damage);
+      }
+    }
   }
 }
 
