@@ -5,6 +5,7 @@
  * unreachable (local-only play stays unranked).
  */
 import { useCallback, useEffect, useState } from 'react';
+import { currentLang, errorText } from '../i18n';
 import { apiUrl } from './api';
 
 export interface Profile {
@@ -57,15 +58,15 @@ export function setActiveDeckId(deckId: string | null): void {
   else localStorage.removeItem(ACTIVE_DECK_KEY);
 }
 
-/** Authenticated POST to a /api/decks/... endpoint. */
+/** Authenticated POST to a /api/decks/... endpoint. Errors arrive as codes and are localized here. */
 export async function deckApi<T>(path: string, profile: Profile, body: object = {}): Promise<T> {
   const res = await fetch(apiUrl(path), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ playerId: profile.playerId, secret: profile.secret, ...body }),
   });
-  const data = (await res.json()) as T & { error?: string };
-  if (!res.ok) throw new Error(data.error ?? `Server odpovedal ${res.status}`);
+  const data = (await res.json()) as T & { error?: string; params?: Record<string, string | number> };
+  if (!res.ok) throw new Error(errorText(currentLang(), data.error ?? `HTTP ${res.status}`, data.params));
   return data;
 }
 

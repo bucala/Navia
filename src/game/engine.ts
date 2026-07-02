@@ -2,9 +2,11 @@
  * Core game engine — a pure reducer over GameState (GDD §2).
  *
  * `applyAction` never mutates its input; it clones, validates, applies and
- * returns the new state, throwing a (Slovak) Error for illegal moves. All
- * randomness comes from the injected Rng. In Fáza 2 this reducer moves
- * server-side into a Cloudflare Durable Object unchanged.
+ * returns the new state. Player-facing output is language-neutral: log
+ * entries are structured message keys (localized by the UI) and thrown
+ * errors are short codes (mapped to text client-side). All randomness
+ * comes from the injected Rng; in multiplayer this reducer runs inside
+ * the GameRoom Durable Object.
  */
 import {
   BURN_TICK_DAMAGE,
@@ -20,6 +22,7 @@ import type {
   Action,
   GameState,
   LaneId,
+  MsgKey,
   PlayerId,
   PlayerState,
   Rng,
@@ -76,7 +79,7 @@ export function createGame(
     nextLogId: 1,
   };
   startTurn(state);
-  logText(state, `Zápas začína — na ťahu je ${state.players.p1.name}.`);
+  logMsg(state, 'gameStart', { player: state.players.p1.name });
   return state;
 }
 
@@ -86,8 +89,8 @@ export function opponentOf(player: PlayerId): PlayerId {
   return player === 'p1' ? 'p2' : 'p1';
 }
 
-function logText(state: GameState, text: string): void {
-  state.log.push({ id: state.nextLogId++, kind: 'text', text });
+export function logMsg(state: GameState, msgKey: MsgKey, params: Record<string, string | number> = {}): void {
+  state.log.push({ id: state.nextLogId++, kind: 'msg', msgKey, params });
 }
 
 function unitAt(player: PlayerState, ref: SlotRef): UnitState | null {
@@ -113,10 +116,10 @@ export function effectiveThreshold(unit: UnitState): number {
 function damageNexus(state: GameState, player: PlayerId, amount: number): void {
   const p = state.players[player];
   p.nexusHp -= amount;
-  logText(state, `Nexus hráča ${p.name} utrpel ${amount} poškodenie (${Math.max(0, p.nexusHp)} HP).`);
+  logMsg(state, 'nexusDamage', { player: p.name, n: amount, hp: Math.max(0, p.nexusHp) });
   if (p.nexusHp <= 0 && !state.winner) {
     state.winner = opponentOf(player);
-    logText(state, `🏆 ${state.players[state.winner].name} víťazí — Nexus súpera padol!`);
+    logMsg(state, 'winner', { player: state.players[state.winner].name });
   }
 }
 
@@ -134,15 +137,13 @@ function damageUnit(
   const card = cardOf(unit);
   if (opts.pestControl && card.token) {
     unit.hp = 0;
-    logText(state, `Vyhubenie: ${card.name} je okamžite zničený (štíty ignorované).`);
+    logMsg(state, 'exterminate', { card: card.id });
   } else {
     const absorbed = Math.min(unit.armor, amount);
     unit.armor -= absorbed;
     unit.hp -= amount - absorbed;
-    logText(
-      state,
-      `${card.name} utrpel ${amount} poškodenie${absorbed ? ` (${absorbed} pohltilo brnenie)` : ''}.`,
-    );
+    if (absorbed > 0) logMsg(state, 'unitDamageAbsorbed', { card: card.id, n: amount, a: absorbed });
+    else logMsg(state, 'unitDamage', { card: card.id, n: amount });
   }
   cleanupIfDead(state, owner, ref);
 }
@@ -164,11 +165,8 @@ function applyAcid(state: GameState, owner: PlayerId, ref: SlotRef, stacks: numb
       bled++;
     }
   }
-  const parts = [
-    shredded ? `-${shredded} brnenie` : '',
-    bled ? `-${bled} HP` : '',
-  ].filter(Boolean);
-  logText(state, `Kyselina leptá ${card.name}: ${parts.join(', ')}.`);
+  if (shredded > 0) logMsg(state, 'acidArmor', { card: card.id, n: shredded });
+  if (bled > 0) logMsg(state, 'acidHp', { card: card.id, n: bled });
   cleanupIfDead(state, owner, ref);
 }
 
@@ -177,7 +175,7 @@ function cleanupIfDead(state: GameState, owner: PlayerId, ref: SlotRef): void {
   const unit = unitAt(player, ref);
   if (unit && unit.hp <= 0) {
     player.lanes[ref.lane][ref.slot] = null;
-    logText(state, `${cardOf(unit).name} umiera.`);
+    logMsg(state, 'unitDies', { card: unit.cardId });
   }
 }
 
@@ -201,11 +199,11 @@ function assertLegalTarget(state: GameState, attacker: PlayerId, target: TargetR
   const defender = state.players[opponentOf(attacker)];
   if (target.kind === 'nexus' || target.lane === 'sanctum') {
     if (laneHasUnits(defender, 'vanguard')) {
-      throw new Error('Predný voj súpera chráni zadnú líniu — najprv ho preraz.');
+      throw new Error('wallProtects');
     }
   }
   if (target.kind === 'unit' && !unitAt(defender, target)) {
-    throw new Error('Na cieľovom slote nie je žiadna jednotka.');
+    throw new Error('targetEmpty');
   }
 }
 
@@ -228,7 +226,7 @@ function startTurn(state: GameState): void {
       if (unit.burn > 0) {
         const dmg = unit.burn * BURN_TICK_DAMAGE;
         unit.hp -= dmg;
-        logText(state, `🔥 ${cardOf(unit).name} horí a stráca ${dmg} HP.`);
+        logMsg(state, 'burnTick', { card: unit.cardId, n: dmg });
         cleanupIfDead(state, player.id, { lane, slot });
       }
     });
@@ -238,8 +236,8 @@ function startTurn(state: GameState): void {
 // ── Actions ─────────────────────────────────────────────────────────────────
 
 export function applyAction(prev: GameState, action: Action, rng: Rng): GameState {
-  if (prev.winner) throw new Error('Zápas sa už skončil.');
-  if (action.player !== prev.active) throw new Error('Nie si na ťahu.');
+  if (prev.winner) throw new Error('gameOver');
+  if (action.player !== prev.active) throw new Error('notYourTurn');
   const state = structuredClone(prev);
 
   switch (action.type) {
@@ -247,9 +245,9 @@ export function applyAction(prev: GameState, action: Action, rng: Rng): GameStat
       playCard(state, action, rng);
       break;
     case 'ENTER_COMBAT':
-      if (state.phase !== 'main') throw new Error('Bojová fáza už prebieha.');
+      if (state.phase !== 'main') throw new Error('combatAlready');
       state.phase = 'combat';
-      logText(state, `${state.players[state.active].name} vstupuje do bojovej fázy.`);
+      logMsg(state, 'enterCombat', { player: state.players[state.active].name });
       break;
     case 'ATTACK':
       attack(state, action.attacker, action.target, action.useDice, rng);
@@ -264,7 +262,7 @@ export function applyAction(prev: GameState, action: Action, rng: Rng): GameStat
       state.active = opponentOf(state.active);
       state.turn++;
       startTurn(state);
-      logText(state, `Ťah ${state.turn} — na rade je ${state.players[state.active].name}.`);
+      logMsg(state, 'turnStart', { n: state.turn, player: state.players[state.active].name });
       break;
     }
   }
@@ -276,21 +274,19 @@ function playCard(
   action: Extract<Action, { type: 'PLAY_CARD' }>,
   rng: Rng,
 ): void {
-  if (state.phase !== 'main') throw new Error('Karty môžeš vykladať iba v hlavnej fáze.');
+  if (state.phase !== 'main') throw new Error('mainPhaseOnly');
   const player = state.players[state.active];
   const cardId = player.hand[action.handIndex];
-  if (!cardId) throw new Error('Neplatná karta v ruke.');
+  if (!cardId) throw new Error('invalidHandCard');
   const card = getCard(cardId);
-  if (card.cost > player.mana) throw new Error('Nedostatok many.');
+  if (card.cost > player.mana) throw new Error('noMana');
 
   if (card.type === 'unit') {
     const lane = action.lane;
     const slot = action.slot;
-    if (lane === undefined || slot === undefined) throw new Error('Vyber slot pre jednotku.');
-    if (lane !== card.lane) {
-      throw new Error(`${card.name} patrí do línie ${card.lane === 'vanguard' ? 'Vanguard' : 'Sanctum'}.`);
-    }
-    if (player.lanes[lane][slot]) throw new Error('Slot je obsadený.');
+    if (lane === undefined || slot === undefined) throw new Error('needSlot');
+    if (lane !== card.lane) throw new Error('wrongLane');
+    if (player.lanes[lane][slot]) throw new Error('slotTaken');
     player.mana -= card.cost;
     player.hand.splice(action.handIndex, 1);
     player.lanes[lane][slot] = {
@@ -303,7 +299,7 @@ function playCard(
       ready: false, // summoning sickness — acts from the owner's next turn
       movedThisTurn: false,
     };
-    logText(state, `${player.name} povoláva ${card.name} (${lane === 'vanguard' ? 'Vanguard' : 'Sanctum'}).`);
+    logMsg(state, 'summon', { player: player.name, card: card.id, lane });
   } else {
     castInfernalChain(state, action, card, rng);
   }
@@ -315,27 +311,28 @@ function castInfernalChain(
   card: ReturnType<typeof getCard>,
   rng: Rng,
 ): void {
-  if (card.type !== 'spell') throw new Error('Karta nie je kúzlo.');
+  if (card.type !== 'spell') throw new Error('notASpell');
   const target = action.target;
   if (!target || target.kind !== 'unit' || target.player === state.active) {
-    throw new Error('Vyber nepriateľskú jednotku ako cieľ kúzla.');
+    throw new Error('spellNeedsTarget');
   }
   const player = state.players[state.active];
   // Spells are not "direct attacks" (GDD §2.1) — they ignore the vanguard wall,
   // but the initial target must exist.
   if (!unitAt(state.players[target.player], target)) {
-    throw new Error('Na cieľovom slote nie je žiadna jednotka.');
+    throw new Error('targetEmpty');
   }
   player.mana -= card.cost;
   player.hand.splice(action.handIndex, 1);
-  logText(state, `${player.name} zosiela ${card.name}.`);
+  logMsg(state, 'spellCast', { player: player.name, card: card.id });
 
   const chain = rollChain(rng);
   state.log.push({
     id: state.nextLogId++,
     kind: 'dice',
     player: state.active,
-    label: card.name,
+    source: card.id,
+    ability: null,
     rolls: chain.rolls,
     kept: chain.rolls[chain.rolls.length - 1],
     threshold: 3,
@@ -356,10 +353,10 @@ function castInfernalChain(
     }
   }
   if (chain.outcome === 'overload') {
-    logText(state, `💥 Overload! Padla 6 — kúzlo sa vymyká spod kontroly.`);
+    logMsg(state, 'overload');
     damageNexus(state, state.active, card.spell.overloadSelfDamage);
   } else {
-    logText(state, `Reťaz sa bezpečne končí (${chain.successes}× úspech).`);
+    logMsg(state, 'chainEnd', { n: chain.successes });
   }
 }
 
@@ -370,26 +367,27 @@ function attack(
   useDice: boolean,
   rng: Rng,
 ): void {
-  if (state.phase !== 'combat') throw new Error('Útočiť môžeš iba v bojovej fáze.');
+  if (state.phase !== 'combat') throw new Error('combatPhaseOnly');
   const player = state.players[state.active];
   const attacker = unitAt(player, attackerRef);
-  if (!attacker) throw new Error('Na tomto slote nemáš jednotku.');
-  if (!attacker.ready) throw new Error('Jednotka už tento ťah konala.');
+  if (!attacker) throw new Error('noUnitHere');
+  if (!attacker.ready) throw new Error('unitExhausted');
   const card = cardOf(attacker);
   assertLegalTarget(state, state.active, target);
 
   // Dice rider (GDD §2.3): pay extra mana, roll, unlock the special effect on success.
   let diceSuccess = false;
   if (useDice) {
-    if (!card.dice || card.dice.activation) throw new Error('Táto jednotka nemá kockový útok.');
-    if (player.mana < card.dice.manaCost) throw new Error('Nedostatok many na hod kockou.');
+    if (!card.dice || card.dice.activation) throw new Error('noDiceAttack');
+    if (player.mana < card.dice.manaCost) throw new Error('noDiceMana');
     player.mana -= card.dice.manaCost;
     const roll = rollCheck(rng, effectiveThreshold(attacker), card.keywords.includes('advantage'));
     state.log.push({
       id: state.nextLogId++,
       kind: 'dice',
       player: state.active,
-      label: `${card.name}: ${card.dice.label}`,
+      source: card.id,
+      ability: card.dice.label,
       rolls: roll.rolls,
       kept: roll.kept,
       threshold: effectiveThreshold(attacker),
@@ -410,7 +408,7 @@ function attack(
   if (target.kind === 'nexus') {
     let damage = card.attack;
     if (diceSuccess && card.dice?.effect.kind === 'berserk') damage += card.dice.effect.bonusDamage;
-    logText(state, `${card.name} útočí na Nexus.`);
+    logMsg(state, 'attackNexus', { card: card.id });
     damageNexus(state, target.player, damage);
     return;
   }
@@ -419,10 +417,10 @@ function attack(
   const primary: SlotRef = { lane: target.lane, slot: target.slot };
   const targets: SlotRef[] = [primary];
   if (diceSuccess && card.dice?.effect.kind === 'aoe') {
-    logText(state, `💥 ${card.name} spúšťa plošný útok do kríža!`);
+    logMsg(state, 'aoeTrigger', { card: card.id });
     targets.push(...crossNeighbors(primary));
   } else if (diceSuccess && card.dice?.effect.kind === 'cleave') {
-    logText(state, `🪓 ${card.name} rozťatím zasahuje aj susedov v línii!`);
+    logMsg(state, 'cleaveTrigger', { card: card.id });
     targets.push(...laneNeighbors(primary));
   }
 
@@ -442,7 +440,7 @@ function attack(
     if (survivor) {
       if (card.keywords.includes('lavaTouch')) {
         survivor.burn += 1;
-        logText(state, `🔥 ${cardOf(survivor).name} horí (Láva ∞).`);
+        logMsg(state, 'burnApplied', { card: survivor.cardId });
       }
       if (card.keywords.includes('acidTouch')) {
         const extra = isPrimary && diceSuccess && card.dice?.effect.kind === 'acidBlast'
@@ -457,11 +455,11 @@ function attack(
 function activate(state: GameState, ref: SlotRef, rng: Rng): void {
   const player = state.players[state.active];
   const unit = unitAt(player, ref);
-  if (!unit) throw new Error('Na tomto slote nemáš jednotku.');
+  if (!unit) throw new Error('noUnitHere');
   const card = cardOf(unit);
-  if (!card.dice || !card.dice.activation) throw new Error('Táto jednotka nemá aktivovateľnú schopnosť.');
-  if (!unit.ready) throw new Error('Jednotka už tento ťah konala.');
-  if (player.mana < card.dice.manaCost) throw new Error('Nedostatok many.');
+  if (!card.dice || !card.dice.activation) throw new Error('noActivation');
+  if (!unit.ready) throw new Error('unitExhausted');
+  if (player.mana < card.dice.manaCost) throw new Error('noMana');
 
   player.mana -= card.dice.manaCost;
   unit.ready = false;
@@ -470,14 +468,15 @@ function activate(state: GameState, ref: SlotRef, rng: Rng): void {
     id: state.nextLogId++,
     kind: 'dice',
     player: state.active,
-    label: `${card.name}: ${card.dice.label}`,
+    source: card.id,
+    ability: card.dice.label,
     rolls: roll.rolls,
     kept: roll.kept,
     threshold: card.dice.threshold,
     success: roll.success,
   });
   if (!roll.success) {
-    logText(state, `Hod zlyhal — schopnosť sa neaktivuje.`);
+    logMsg(state, 'diceFail');
     return;
   }
 
@@ -485,16 +484,16 @@ function activate(state: GameState, ref: SlotRef, rng: Rng): void {
   if (effect.kind === 'fortify') {
     unit.hp = Math.min(unit.maxHp, unit.hp + effect.heal);
     unit.armor += effect.armor;
-    logText(state, `🛡️ ${card.name} sa opevňuje: +${effect.heal} HP, +${effect.armor} brnenie.`);
+    logMsg(state, 'fortify', { card: card.id, heal: effect.heal, armor: effect.armor });
   } else if (effect.kind === 'blessVanguard') {
     for (const ally of player.lanes.vanguard) {
       if (!ally) continue;
       ally.hp = Math.min(ally.maxHp, ally.hp + effect.heal);
       ally.armor += effect.armor;
     }
-    logText(state, `✨ ${card.name} žehná predný voj: +${effect.heal} HP, +${effect.armor} brnenie pre Vanguard.`);
+    logMsg(state, 'bless', { card: card.id, heal: effect.heal, armor: effect.armor });
   } else if (effect.kind === 'stormcall') {
-    logText(state, `⚡ ${card.name} zvoláva búrku — blesky bijú do všetkých nepriateľov!`);
+    logMsg(state, 'stormcall', { card: card.id });
     const enemyId = opponentOf(state.active);
     const enemy = state.players[enemyId];
     for (const lane of ['vanguard', 'sanctum'] as const) {
@@ -506,17 +505,17 @@ function activate(state: GameState, ref: SlotRef, rng: Rng): void {
 }
 
 function moveUnit(state: GameState, from: SlotRef, to: SlotRef): void {
-  if (state.phase !== 'combat') throw new Error('Presúvať sa dá iba v bojovej fáze.');
+  if (state.phase !== 'combat') throw new Error('moveCombatOnly');
   const player = state.players[state.active];
   const unit = unitAt(player, from);
-  if (!unit) throw new Error('Na tomto slote nemáš jednotku.');
+  if (!unit) throw new Error('noUnitHere');
   const card = cardOf(unit);
-  if (!card.keywords.includes('agile')) throw new Error('Táto jednotka sa nevie presúvať.');
-  if (unit.movedThisTurn) throw new Error('Jednotka sa tento ťah už presunula.');
-  if (to.lane === from.lane) throw new Error('Presun musí zmeniť líniu.');
-  if (player.lanes[to.lane][to.slot]) throw new Error('Cieľový slot je obsadený.');
+  if (!card.keywords.includes('agile')) throw new Error('cantMove');
+  if (unit.movedThisTurn) throw new Error('alreadyMoved');
+  if (to.lane === from.lane) throw new Error('mustChangeLane');
+  if (player.lanes[to.lane][to.slot]) throw new Error('targetSlotTaken');
   player.lanes[to.lane][to.slot] = unit;
   player.lanes[from.lane][from.slot] = null;
   unit.movedThisTurn = true;
-  logText(state, `🐒 ${card.name} preskakuje do línie ${to.lane === 'vanguard' ? 'Vanguard' : 'Sanctum'}.`);
+  logMsg(state, 'move', { card: card.id, lane: to.lane });
 }
