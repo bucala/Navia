@@ -4,16 +4,13 @@
  * Durable Object, pairs quick-play seekers via the Matchmaker DO,
  * and serves the built React app for everything else.
  */
+import { handleApi } from './api';
+import type { Env } from './env';
 import { generateRoomCode } from './roomCode';
 
 export { GameRoom } from './GameRoom';
 export { Matchmaker } from './Matchmaker';
-
-export interface Env {
-  GAME_ROOM: DurableObjectNamespace;
-  MATCHMAKER: DurableObjectNamespace;
-  ASSETS: Fetcher;
-}
+export type { Env } from './env';
 
 const ROOM_WS_PATTERN = /^\/api\/rooms\/([A-Za-z0-9]{4,12})\/ws$/;
 
@@ -24,6 +21,13 @@ export default {
     if (url.pathname === '/api/rooms' && request.method === 'POST') {
       return Response.json({ roomId: generateRoomCode() });
     }
+
+    // Profiles, decks, leaderboard (D1).
+    const apiResponse = await handleApi(request, env).catch((e) => {
+      console.error('api error', e);
+      return Response.json({ error: 'Server error' }, { status: 500 });
+    });
+    if (apiResponse) return apiResponse;
 
     if (url.pathname.startsWith('/api/matchmaking/')) {
       const stub = env.MATCHMAKER.get(env.MATCHMAKER.idFromName('global'));

@@ -40,8 +40,8 @@ function shuffle<T>(items: T[], rng: Rng): T[] {
   return arr;
 }
 
-function createPlayer(id: PlayerId, name: string, rng: Rng): PlayerState {
-  const deck = shuffle(STARTER_DECK, rng);
+function createPlayer(id: PlayerId, name: string, rng: Rng, deckList?: string[]): PlayerState {
+  const deck = shuffle(deckList ?? STARTER_DECK, rng);
   return {
     id,
     name,
@@ -57,11 +57,15 @@ function createPlayer(id: PlayerId, name: string, rng: Rng): PlayerState {
   };
 }
 
-export function createGame(rng: Rng, names: [string, string] = ['Hráč 1', 'Hráč 2']): GameState {
+export function createGame(
+  rng: Rng,
+  names: [string, string] = ['Hráč 1', 'Hráč 2'],
+  decks?: [string[] | undefined, string[] | undefined],
+): GameState {
   const state: GameState = {
     players: {
-      p1: createPlayer('p1', names[0], rng),
-      p2: createPlayer('p2', names[1], rng),
+      p1: createPlayer('p1', names[0], rng, decks?.[0]),
+      p2: createPlayer('p2', names[1], rng, decks?.[1]),
     },
     active: 'p1',
     turn: 1,

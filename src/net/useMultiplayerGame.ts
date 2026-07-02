@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Action, GameState, PlayerId } from '../game/types';
 import { wsUrl } from './api';
+import { activeDeckId, ensureProfile } from './profile';
 import type { ClientMessage, SeatsInfo, ServerMessage } from './protocol';
 
 export type ConnectionStatus = 'connecting' | 'waiting' | 'playing' | 'closed';
@@ -37,8 +38,19 @@ export function useMultiplayerGame(roomId: string, playerName: string, onError: 
     wsRef.current = ws;
     setStatus('connecting');
 
-    ws.onopen = () => {
-      const join: ClientMessage = { type: 'JOIN_ROOM', token: playerToken(roomId), name: playerName };
+    ws.onopen = async () => {
+      // Attach the D1 profile and active deck so the match can be ranked
+      // and use the player's own deck (both validated server-side).
+      const profile = await ensureProfile(playerName);
+      if (wsRef.current !== ws || ws.readyState !== WebSocket.OPEN) return;
+      const join: ClientMessage = {
+        type: 'JOIN_ROOM',
+        token: playerToken(roomId),
+        name: playerName,
+        playerId: profile?.playerId,
+        secret: profile?.secret,
+        deckId: activeDeckId() ?? undefined,
+      };
       ws.send(JSON.stringify(join));
     };
     ws.onmessage = (event) => {

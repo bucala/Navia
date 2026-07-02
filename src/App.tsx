@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useProfile } from './net/profile';
 import { Codex } from './ui/Codex';
+import { DeckBuilder } from './ui/DeckBuilder';
+import { Leaderboard } from './ui/Leaderboard';
 import { LocalGame } from './ui/LocalGame';
 import { OnlineGame } from './ui/OnlineGame';
 import { isMuted, setMuted } from './ui/sfx';
 
-type Screen = 'menu' | 'local' | 'online' | 'codex';
+type Screen = 'menu' | 'local' | 'online' | 'codex' | 'decks' | 'ranking';
 
 export default function App() {
   // Opening an invite link (?room=XYZ) jumps straight into the online flow.
@@ -12,6 +15,7 @@ export default function App() {
     new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
   );
   const [muted, setMutedState] = useState(isMuted);
+  const { profile } = useProfile();
   const toggleMute = () => {
     setMuted(!muted);
     setMutedState(!muted);
@@ -24,6 +28,13 @@ export default function App() {
           ⚄ Pantheon: Dice of Destiny
         </button>
         <div className="flex items-center gap-2">
+          {profile && (
+            <span className="hidden text-xs text-slate-400 sm:inline">
+              🧙 {profile.name} · <span className="font-bold text-amber-200">{profile.elo}</span> ELO ·{' '}
+              <span className="text-emerald-400">{profile.wins}V</span>/
+              <span className="text-red-400">{profile.losses}P</span>
+            </span>
+          )}
           <button
             onClick={toggleMute}
             title={muted ? 'Zapnúť zvuk' : 'Vypnúť zvuk'}
@@ -63,6 +74,18 @@ export default function App() {
             🌐 Online hra
           </button>
           <button
+            onClick={() => setScreen('decks')}
+            className="w-64 rounded-xl bg-emerald-900 px-6 py-3 font-semibold text-emerald-50 shadow-lg hover:bg-emerald-800"
+          >
+            🃏 Balíčky
+          </button>
+          <button
+            onClick={() => setScreen('ranking')}
+            className="w-64 rounded-xl bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-700"
+          >
+            🏆 Rebríček
+          </button>
+          <button
             onClick={() => setScreen('codex')}
             className="w-64 rounded-xl bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-700"
           >
@@ -74,6 +97,8 @@ export default function App() {
       {screen === 'local' && <LocalGame key="local" />}
       {screen === 'online' && <OnlineGame onExit={() => setScreen('menu')} />}
       {screen === 'codex' && <Codex onBack={() => setScreen('menu')} />}
+      {screen === 'decks' && <DeckBuilder onBack={() => setScreen('menu')} />}
+      {screen === 'ranking' && <Leaderboard onBack={() => setScreen('menu')} />}
     </div>
   );
 }

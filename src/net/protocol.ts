@@ -6,8 +6,13 @@
 import type { Action, GameState, PlayerId } from '../game/types';
 
 export type ClientMessage =
-  /** Join (or rejoin) a room; the token identifies the player across reconnects. */
-  | { type: 'JOIN_ROOM'; token: string; name: string }
+  /**
+   * Join (or rejoin) a room; the token identifies the player across
+   * reconnects. Optional playerId+secret tie the seat to a D1 profile
+   * (ELO is recorded when both seats have one); optional deckId picks
+   * one of the player's saved decks instead of the starter deck.
+   */
+  | { type: 'JOIN_ROOM'; token: string; name: string; playerId?: string; secret?: string; deckId?: string }
   /** Any game action — PLAY_CARD, ATTACK (with the dice flag), END_TURN, … */
   | { type: 'ACTION'; action: Action };
 

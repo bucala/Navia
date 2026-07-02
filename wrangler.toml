@@ -27,5 +27,13 @@ new_sqlite_classes = ["GameRoom"]
 tag = "v2"
 new_sqlite_classes = ["Matchmaker"]
 
+# Účty, ELO, balíčky (GDD §5.2). Lokálne funguje hneď (wrangler dev);
+# pred nasadením spusti `wrangler d1 create pantheon-db` a vlož database_id.
+[[d1_databases]]
+binding = "DB"
+database_name = "pantheon-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
 [observability]
 enabled = true
