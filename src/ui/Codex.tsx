@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getCard } from '../game/cards';
 import { LORE } from '../game/lore';
 import type { Faction, Rarity } from '../game/types';
+import { CardArt } from './CardArt';
 
 const FACTION_LABEL: Record<Faction, string> = {
   lava: 'Lávový dvor',
@@ -24,11 +25,9 @@ const RARITY_LABEL: Record<Rarity, string> = {
 /** Sieň Božstiev — browse the pantheon's characters and their stories. */
 export function Codex({ onBack }: { onBack: () => void }) {
   const [index, setIndex] = useState(0);
-  const [brokenArt, setBrokenArt] = useState<Record<string, boolean>>({});
 
   const entry = LORE[index];
   const card = getCard(entry.cardId);
-  const showArt = !brokenArt[entry.cardId];
 
   const step = (delta: number) => setIndex((i) => (i + delta + LORE.length) % LORE.length);
 
@@ -71,16 +70,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-6 md:flex-row">
             {/* Art */}
             <div className="mx-auto flex h-80 w-64 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-amber-900/60 bg-gradient-to-b from-slate-800 to-slate-950 shadow-2xl">
-              {showArt ? (
-                <img
-                  src={entry.art}
-                  alt={card.name}
-                  className="h-full w-full object-cover"
-                  onError={() => setBrokenArt((prev) => ({ ...prev, [entry.cardId]: true }))}
-                />
-              ) : (
-                <span className="text-8xl drop-shadow-lg">{card.glyph}</span>
-              )}
+              <CardArt cardId={entry.cardId} className="h-full w-full" glyphClass="text-8xl" />
             </div>
 
             {/* Facts */}

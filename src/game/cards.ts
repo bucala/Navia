@@ -38,6 +38,7 @@ export const MEGADRAK = define<UnitCardDef>({
   },
   text: 'Láva ∞: útoky zapaľujú. Kyselina ∞: útoky trvalo znižujú brnenie. Vyhubenie: tokeny zabíja okamžite. Kocka 3+ (2 many): útok zasiahne aj susedné sloty do kríža.',
   glyph: '🐉',
+  art: '/art/megadrak.jpg',
 });
 
 export const PEKELNE_ZAKLINADLO = define<CardDef>({
@@ -55,6 +56,7 @@ export const PEKELNE_ZAKLINADLO = define<CardDef>({
   },
   text: 'Hádž kockou: pri 3–5 udelí cieľu 2 poškodenie, vráti ti 1 HP a hádžeš znova. Pri 1–2 sa reťaz ukončí bez postihu. Pri 6 reťaz končí a tvoj Nexus utrpí 3 poškodenie (Overload).',
   glyph: '🔥',
+  art: '/art/pekelne_zaklinadlo.jpg',
 });
 
 export const LAVOVY_SKRIATOK = define<UnitCardDef>({
@@ -72,6 +74,7 @@ export const LAVOVY_SKRIATOK = define<UnitCardDef>({
   keywords: ['lavaTouch'],
   text: 'Token. Láva ∞: útoky zapaľujú cieľ.',
   glyph: '👺',
+  art: '/art/lavovy_skriatok.jpg',
 });
 
 // ── Frakcia: Prírodný a Zemský Pakt (Obrana a Stabilita) ────────────────────
@@ -97,6 +100,7 @@ export const GORILA = define<UnitCardDef>({
   },
   text: 'Výhoda: pri hodoch hádže 2× D6 a berie lepší výsledok. Kocka 5+ (1 mana): vylieči si 3 HP a získa 3 brnenie.',
   glyph: '🦍',
+  art: '/art/gorila.jpg',
 });
 
 export const KAMENNY_STRAZCA = define<UnitCardDef>({
@@ -113,6 +117,7 @@ export const KAMENNY_STRAZCA = define<UnitCardDef>({
   keywords: [],
   text: 'Pevný obranca predného voja.',
   glyph: '🗿',
+  art: '/art/kamenny_strazca.jpg',
 });
 
 export const ZLATY_GRYF = define<UnitCardDef>({
@@ -136,6 +141,7 @@ export const ZLATY_GRYF = define<UnitCardDef>({
   },
   text: 'Kocka 3+ (2 many): každá tvoja jednotka vo Vanguarde si vylieči 2 HP a získa 1 brnenie.',
   glyph: '🦅',
+  art: '/art/zlaty_gryf.jpg',
 });
 
 // ── Frakcia: Nebeský Zbor (Mobilita a Podfuky) ──────────────────────────────
@@ -161,6 +167,7 @@ export const PAPAGAJ = define<UnitCardDef>({
   },
   text: 'Letec. Kyselina ∞: útoky trvalo znižujú brnenie. Stabilita — Kocka 1+ (1 mana): spŕška 2 kyseliny navyše, hod prakticky nemôže zlyhať.',
   glyph: '🦜',
+  art: '/art/papagaj.jpg',
 });
 
 export const BOJOVY_KOHUT = define<UnitCardDef>({
@@ -184,6 +191,7 @@ export const BOJOVY_KOHUT = define<UnitCardDef>({
   },
   text: 'Berserker — Kocka (1 mana): +4 poškodenie. Požiadavka klesá so zraneniami: plné HP 5+, každé chýbajúce HP ju znižuje o 1 (najmenej 2+).',
   glyph: '🐓',
+  art: '/art/bojovy_kohut.jpg',
 });
 
 export const OPICI_KRAL = define<UnitCardDef>({
@@ -200,6 +208,7 @@ export const OPICI_KRAL = define<UnitCardDef>({
   keywords: ['agile'],
   text: 'Agilná: raz za ťah sa počas bojovej fázy môže presunúť medzi Vanguardom a Sanctom (uhýba sa AoE útokom).',
   glyph: '🐒',
+  art: '/art/wukong.jpg',
 });
 
 export const MEDVEBOR = define<UnitCardDef>({
@@ -223,6 +232,7 @@ export const MEDVEBOR = define<UnitCardDef>({
   },
   text: 'Kocka 4+ (2 many): sekera zasiahne aj jednotky naľavo a napravo od cieľa v tej istej línii.',
   glyph: '🐻',
+  art: '/art/medvebor.jpg',
 });
 
 export const MAHISA = define<UnitCardDef>({
@@ -246,6 +256,7 @@ export const MAHISA = define<UnitCardDef>({
   },
   text: 'Kocka 4+ (1 mana): rozbehnutý býk udelí cieľu +3 poškodenie navyše.',
   glyph: '🐃',
+  art: '/art/mahisa.jpg',
 });
 
 export const CHEPRI = define<UnitCardDef>({
@@ -269,6 +280,7 @@ export const CHEPRI = define<UnitCardDef>({
   },
   text: 'Letec. Kocka 3+ (1 mana): chitínový pancier sa obnoví — vylieči si 2 HP a získa 2 brnenie.',
   glyph: '🪲',
+  art: '/art/chepri.jpg',
 });
 
 export const RYSOSLAV = define<UnitCardDef>({
@@ -292,6 +304,7 @@ export const RYSOSLAV = define<UnitCardDef>({
   },
   text: 'Kocka 4+ (2 many): zvolá búrku — každá nepriateľská jednotka na ploche utrpí 1 poškodenie.',
   glyph: '🐆',
+  art: '/art/rysoslav.jpg',
 });
 
 export const NEBESKY_VRABEC = define<UnitCardDef>({
@@ -308,6 +321,7 @@ export const NEBESKY_VRABEC = define<UnitCardDef>({
   keywords: ['flying'],
   text: 'Letec. Rýchly prieskumník Nebeského zboru.',
   glyph: '🐦',
+  art: '/art/nebesky_vrabec.jpg',
 });
 
 /** Shared Fáza 1 test deck — both Pass & Play players run the same list. */

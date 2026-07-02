@@ -25,9 +25,14 @@ export function LogPanel({ state }: { state: GameState }) {
         Priebeh zápasu
       </h2>
       <div className="flex-1 space-y-1 overflow-y-auto p-2 text-[11px] leading-snug text-slate-300">
-        {state.log.map((event) =>
-          event.kind === 'dice' ? <DiceLine key={event.id} event={event} /> : <p key={event.id}>{event.text}</p>,
-        )}
+        {state.log.map((event) => {
+          if (event.kind === 'attack') return null; // visual-only event
+          return event.kind === 'dice' ? (
+            <DiceLine key={event.id} event={event} />
+          ) : (
+            <p key={event.id}>{event.text}</p>
+          );
+        })}
         <div ref={bottomRef} />
       </div>
     </aside>

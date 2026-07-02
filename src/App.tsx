@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Codex } from './ui/Codex';
 import { LocalGame } from './ui/LocalGame';
 import { OnlineGame } from './ui/OnlineGame';
+import { isMuted, setMuted } from './ui/sfx';
 
 type Screen = 'menu' | 'local' | 'online' | 'codex';
 
@@ -10,6 +11,11 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(() =>
     new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
   );
+  const [muted, setMutedState] = useState(isMuted);
+  const toggleMute = () => {
+    setMuted(!muted);
+    setMutedState(!muted);
+  };
 
   return (
     <div className="flex h-screen flex-col text-slate-100">
@@ -17,14 +23,23 @@ export default function App() {
         <button onClick={() => setScreen('menu')} className="text-sm font-bold tracking-wide text-amber-200">
           ⚄ Pantheon: Dice of Destiny
         </button>
-        {screen !== 'menu' && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setScreen('menu')}
+            onClick={toggleMute}
+            title={muted ? 'Zapnúť zvuk' : 'Vypnúť zvuk'}
             className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
           >
-            ← Menu
+            {muted ? '🔇' : '🔊'}
           </button>
-        )}
+          {screen !== 'menu' && (
+            <button
+              onClick={() => setScreen('menu')}
+              className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
+            >
+              ← Menu
+            </button>
+          )}
+        </div>
       </header>
 
       {screen === 'menu' && (

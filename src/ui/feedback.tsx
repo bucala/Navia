@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameState, LogEvent } from '../game/types';
 import { DiceOverlay } from './DiceOverlay';
+import { sfxDiceRoll, sfxFail, sfxSuccess } from './sfx';
 
 export type DiceEvent = Extract<LogEvent, { kind: 'dice' }>;
 
@@ -27,8 +28,11 @@ export function useDiceFeedback(state: GameState | null) {
     if (fresh.length > 0) {
       const shown = fresh[fresh.length - 1];
       setDiceEvent(shown);
+      sfxDiceRoll();
+      const settle = 1150 + (shown.rolls.length - 1) * 160;
+      setTimeout(() => (shown.success ? sfxSuccess() : sfxFail()), settle);
       clearTimeout(timer.current);
-      timer.current = setTimeout(() => setDiceEvent(null), shown.rolls.length > 2 ? 2600 : 1800);
+      timer.current = setTimeout(() => setDiceEvent(null), Math.min(4200, settle + 1100));
     }
   }, [state]);
 

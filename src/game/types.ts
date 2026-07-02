@@ -79,8 +79,10 @@ export interface UnitCardDef {
   dice?: DiceAbility;
   /** Rules text (Slovak). */
   text: string;
-  /** Emoji stand-in until the R2-hosted art lands in Fáza 3. */
+  /** Emoji fallback shown while the art file is missing. */
   glyph: string;
+  /** Art path under public/ (Fáza 3; R2-hosted later). */
+  art: string;
 }
 
 /** Pekelné zaklínadlo — push-your-luck chain (GDD §4). */
@@ -102,6 +104,7 @@ export interface SpellCardDef {
   };
   text: string;
   glyph: string;
+  art: string;
 }
 
 export type CardDef = UnitCardDef | SpellCardDef;
@@ -143,7 +146,9 @@ export type LogEvent =
       kept: number;
       threshold: number;
       success: boolean;
-    };
+    }
+  /** Structured combat event so both clients can animate the strike. */
+  | { id: number; kind: 'attack'; player: PlayerId; from: SlotRef; target: TargetRef };
 
 export interface GameState {
   players: Record<PlayerId, PlayerState>;

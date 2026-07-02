@@ -395,6 +395,13 @@ function attack(
   }
 
   attacker.ready = false;
+  state.log.push({
+    id: state.nextLogId++,
+    kind: 'attack',
+    player: state.active,
+    from: attackerRef,
+    target,
+  });
 
   if (target.kind === 'nexus') {
     let damage = card.attack;

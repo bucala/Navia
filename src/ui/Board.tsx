@@ -4,6 +4,7 @@ import { effectiveThreshold, opponentOf } from '../game/engine';
 import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
+import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
 
 type Selection =
   | { mode: 'idle' }
@@ -27,6 +28,19 @@ function sameSlot(a: SlotRef, b: SlotRef): boolean {
   return a.lane === b.lane && a.slot === b.slot;
 }
 
+function NexusPopup({ popup }: { popup?: Popup }) {
+  if (!popup) return null;
+  return (
+    <span
+      className={`animate-popup pointer-events-none absolute inset-x-0 -top-2 z-10 text-center text-xl font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
+        popup.kind === 'damage' ? 'text-red-400' : 'text-emerald-300'
+      }`}
+    >
+      {popup.kind === 'damage' ? `−${popup.amount}` : `+${popup.amount}`}
+    </span>
+  );
+}
+
 function ManaBar({ mana, maxMana }: { mana: number; maxMana: number }) {
   return (
     <div className="flex items-center gap-0.5" title={`Mana ${mana}/${maxMana}`}>
@@ -46,6 +60,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const me = state.players[viewpoint];
   const foe = state.players[opponentOf(viewpoint)];
   const foeHasVanguard = foe.lanes.vanguard.some((u) => u !== null);
+  const { fx, nexusFx } = useCombatFx(state);
 
   // Drop stale selections when the turn or seat changes.
   useEffect(() => setSelection({ mode: 'idle' }), [state.active, viewpoint]);
@@ -169,6 +184,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
               key={slot}
               unit={unit}
               highlight={highlight}
+              enemySide={owner === 'foe'}
+              fx={fx[slotFxKey(player.id, lane, slot)]}
               onClick={() => (owner === 'me' ? clickMySlot(lane, slot) : clickFoeSlot(lane, slot))}
             />
           );
@@ -194,7 +211,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         <ManaBar mana={foe.mana} maxMana={foe.maxMana} />
         <button
           onClick={clickFoeNexus}
-          className={`rounded-lg border px-3 py-1 text-sm font-bold ${
+          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${
             nexusTargetable
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
               : 'border-slate-700 bg-slate-900 text-red-300'
@@ -202,11 +219,12 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           title="Nexus súpera"
         >
           ❤️ {foe.nexusHp}
+          <NexusPopup popup={nexusFx[foe.id]} />
         </button>
       </div>
 
       {/* Arena */}
-      <div className="flex flex-1 flex-col justify-center">
+      <div className="arena-bg flex flex-1 flex-col justify-center">
         {renderLane('foe', 'sanctum')}
         {renderLane('foe', 'vanguard')}
 
@@ -283,8 +301,9 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         <div className="mb-2 flex items-center justify-between">
           <span className="font-semibold text-slate-200">{me.name}</span>
           <ManaBar mana={me.mana} maxMana={me.maxMana} />
-          <span className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
+          <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
             ❤️ {me.nexusHp}
+            <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
         <div className="flex justify-center gap-2 overflow-x-auto pb-1">

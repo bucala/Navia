@@ -1,5 +1,6 @@
 import { getCard } from '../game/cards';
 import type { Faction, Rarity } from '../game/types';
+import { CardArt } from './CardArt';
 
 const FACTION_BG: Record<Faction, string> = {
   lava: 'from-red-950 to-orange-900',
@@ -34,7 +35,7 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
       <span className="absolute -left-1.5 -top-1.5 flex h-7 w-7 rotate-45 items-center justify-center rounded-sm border border-cyan-200 bg-gradient-to-br from-cyan-400 to-blue-700 shadow">
         <span className="-rotate-45 text-sm font-bold text-white">{card.cost}</span>
       </span>
-      <span className="mt-2 text-center text-4xl drop-shadow">{card.glyph}</span>
+      <CardArt cardId={cardId} className="mt-2 h-14 w-full rounded-md" glyphClass="text-4xl" />
       <span className="mt-1 truncate text-center text-[11px] font-semibold text-amber-100">{card.name}</span>
       <span className="mt-auto line-clamp-4 text-[8px] leading-tight text-slate-200">{card.text}</span>
       <div className="mt-1 flex items-center justify-between text-[11px] font-bold">
