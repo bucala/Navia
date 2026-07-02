@@ -1,8 +1,11 @@
 # Art kariet
 
-Obrázky vo vysokom rozlíšení sem zatiaľ nie je možné nahrať priamo z chatu —
-ulož ich sem pod týmito názvami a hra (karty v ruke, jednotky na ploche aj
-Sieň Božstiev) ich zobrazí automaticky. Dovtedy sa používa emoji glyph karty.
+V tomto priečinku sú **vygenerované placeholder porträty** („astrálne erby",
+896×1152 JPG) pre všetkých 16 kariet — hra ich zobrazuje na kartách v ruke,
+na jednotkách aj v Sieni Božstiev. Finálne AI obrázky vo vysokom rozlíšení
+sa z chatu nedajú extrahovať ako súbory: **prepíš súbory nižšie svojimi
+obrázkami s rovnakými názvami** a všetko naskočí automaticky (odporúčaný
+pomer na výšku, ideálne ~896×1152).
 
 ## Dodané party (postavy z chatu)
 
