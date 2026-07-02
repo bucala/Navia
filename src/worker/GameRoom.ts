@@ -55,7 +55,7 @@ export class GameRoom {
   async webSocketMessage(ws: WebSocket, raw: ArrayBuffer | string): Promise<void> {
     const msg = typeof raw === 'string' ? parseClientMessage(raw) : null;
     if (!msg) {
-      this.send(ws, { type: 'ERROR', message: 'Neplatná správa.' });
+      this.send(ws, { type: 'ERROR', message: 'invalidMessage' });
       return;
     }
     if (msg.type === 'JOIN_ROOM') {
@@ -76,7 +76,7 @@ export class GameRoom {
       const taken = new Set(Object.values(meta.tokens));
       const free = (['p1', 'p2'] as const).find((s) => !taken.has(s));
       if (!free) {
-        this.send(ws, { type: 'ERROR', message: 'Miestnosť je už plná.' });
+        this.send(ws, { type: 'ERROR', message: 'roomFull' });
         ws.close(1008, 'room full');
         return;
       }
@@ -126,17 +126,17 @@ export class GameRoom {
   private async handleAction(ws: WebSocket, action: Action): Promise<void> {
     const attachment = ws.deserializeAttachment() as Attachment | null;
     if (!attachment) {
-      this.send(ws, { type: 'ERROR', message: 'Najprv sa pripoj do miestnosti.' });
+      this.send(ws, { type: 'ERROR', message: 'joinFirst' });
       return;
     }
     const game = await this.loadGame();
     if (!game) {
-      this.send(ws, { type: 'ERROR', message: 'Hra ešte nezačala — čaká sa na druhého hráča.' });
+      this.send(ws, { type: 'ERROR', message: 'gameNotStarted' });
       return;
     }
     // Seat spoofing guard: a client may only act as the seat it was assigned.
     if (action.player !== attachment.seat) {
-      this.send(ws, { type: 'ERROR', message: 'Nemôžeš hrať za súpera.' });
+      this.send(ws, { type: 'ERROR', message: 'notYourSeat' });
       return;
     }
     try {
@@ -146,7 +146,7 @@ export class GameRoom {
       await this.ctx.storage.put('game', next);
       this.broadcast({ type: 'ROOM_STATE', state: next, seats: meta.names });
     } catch (e) {
-      this.send(ws, { type: 'ERROR', message: e instanceof Error ? e.message : 'Neplatná akcia.' });
+      this.send(ws, { type: 'ERROR', message: e instanceof Error ? e.message : 'invalidAction' });
     }
   }
 
@@ -179,8 +179,9 @@ export class GameRoom {
       ]);
       state.log.push({
         id: state.nextLogId++,
-        kind: 'text',
-        text: `📈 ELO: ${w.name} +${delta} (${w.elo + delta}) · ${l.name} −${delta} (${Math.max(0, l.elo - delta)})`,
+        kind: 'msg',
+        msgKey: 'eloUpdate',
+        params: { winner: w.name, loser: l.name, delta, welo: w.elo + delta, lelo: Math.max(0, l.elo - delta) },
       });
     } catch {
       // D1 unavailable — the match result stays unranked but the game is unaffected.

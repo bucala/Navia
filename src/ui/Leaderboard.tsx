@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLang } from '../i18n';
 import { apiUrl } from '../net/api';
 
 interface Entry {
@@ -10,6 +11,7 @@ interface Entry {
 
 /** 🏆 Rebríček — top 10 by ELO (players with at least one ranked match). */
 export function Leaderboard({ onBack }: { onBack: () => void }) {
+  const { t } = useLang();
   const [players, setPlayers] = useState<Entry[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -22,19 +24,19 @@ export function Leaderboard({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="mx-auto w-full max-w-lg flex-1 overflow-y-auto p-6">
-      <h2 className="text-2xl font-bold text-amber-100">🏆 Rebríček</h2>
-      {error && <p className="mt-4 text-sm text-slate-400">Rebríček sa nepodarilo načítať — vyžaduje spustený server.</p>}
+      <h2 className="text-2xl font-bold text-amber-100">{t('rank_title')}</h2>
+      {error && <p className="mt-4 text-sm text-slate-400">{t('rank_error')}</p>}
       {players && players.length === 0 && (
-        <p className="mt-4 text-sm text-slate-400">Zatiaľ sa nehral žiadny hodnotený zápas.</p>
+        <p className="mt-4 text-sm text-slate-400">{t('rank_empty')}</p>
       )}
       {players && players.length > 0 && (
         <table className="mt-4 w-full text-sm">
           <thead>
             <tr className="border-b border-slate-700 text-left text-[11px] uppercase tracking-widest text-slate-500">
               <th className="py-2 pr-2">#</th>
-              <th className="py-2">Hráč</th>
+              <th className="py-2">{t('rank_player')}</th>
               <th className="py-2 text-right">ELO</th>
-              <th className="py-2 text-right">V / P</th>
+              <th className="py-2 text-right">{t('rank_wl')}</th>
             </tr>
           </thead>
           <tbody>
@@ -52,7 +54,7 @@ export function Leaderboard({ onBack }: { onBack: () => void }) {
         </table>
       )}
       <button onClick={onBack} className="mt-6 text-xs text-slate-400 hover:text-slate-200">
-        ← Späť do menu
+        {t('back_menu')}
       </button>
     </div>
   );

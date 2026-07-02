@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameState, LogEvent } from '../game/types';
+import { useLang } from '../i18n';
 import { DiceOverlay } from './DiceOverlay';
 import { sfxDiceRoll, sfxFail, sfxSuccess } from './sfx';
 
@@ -63,21 +64,23 @@ export function GameOverlays({ diceEvent }: { diceEvent: DiceEvent | null }) {
   return diceEvent ? <DiceOverlay event={diceEvent} /> : null;
 }
 
-export function WinnerOverlay({ name, onNewGame, newGameLabel = 'Nová hra' }: {
+export function WinnerOverlay({ name, onNewGame, backToMenu = false }: {
   name: string;
   onNewGame: () => void;
-  newGameLabel?: string;
+  /** True when the button leads back to the menu instead of a rematch. */
+  backToMenu?: boolean;
 }) {
+  const { t } = useLang();
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80">
       <p className="text-6xl">🏆</p>
-      <p className="mt-4 text-2xl font-bold text-amber-200">{name} víťazí!</p>
-      <p className="mt-1 text-sm text-slate-400">Nexus súpera padol.</p>
+      <p className="mt-4 text-2xl font-bold text-amber-200">{t('winner_title', { player: name })}</p>
+      <p className="mt-1 text-sm text-slate-400">{t('winner_sub')}</p>
       <button
         onClick={onNewGame}
         className="mt-6 rounded-lg bg-amber-700 px-6 py-2 font-semibold text-amber-50 hover:bg-amber-600"
       >
-        {newGameLabel}
+        {t(backToMenu ? 'back_to_menu_win' : 'new_game')}
       </button>
     </div>
   );

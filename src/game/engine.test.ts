@@ -86,11 +86,11 @@ describe('playing cards', () => {
     g.players.p1.mana = 10;
     expect(() =>
       applyAction(g, { type: 'PLAY_CARD', player: 'p1', handIndex: 0, lane: 'vanguard', slot: 0 }, Math.random),
-    ).toThrow(/Sanctum/);
+    ).toThrow('wrongLane');
     g.players.p1.mana = 1;
     expect(() =>
       applyAction(g, { type: 'PLAY_CARD', player: 'p1', handIndex: 1, lane: 'vanguard', slot: 0 }, Math.random),
-    ).toThrow(/many/);
+    ).toThrow('noMana');
   });
 });
 
@@ -107,14 +107,14 @@ describe('combat and the vanguard wall', () => {
         { type: 'ATTACK', player: 'p1', attacker: { lane: 'vanguard', slot: 0 }, target: { kind: 'nexus', player: 'p2' }, useDice: false },
         Math.random,
       ),
-    ).toThrow(/Predný voj/);
+    ).toThrow('wallProtects');
     expect(() =>
       applyAction(
         g,
         { type: 'ATTACK', player: 'p1', attacker: { lane: 'vanguard', slot: 0 }, target: { kind: 'unit', player: 'p2', lane: 'sanctum', slot: 0 }, useDice: false },
         Math.random,
       ),
-    ).toThrow(/Predný voj/);
+    ).toThrow('wallProtects');
   });
 
   it('armor absorbs damage before HP', () => {
@@ -144,7 +144,7 @@ describe('combat and the vanguard wall', () => {
     );
     expect(g.players.p2.nexusHp).toBe(0);
     expect(g.winner).toBe('p1');
-    expect(() => applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random)).toThrow(/skončil/);
+    expect(() => applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random)).toThrow('gameOver');
   });
 });
 
@@ -220,7 +220,7 @@ describe('keyword mechanics', () => {
         { type: 'MOVE_UNIT', player: 'p1', from: { lane: 'sanctum', slot: 2 }, to: { lane: 'vanguard', slot: 0 } },
         Math.random,
       ),
-    ).toThrow(/už presunula/);
+    ).toThrow('alreadyMoved');
   });
 });
 

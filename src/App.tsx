@@ -1,15 +1,50 @@
 import { useState } from 'react';
+import { useLang } from './i18n';
+import type { StringKey } from './i18n/strings';
 import { useProfile } from './net/profile';
+import { AiGame } from './ui/AiGame';
 import { Codex } from './ui/Codex';
 import { DeckBuilder } from './ui/DeckBuilder';
 import { Leaderboard } from './ui/Leaderboard';
 import { LocalGame } from './ui/LocalGame';
 import { OnlineGame } from './ui/OnlineGame';
+import { Settings } from './ui/Settings';
 import { isMuted, setMuted } from './ui/sfx';
 
-type Screen = 'menu' | 'local' | 'online' | 'codex' | 'decks' | 'ranking';
+type Screen = 'menu' | 'multi' | 'single' | 'local' | 'online' | 'codex' | 'decks' | 'ranking' | 'settings';
+
+interface MenuItem {
+  icon: string;
+  label: StringKey;
+  desc: StringKey;
+  screen: Screen;
+}
+
+const MAIN_MENU: MenuItem[] = [
+  { icon: '⚔️', label: 'menu_single', desc: 'menu_single_desc', screen: 'single' },
+  { icon: '🌐', label: 'menu_multi', desc: 'menu_multi_desc', screen: 'multi' },
+  { icon: '🃏', label: 'menu_decks', desc: 'menu_decks_desc', screen: 'decks' },
+  { icon: '🏛️', label: 'menu_codex', desc: 'menu_codex_desc', screen: 'codex' },
+  { icon: '🏆', label: 'menu_ranking', desc: 'menu_ranking_desc', screen: 'ranking' },
+  { icon: '⚙️', label: 'menu_settings', desc: 'menu_settings_desc', screen: 'settings' },
+];
+
+function MenuButton({ item, onClick }: { item: MenuItem; onClick: () => void }) {
+  const { t } = useLang();
+  return (
+    <button onClick={onClick} className="menu-button group flex w-80 items-center gap-4 px-5 py-3 text-left">
+      <span className="text-3xl drop-shadow-lg transition-transform group-hover:scale-110">{item.icon}</span>
+      <span className="min-w-0">
+        <span className="block font-semibold tracking-wide text-amber-100">{t(item.label)}</span>
+        <span className="block truncate text-xs text-slate-400">{t(item.desc)}</span>
+      </span>
+      <span className="ml-auto text-amber-700 transition-transform group-hover:translate-x-1">❯</span>
+    </button>
+  );
+}
 
 export default function App() {
+  const { t } = useLang();
   // Opening an invite link (?room=XYZ) jumps straight into the online flow.
   const [screen, setScreen] = useState<Screen>(() =>
     new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
@@ -20,85 +55,88 @@ export default function App() {
     setMuted(!muted);
     setMutedState(!muted);
   };
+  const toMenu = () => setScreen('menu');
 
   return (
-    <div className="flex h-screen flex-col text-slate-100">
+    <div className="app-bg flex h-screen flex-col text-slate-100">
       <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-1.5">
-        <button onClick={() => setScreen('menu')} className="text-sm font-bold tracking-wide text-amber-200">
+        <button onClick={toMenu} className="text-sm font-bold tracking-wide text-amber-200">
           ⚄ Pantheon: Dice of Destiny
         </button>
         <div className="flex items-center gap-2">
           {profile && (
             <span className="hidden text-xs text-slate-400 sm:inline">
               🧙 {profile.name} · <span className="font-bold text-amber-200">{profile.elo}</span> ELO ·{' '}
-              <span className="text-emerald-400">{profile.wins}V</span>/
-              <span className="text-red-400">{profile.losses}P</span>
+              <span className="text-emerald-400">{profile.wins}</span>/
+              <span className="text-red-400">{profile.losses}</span>
             </span>
           )}
           <button
             onClick={toggleMute}
-            title={muted ? 'Zapnúť zvuk' : 'Vypnúť zvuk'}
+            title={t(muted ? 'mute_on' : 'mute_off')}
             className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
           >
             {muted ? '🔇' : '🔊'}
           </button>
           {screen !== 'menu' && (
             <button
-              onClick={() => setScreen('menu')}
+              onClick={toMenu}
               className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
             >
-              ← Menu
+              {t('header_menu')}
             </button>
           )}
         </div>
       </header>
 
       {screen === 'menu' && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
-          <p className="text-5xl">⚄</p>
-          <h1 className="text-center text-3xl font-bold text-amber-100">Pantheon: Dice of Destiny</h1>
-          <p className="mb-6 max-w-md text-center text-sm text-slate-400">
-            Povolaj mýtické zvieracie božstvá, obsaď taktické línie a nechaj o osude útokov rozhodnúť Božský hod
-            kockou.
-          </p>
-          <button
-            onClick={() => setScreen('local')}
-            className="w-64 rounded-xl bg-amber-700 px-6 py-3 font-semibold text-amber-50 shadow-lg hover:bg-amber-600"
-          >
-            🎲 Lokálna hra (Pass &amp; Play)
-          </button>
-          <button
-            onClick={() => setScreen('online')}
-            className="w-64 rounded-xl bg-sky-800 px-6 py-3 font-semibold text-sky-50 shadow-lg hover:bg-sky-700"
-          >
-            🌐 Online hra
-          </button>
-          <button
-            onClick={() => setScreen('decks')}
-            className="w-64 rounded-xl bg-emerald-900 px-6 py-3 font-semibold text-emerald-50 shadow-lg hover:bg-emerald-800"
-          >
-            🃏 Balíčky
-          </button>
-          <button
-            onClick={() => setScreen('ranking')}
-            className="w-64 rounded-xl bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-700"
-          >
-            🏆 Rebríček
-          </button>
-          <button
-            onClick={() => setScreen('codex')}
-            className="w-64 rounded-xl bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-700"
-          >
-            📖 Sieň Božstiev
-          </button>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-8">
+          <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
+            <p className="menu-die text-6xl">⚄</p>
+            <h1 className="menu-title text-center text-4xl font-black tracking-wide">
+              Pantheon
+              <span className="mt-1 block text-lg font-semibold tracking-[0.35em] text-amber-200/90">
+                DICE OF DESTINY
+              </span>
+            </h1>
+            <p className="max-w-md text-center text-sm leading-relaxed text-slate-400">{t('menu_subtitle')}</p>
+            <div className="mt-5 flex flex-col gap-2.5">
+              {MAIN_MENU.map((item) => (
+                <MenuButton key={item.screen} item={item} onClick={() => setScreen(item.screen)} />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
+      {screen === 'multi' && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+          <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
+            <h2 className="text-2xl font-bold text-amber-100">🌐 {t('multi_title')}</h2>
+            <div className="mt-4 flex flex-col gap-2.5">
+              <MenuButton
+                item={{ icon: '⚡', label: 'multi_online', desc: 'multi_online_desc', screen: 'online' }}
+                onClick={() => setScreen('online')}
+              />
+              <MenuButton
+                item={{ icon: '🤝', label: 'multi_local', desc: 'multi_local_desc', screen: 'local' }}
+                onClick={() => setScreen('local')}
+              />
+            </div>
+            <button onClick={toMenu} className="mt-4 text-xs text-slate-400 hover:text-slate-200">
+              {t('back_menu')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {screen === 'single' && <AiGame key="single" />}
       {screen === 'local' && <LocalGame key="local" />}
-      {screen === 'online' && <OnlineGame onExit={() => setScreen('menu')} />}
-      {screen === 'codex' && <Codex onBack={() => setScreen('menu')} />}
-      {screen === 'decks' && <DeckBuilder onBack={() => setScreen('menu')} />}
-      {screen === 'ranking' && <Leaderboard onBack={() => setScreen('menu')} />}
+      {screen === 'online' && <OnlineGame onExit={toMenu} />}
+      {screen === 'codex' && <Codex onBack={toMenu} />}
+      {screen === 'decks' && <DeckBuilder onBack={toMenu} />}
+      {screen === 'ranking' && <Leaderboard onBack={toMenu} />}
+      {screen === 'settings' && <Settings onBack={toMenu} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { errorText, useLang } from '../i18n';
 import { apiUrl } from '../net/api';
 import { useMultiplayerGame } from '../net/useMultiplayerGame';
 import { Board } from './Board';
@@ -17,8 +18,9 @@ function setRoomInUrl(roomId: string | null): void {
   window.history.replaceState(null, '', url);
 }
 
-/** Lobby → waiting room → online match (GDD Fáza 2). */
+/** Lobby → waiting room → online match. */
 export function OnlineGame({ onExit }: { onExit: () => void }) {
+  const { t } = useLang();
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('pantheon-name') ?? '');
   const [joinCode, setJoinCode] = useState('');
   const [roomId, setRoomId] = useState<string | null>(roomFromUrl);
@@ -27,7 +29,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   const { toast, showToast } = useToast();
 
   const rememberName = () => {
-    const name = playerName.trim() || 'Vyvolávač';
+    const name = playerName.trim() || t('you');
     localStorage.setItem('pantheon-name', name);
     return name;
   };
@@ -37,30 +39,30 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
     setBusy(true);
     try {
       const res = await fetch(apiUrl('/api/rooms'), { method: 'POST' });
-      if (!res.ok) throw new Error(`Server odpovedal ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const { roomId: created } = (await res.json()) as { roomId: string };
       setRoomInUrl(created);
       setRoomId(created);
     } catch (e) {
-      showToast(`Miestnosť sa nepodarilo vytvoriť: ${e instanceof Error ? e.message : e}`);
+      showToast(t('err_createRoom', { msg: e instanceof Error ? e.message : String(e) }));
     } finally {
       setBusy(false);
     }
   };
 
-  /** Rýchla hra — the Matchmaker pairs us with the next seeker (GDD Fáza 4). */
+  /** Rýchla hra — the Matchmaker pairs us with the next seeker. */
   const quickPlay = async () => {
     rememberName();
     setBusy(true);
     try {
       const res = await fetch(apiUrl('/api/matchmaking/join'), { method: 'POST' });
-      if (!res.ok) throw new Error(`Server odpovedal ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const { roomId: found } = (await res.json()) as { roomId: string; matched: boolean };
       setQuickMatch(true);
       setRoomInUrl(found);
       setRoomId(found);
     } catch (e) {
-      showToast(`Vyhľadávanie súpera zlyhalo: ${e instanceof Error ? e.message : e}`);
+      showToast(t('err_quickPlay', { msg: e instanceof Error ? e.message : String(e) }));
     } finally {
       setBusy(false);
     }
@@ -69,7 +71,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   const joinRoom = () => {
     const code = joinCode.trim().toUpperCase();
     if (code.length < 4) {
-      showToast('Zadaj kód miestnosti.');
+      showToast(t('err_enterCode'));
       return;
     }
     rememberName();
@@ -94,13 +96,13 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   if (!roomId) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
-        <h2 className="text-2xl font-bold text-amber-100">🌐 Online hra</h2>
+        <h2 className="text-2xl font-bold text-amber-100">{t('online_title')}</h2>
         <label className="flex w-72 flex-col gap-1 text-xs text-slate-400">
-          Tvoje meno
+          {t('online_name')}
           <input
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="Vyvolávač"
+            placeholder={t('you')}
             maxLength={20}
             className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-500"
           />
@@ -108,22 +110,22 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
         <button
           onClick={quickPlay}
           disabled={busy}
-          className="w-72 rounded-xl bg-amber-700 px-6 py-3 font-semibold text-amber-50 shadow-lg hover:bg-amber-600 disabled:opacity-50"
+          className="menu-button w-72 rounded-xl bg-amber-700 px-6 py-3 font-semibold text-amber-50 shadow-lg hover:bg-amber-600 disabled:opacity-50"
         >
-          ⚡ Rýchla hra (nájdi súpera)
+          {t('online_quick')}
         </button>
         <button
           onClick={createRoom}
           disabled={busy}
-          className="w-72 rounded-xl bg-slate-700 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-600 disabled:opacity-50"
+          className="menu-button w-72 rounded-xl bg-slate-700 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-600 disabled:opacity-50"
         >
-          ➕ Vytvoriť miestnosť pre priateľa
+          {t('online_create')}
         </button>
         <div className="flex w-72 items-center gap-2">
           <input
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-            placeholder="KÓD MIESTNOSTI"
+            placeholder={t('online_code_ph')}
             maxLength={12}
             className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm uppercase tracking-widest text-slate-100 outline-none focus:border-amber-500"
           />
@@ -131,7 +133,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
             onClick={joinRoom}
             className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-600"
           >
-            Pripojiť sa
+            {t('online_join')}
           </button>
         </div>
         {toast && <Toast message={toast} />}
@@ -142,7 +144,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   return (
     <OnlineMatch
       roomId={roomId}
-      playerName={playerName.trim() || 'Vyvolávač'}
+      playerName={playerName.trim() || t('you')}
       quickMatch={quickMatch}
       onLeave={leave}
     />
@@ -160,8 +162,13 @@ function OnlineMatch({
   quickMatch: boolean;
   onLeave: () => void;
 }) {
+  const { lang, t } = useLang();
   const { toast, showToast } = useToast();
-  const { status, seat, state, seats, pending, sendAction } = useMultiplayerGame(roomId, playerName, showToast);
+  const onServerError = useCallback(
+    (code: string) => showToast(errorText(lang, code)),
+    [showToast, lang],
+  );
+  const { status, seat, state, seats, pending, sendAction } = useMultiplayerGame(roomId, playerName, onServerError);
   const { diceEvent, shake } = useDiceFeedback(state);
   const [copied, setCopied] = useState(false);
 
@@ -191,22 +198,22 @@ function OnlineMatch({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      showToast('Kopírovanie zlyhalo — skopíruj linku ručne.');
+      showToast(t('err_copyFailed'));
     }
   };
 
   if (status === 'closed') {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
-        <p className="text-lg text-red-300">Spojenie so serverom sa prerušilo.</p>
+        <p className="text-lg text-red-300">{t('conn_lost')}</p>
         <button
           onClick={() => window.location.reload()}
           className="rounded-lg bg-amber-700 px-5 py-2 font-semibold text-amber-50 hover:bg-amber-600"
         >
-          Skúsiť znova
+          {t('retry')}
         </button>
         <button onClick={onLeave} className="text-xs text-slate-400 hover:text-slate-200">
-          ← Späť do menu
+          {t('back_menu')}
         </button>
       </div>
     );
@@ -216,29 +223,25 @@ function OnlineMatch({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
         <p className="text-sm text-slate-400">
-          {status === 'connecting'
-            ? 'Pripájam sa do miestnosti…'
-            : quickMatch
-              ? '⚡ Hľadám súpera — hra začne automaticky…'
-              : 'Čaká sa na druhého hráča…'}
+          {status === 'connecting' ? t('waiting_connect') : quickMatch ? t('waiting_search') : t('waiting_friend')}
         </p>
         <p className="text-4xl font-bold tracking-[0.3em] text-amber-200">{roomId}</p>
         <div className="flex w-full max-w-md items-center gap-2">
           <input
             readOnly
             value={inviteLink}
-            className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300"
+            className="min-w-0 flex-1 select-text rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300"
           />
           <button
             onClick={copyLink}
             className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-600"
           >
-            {copied ? '✓ Skopírované' : 'Kopírovať'}
+            {copied ? t('copied') : t('copy')}
           </button>
         </div>
-        <p className="text-xs text-slate-500">Pošli linku alebo kód súperovi — hra začne, keď sa pripojí.</p>
+        <p className="text-xs text-slate-500">{t('waiting_share')}</p>
         <button onClick={onLeave} className="text-xs text-slate-400 hover:text-slate-200">
-          ← Späť do menu
+          {t('back_menu')}
         </button>
         {toast && <Toast message={toast} />}
       </div>
@@ -247,7 +250,7 @@ function OnlineMatch({
 
   const myTurn = state.active === seat;
   const canAct = myTurn && !pending && !state.winner;
-  const foeName = seats[seat === 'p1' ? 'p2' : 'p1'] ?? 'Súper';
+  const foeName = seats[seat === 'p1' ? 'p2' : 'p1'] ?? t('opponent');
 
   return (
     <div className={`flex min-h-0 flex-1 flex-col ${shake ? 'shake' : ''}`}>
@@ -257,13 +260,13 @@ function OnlineMatch({
         }`}
       >
         {pending ? (
-          <span className="animate-pulse">⏳ Čakám na server…</span>
+          <span className="animate-pulse">{t('pending')}</span>
         ) : myTurn ? (
-          <span>⚔ Si na ťahu!</span>
+          <span>{t('your_turn')}</span>
         ) : (
-          <span>🕐 Na ťahu je {foeName}…</span>
+          <span>{t('opp_turn', { name: foeName })}</span>
         )}
-        <span className="text-slate-500">· miestnosť {roomId}</span>
+        <span className="text-slate-500">{t('room_label', { id: roomId })}</span>
       </div>
       <div className="flex min-h-0 flex-1">
         <Board state={state} dispatch={sendAction} viewpoint={seat} canAct={canAct} />
@@ -273,7 +276,7 @@ function OnlineMatch({
       {toast && <Toast message={toast} />}
       <GameOverlays diceEvent={diceEvent} />
       {state.winner && (
-        <WinnerOverlay name={state.players[state.winner].name} onNewGame={onLeave} newGameLabel="Späť do menu" />
+        <WinnerOverlay name={state.players[state.winner].name} onNewGame={onLeave} backToMenu />
       )}
     </div>
   );

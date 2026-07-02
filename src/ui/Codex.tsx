@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import { getCard } from '../game/cards';
 import { LORE } from '../game/lore';
-import type { Faction, Rarity } from '../game/types';
+import type { Faction } from '../game/types';
+import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
-
-const FACTION_LABEL: Record<Faction, string> = {
-  lava: 'Lávový dvor',
-  nature: 'Prírodný a Zemský Pakt',
-  celestial: 'Nebeský Zbor',
-};
 
 const FACTION_CHIP: Record<Faction, string> = {
   lava: 'bg-red-950 text-red-200 border-red-700',
@@ -16,14 +11,9 @@ const FACTION_CHIP: Record<Faction, string> = {
   celestial: 'bg-sky-950 text-sky-200 border-sky-700',
 };
 
-const RARITY_LABEL: Record<Rarity, string> = {
-  common: 'Bežná',
-  rare: 'Vzácna',
-  legendary: 'Legendárna',
-};
-
 /** Sieň Božstiev — browse the pantheon's characters and their stories. */
 export function Codex({ onBack }: { onBack: () => void }) {
+  const { t, lx } = useLang();
   const [index, setIndex] = useState(0);
 
   const entry = LORE[index];
@@ -36,7 +26,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
       {/* Character list */}
       <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-800 bg-slate-950/70 md:flex">
         <h2 className="border-b border-slate-800 px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-400">
-          Sieň Božstiev
+          {t('codex_title')}
         </h2>
         {LORE.map((item, i) => {
           const c = getCard(item.cardId);
@@ -49,12 +39,12 @@ export function Codex({ onBack }: { onBack: () => void }) {
               }`}
             >
               <span className="text-2xl">{c.glyph}</span>
-              <span className="truncate">{c.name}</span>
+              <span className="truncate">{lx(c.name)}</span>
             </button>
           );
         })}
         <button onClick={onBack} className="mt-auto px-3 py-3 text-left text-xs text-slate-500 hover:text-slate-300">
-          ← Späť do menu
+          {t('back_menu')}
         </button>
       </aside>
 
@@ -63,7 +53,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
         <div className="mx-auto w-full max-w-3xl p-4 md:p-8">
           <div className="mb-4 flex items-center justify-between md:hidden">
             <button onClick={onBack} className="text-xs text-slate-400">
-              ← Menu
+              {t('header_menu')}
             </button>
           </div>
 
@@ -75,16 +65,16 @@ export function Codex({ onBack }: { onBack: () => void }) {
 
             {/* Facts */}
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-bold text-amber-100">{card.name}</h1>
+              <h1 className="text-2xl font-bold text-amber-100">{lx(card.name)}</h1>
               <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
                 <span className={`rounded-full border px-2 py-0.5 ${FACTION_CHIP[card.faction]}`}>
-                  {FACTION_LABEL[card.faction]}
+                  {t(`faction_${card.faction}`)}
                 </span>
                 <span className="rounded-full border border-amber-700 bg-amber-950 px-2 py-0.5 text-amber-200">
-                  {RARITY_LABEL[card.rarity]}
+                  {t(`rarity_${card.rarity}`)}
                 </span>
                 <span className="rounded-full border border-cyan-700 bg-cyan-950 px-2 py-0.5 text-cyan-200">
-                  💎 {card.cost} many
+                  {t('codex_mana', { n: card.cost })}
                 </span>
                 {card.type === 'unit' && (
                   <>
@@ -93,20 +83,26 @@ export function Codex({ onBack }: { onBack: () => void }) {
                       {card.armor > 0 ? ` · 🛡 ${card.armor}` : ''}
                     </span>
                     <span className="rounded-full border border-slate-600 bg-slate-900 px-2 py-0.5 text-slate-200">
-                      {card.lane === 'vanguard' ? 'Vanguard' : 'Sanctum'}
+                      {t(card.lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum')}
                     </span>
                   </>
                 )}
               </div>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Schopnosti</h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-300">{card.text}</p>
+              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                {t('codex_abilities')}
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-300">{lx(card.text)}</p>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Príbeh</h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-200">{entry.story}</p>
+              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                {t('codex_story')}
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-200">{lx(entry.story)}</p>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Kultúrny odkaz</h3>
-              <p className="mt-1 text-sm italic leading-relaxed text-slate-400">{entry.culture}</p>
+              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                {t('codex_culture')}
+              </h3>
+              <p className="mt-1 text-sm italic leading-relaxed text-slate-400">{lx(entry.culture)}</p>
             </div>
           </div>
 
@@ -116,7 +112,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
               onClick={() => step(-1)}
               className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
             >
-              ◀ Predchádzajúca
+              {t('codex_prev')}
             </button>
             <span className="text-xs text-slate-500">
               {index + 1} / {LORE.length}
@@ -125,7 +121,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
               onClick={() => step(1)}
               className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
             >
-              Ďalšia ▶
+              {t('codex_next')}
             </button>
           </div>
         </div>

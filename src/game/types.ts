@@ -11,6 +11,12 @@ export type LaneId = 'vanguard' | 'sanctum';
 export type Faction = 'lava' | 'nature' | 'celestial';
 export type Rarity = 'common' | 'rare' | 'legendary';
 
+/** Every player-facing string ships in both languages, kept in parallel. */
+export interface LocalizedText {
+  sk: string;
+  en: string;
+}
+
 /** Turn phases the player interacts with; start/end-of-turn steps resolve automatically. */
 export type Phase = 'main' | 'combat';
 
@@ -49,8 +55,8 @@ export type DiceEffect =
   | { kind: 'blessVanguard'; heal: number; armor: number };
 
 export interface DiceAbility {
-  /** Short Slovak label shown in the UI and log. */
-  label: string;
+  /** Short label shown in the UI and log. */
+  label: LocalizedText;
   /** Roll >= threshold succeeds ("3+"). Berserker units override this dynamically. */
   threshold: 1 | 2 | 3 | 4 | 5 | 6;
   /** Extra mana paid to roll the dice. */
@@ -63,7 +69,7 @@ export interface DiceAbility {
 export interface UnitCardDef {
   type: 'unit';
   id: string;
-  name: string;
+  name: LocalizedText;
   faction: Faction;
   rarity: Rarity;
   cost: number;
@@ -77,8 +83,8 @@ export interface UnitCardDef {
   token?: boolean;
   keywords: Keyword[];
   dice?: DiceAbility;
-  /** Rules text (Slovak). */
-  text: string;
+  /** Rules text. */
+  text: LocalizedText;
   /** Emoji fallback shown while the art file is missing. */
   glyph: string;
   /** Art path under public/ (Fáza 3; R2-hosted later). */
@@ -89,7 +95,7 @@ export interface UnitCardDef {
 export interface SpellCardDef {
   type: 'spell';
   id: string;
-  name: string;
+  name: LocalizedText;
   faction: Faction;
   rarity: Rarity;
   cost: number;
@@ -102,7 +108,7 @@ export interface SpellCardDef {
     /** Damage the caster's Nexus takes when the chain ends on a 6 (Overload). */
     overloadSelfDamage: number;
   };
-  text: string;
+  text: LocalizedText;
   glyph: string;
   art: string;
 }
@@ -135,13 +141,50 @@ export interface PlayerState {
   lanes: Record<LaneId, (UnitState | null)[]>;
 }
 
+/** Message keys resolved to the client's language by the UI (src/i18n). */
+export type MsgKey =
+  | 'gameStart'
+  | 'turnStart'
+  | 'summon'
+  | 'enterCombat'
+  | 'nexusDamage'
+  | 'winner'
+  | 'unitDamage'
+  | 'unitDamageAbsorbed'
+  | 'exterminate'
+  | 'acidArmor'
+  | 'acidHp'
+  | 'unitDies'
+  | 'burnTick'
+  | 'burnApplied'
+  | 'spellCast'
+  | 'overload'
+  | 'chainEnd'
+  | 'aoeTrigger'
+  | 'cleaveTrigger'
+  | 'attackNexus'
+  | 'fortify'
+  | 'bless'
+  | 'stormcall'
+  | 'diceFail'
+  | 'move'
+  | 'eloUpdate';
+
 export type LogEvent =
-  | { id: number; kind: 'text'; text: string }
+  /**
+   * Localizable game message. By convention params.card / params.card2
+   * carry card ids and params.lane a LaneId — the renderer resolves
+   * them to the active language.
+   */
+  | { id: number; kind: 'msg'; msgKey: MsgKey; params: Record<string, string | number> }
   | {
       id: number;
       kind: 'dice';
       player: PlayerId;
-      label: string;
+      /** Card id of whatever rolled the dice. */
+      source: string;
+      /** Ability label; null for spell chains (the card name says it all). */
+      ability: LocalizedText | null;
       rolls: number[];
       kept: number;
       threshold: number;
