@@ -5,6 +5,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Action, GameState, PlayerId } from '../game/types';
+import { wsUrl } from './api';
 import type { ClientMessage, SeatsInfo, ServerMessage } from './protocol';
 
 export type ConnectionStatus = 'connecting' | 'waiting' | 'playing' | 'closed';
@@ -32,8 +33,7 @@ export function useMultiplayerGame(roomId: string, playerName: string, onError: 
   onErrorRef.current = onError;
 
   useEffect(() => {
-    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${proto}://${window.location.host}/api/rooms/${roomId}/ws`);
+    const ws = new WebSocket(wsUrl(`/api/rooms/${roomId}/ws`));
     wsRef.current = ws;
     setStatus('connecting');
 

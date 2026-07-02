@@ -1,23 +1,18 @@
 /**
  * Cloudflare Worker entry point (GDD §5.2): routes API traffic,
  * upgrades /api/rooms/:id/ws to a WebSocket handled by the room's
- * Durable Object, and serves the built React app for everything else.
+ * Durable Object, pairs quick-play seekers via the Matchmaker DO,
+ * and serves the built React app for everything else.
  */
+import { generateRoomCode } from './roomCode';
+
 export { GameRoom } from './GameRoom';
+export { Matchmaker } from './Matchmaker';
 
 export interface Env {
   GAME_ROOM: DurableObjectNamespace;
+  MATCHMAKER: DurableObjectNamespace;
   ASSETS: Fetcher;
-}
-
-/** Unambiguous room codes (no 0/O, 1/I/L). */
-const ROOM_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-
-function generateRoomCode(): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(6));
-  let code = '';
-  for (const b of bytes) code += ROOM_ALPHABET[b % ROOM_ALPHABET.length];
-  return code;
 }
 
 const ROOM_WS_PATTERN = /^\/api\/rooms\/([A-Za-z0-9]{4,12})\/ws$/;
@@ -28,6 +23,11 @@ export default {
 
     if (url.pathname === '/api/rooms' && request.method === 'POST') {
       return Response.json({ roomId: generateRoomCode() });
+    }
+
+    if (url.pathname.startsWith('/api/matchmaking/')) {
+      const stub = env.MATCHMAKER.get(env.MATCHMAKER.idFromName('global'));
+      return stub.fetch(request);
     }
 
     const wsMatch = url.pathname.match(ROOM_WS_PATTERN);

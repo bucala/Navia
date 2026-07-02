@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { apiUrl } from '../net/api';
 import { useMultiplayerGame } from '../net/useMultiplayerGame';
 import { Board } from './Board';
 import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
@@ -21,6 +22,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('pantheon-name') ?? '');
   const [joinCode, setJoinCode] = useState('');
   const [roomId, setRoomId] = useState<string | null>(roomFromUrl);
+  const [quickMatch, setQuickMatch] = useState(false);
   const [busy, setBusy] = useState(false);
   const { toast, showToast } = useToast();
 
@@ -34,13 +36,31 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
     rememberName();
     setBusy(true);
     try {
-      const res = await fetch('/api/rooms', { method: 'POST' });
+      const res = await fetch(apiUrl('/api/rooms'), { method: 'POST' });
       if (!res.ok) throw new Error(`Server odpovedal ${res.status}`);
       const { roomId: created } = (await res.json()) as { roomId: string };
       setRoomInUrl(created);
       setRoomId(created);
     } catch (e) {
       showToast(`Miestnosť sa nepodarilo vytvoriť: ${e instanceof Error ? e.message : e}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Rýchla hra — the Matchmaker pairs us with the next seeker (GDD Fáza 4). */
+  const quickPlay = async () => {
+    rememberName();
+    setBusy(true);
+    try {
+      const res = await fetch(apiUrl('/api/matchmaking/join'), { method: 'POST' });
+      if (!res.ok) throw new Error(`Server odpovedal ${res.status}`);
+      const { roomId: found } = (await res.json()) as { roomId: string; matched: boolean };
+      setQuickMatch(true);
+      setRoomInUrl(found);
+      setRoomId(found);
+    } catch (e) {
+      showToast(`Vyhľadávanie súpera zlyhalo: ${e instanceof Error ? e.message : e}`);
     } finally {
       setBusy(false);
     }
@@ -58,6 +78,14 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
   };
 
   const leave = () => {
+    // Free the queue slot if we bail out of a quick match before it starts.
+    if (quickMatch && roomId) {
+      void fetch(apiUrl('/api/matchmaking/cancel'), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ roomId }),
+      }).catch(() => {});
+    }
     setRoomInUrl(null);
     setRoomId(null);
     onExit();
@@ -78,11 +106,18 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
           />
         </label>
         <button
-          onClick={createRoom}
+          onClick={quickPlay}
           disabled={busy}
           className="w-72 rounded-xl bg-amber-700 px-6 py-3 font-semibold text-amber-50 shadow-lg hover:bg-amber-600 disabled:opacity-50"
         >
-          ➕ Vytvoriť miestnosť
+          ⚡ Rýchla hra (nájdi súpera)
+        </button>
+        <button
+          onClick={createRoom}
+          disabled={busy}
+          className="w-72 rounded-xl bg-slate-700 px-6 py-3 font-semibold text-slate-100 shadow-lg hover:bg-slate-600 disabled:opacity-50"
+        >
+          ➕ Vytvoriť miestnosť pre priateľa
         </button>
         <div className="flex w-72 items-center gap-2">
           <input
@@ -104,14 +139,50 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
     );
   }
 
-  return <OnlineMatch roomId={roomId} playerName={playerName.trim() || 'Vyvolávač'} onLeave={leave} />;
+  return (
+    <OnlineMatch
+      roomId={roomId}
+      playerName={playerName.trim() || 'Vyvolávač'}
+      quickMatch={quickMatch}
+      onLeave={leave}
+    />
+  );
 }
 
-function OnlineMatch({ roomId, playerName, onLeave }: { roomId: string; playerName: string; onLeave: () => void }) {
+function OnlineMatch({
+  roomId,
+  playerName,
+  quickMatch,
+  onLeave,
+}: {
+  roomId: string;
+  playerName: string;
+  quickMatch: boolean;
+  onLeave: () => void;
+}) {
   const { toast, showToast } = useToast();
   const { status, seat, state, seats, pending, sendAction } = useMultiplayerGame(roomId, playerName, showToast);
   const { diceEvent, shake } = useDiceFeedback(state);
   const [copied, setCopied] = useState(false);
+
+  // Quick match: keep the queue entry alive while waiting. Cancelling is an
+  // explicit user action (onLeave) — never effect cleanup, which would fire a
+  // spurious cancel on StrictMode's dev double-mount. Closed tabs are handled
+  // by the server-side TTL.
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  useEffect(() => {
+    if (!quickMatch) return;
+    const interval = setInterval(() => {
+      if (statusRef.current === 'playing') return;
+      void fetch(apiUrl('/api/matchmaking/heartbeat'), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ roomId }),
+      }).catch(() => {});
+    }, 30_000);
+    return () => clearInterval(interval);
+  }, [quickMatch, roomId]);
 
   const inviteLink = `${window.location.origin}/?room=${roomId}`;
   const copyLink = async () => {
@@ -145,7 +216,11 @@ function OnlineMatch({ roomId, playerName, onLeave }: { roomId: string; playerNa
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
         <p className="text-sm text-slate-400">
-          {status === 'connecting' ? 'Pripájam sa do miestnosti…' : 'Čaká sa na druhého hráča…'}
+          {status === 'connecting'
+            ? 'Pripájam sa do miestnosti…'
+            : quickMatch
+              ? '⚡ Hľadám súpera — hra začne automaticky…'
+              : 'Čaká sa na druhého hráča…'}
         </p>
         <p className="text-4xl font-bold tracking-[0.3em] text-amber-200">{roomId}</p>
         <div className="flex w-full max-w-md items-center gap-2">

@@ -14,9 +14,18 @@ not_found_handling = "single-page-application"
 name = "GAME_ROOM"
 class_name = "GameRoom"
 
+# Single global instance pairing quick-play seekers.
+[[durable_objects.bindings]]
+name = "MATCHMAKER"
+class_name = "Matchmaker"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["GameRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Matchmaker"]
 
 [observability]
 enabled = true
