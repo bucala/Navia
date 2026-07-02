@@ -5,6 +5,7 @@ import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState
 import { CardFace } from './CardFace';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
+import { useLang } from '../i18n';
 
 type Selection =
   | { mode: 'idle' }
@@ -21,8 +22,6 @@ interface Props {
   /** False while it's the opponent's turn (or an action awaits the server). */
   canAct: boolean;
 }
-
-const LANE_LABEL: Record<LaneId, string> = { vanguard: 'Vanguard', sanctum: 'Sanctum' };
 
 function sameSlot(a: SlotRef, b: SlotRef): boolean {
   return a.lane === b.lane && a.slot === b.slot;
@@ -41,9 +40,9 @@ function NexusPopup({ popup }: { popup?: Popup }) {
   );
 }
 
-function ManaBar({ mana, maxMana }: { mana: number; maxMana: number }) {
+function ManaBar({ mana, maxMana, label }: { mana: number; maxMana: number; label: string }) {
   return (
-    <div className="flex items-center gap-0.5" title={`Mana ${mana}/${maxMana}`}>
+    <div className="flex items-center gap-0.5" title={label}>
       {Array.from({ length: maxMana }, (_, i) => (
         <span key={i} className={`h-3 w-3 rotate-45 rounded-sm ${i < mana ? 'bg-cyan-400' : 'bg-slate-700'}`} />
       ))}
@@ -56,6 +55,8 @@ function ManaBar({ mana, maxMana }: { mana: number; maxMana: number }) {
 
 /** The arena, rendered from the given seat's perspective. */
 export function Board({ state, dispatch, viewpoint, canAct }: Props) {
+  const { t, lx } = useLang();
+  const laneLabel = (lane: LaneId) => t(lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum');
   const [selection, setSelection] = useState<Selection>({ mode: 'idle' });
   const me = state.players[viewpoint];
   const foe = state.players[opponentOf(viewpoint)];
@@ -164,7 +165,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
     return (
       <div className="flex items-center justify-center gap-2 py-1">
         <span className="w-20 text-right text-[10px] uppercase tracking-widest text-slate-500">
-          {LANE_LABEL[lane]}
+          {laneLabel(lane)}
         </span>
         {player.lanes[lane].map((unit, slot) => {
           let highlight: SlotHighlight = 'none';
@@ -206,9 +207,9 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-200">{foe.name}</span>
-          <span className="text-xs text-slate-400">🂠 {foe.hand.length} kariet</span>
+          <span className="text-xs text-slate-400">🂠 {t('cards_in_hand', { n: foe.hand.length })}</span>
         </div>
-        <ManaBar mana={foe.mana} maxMana={foe.maxMana} />
+        <ManaBar mana={foe.mana} maxMana={foe.maxMana} label={t('mana_label', { m: foe.mana, max: foe.maxMana })} />
         <button
           onClick={clickFoeNexus}
           className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${
@@ -216,7 +217,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
               : 'border-slate-700 bg-slate-900 text-red-300'
           }`}
-          title="Nexus súpera"
+          title={t('nexus_title')}
         >
           ❤️ {foe.nexusHp}
           <NexusPopup popup={nexusFx[foe.id]} />
@@ -231,9 +232,9 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         {/* Mid controls */}
         <div className="my-1 flex items-center justify-center gap-4 border-y border-slate-800/70 bg-slate-950/40 py-1.5">
           <span className="text-xs text-slate-400">
-            Ťah {state.turn} ·{' '}
+            {t('turn_label', { n: state.turn })} ·{' '}
             <span className="font-semibold text-amber-200">
-              {state.phase === 'main' ? 'Hlavná fáza' : 'Bojová fáza'}
+              {state.phase === 'main' ? t('phase_main') : t('phase_combat')}
             </span>
           </span>
           {state.phase === 'main' && (
@@ -242,7 +243,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
               disabled={!canAct}
               className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40"
             >
-              ⚔ Bojová fáza
+              {t('btn_combat')}
             </button>
           )}
           <button
@@ -250,7 +251,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             disabled={!canAct}
             className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40"
           >
-            Ukončiť ťah ➤
+            {t('btn_endturn')}
           </button>
         </div>
 
@@ -261,15 +262,15 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       {/* Selected-unit action bar */}
       {selection.mode === 'unit' && selectedUnit && selectedUnitCard && (
         <div className="flex items-center justify-center gap-2 bg-slate-900/80 py-1.5 text-xs">
-          <span className="font-semibold text-amber-100">{selectedUnitCard.name}</span>
-          {!selectedUnit.ready && <span className="text-slate-500">(tento ťah už konala)</span>}
+          <span className="font-semibold text-amber-100">{lx(selectedUnitCard.name)}</span>
+          {!selectedUnit.ready && <span className="text-slate-500">{t('action_exhausted')}</span>}
           {selectedUnitCard.dice?.activation && selectedUnit.ready && (
             <button
               onClick={() => act({ type: 'ACTIVATE', player: me.id, unit: selection.ref })}
               disabled={me.mana < selectedUnitCard.dice.manaCost}
               className="rounded bg-emerald-800 px-2 py-1 font-semibold text-emerald-100 hover:bg-emerald-700 disabled:opacity-40"
             >
-              🎲 {selectedUnitCard.dice.label} ({selectedUnitCard.dice.threshold}+, {selectedUnitCard.dice.manaCost} 💧)
+              🎲 {lx(selectedUnitCard.dice.label)} ({selectedUnitCard.dice.threshold}+, {selectedUnitCard.dice.manaCost} 💧)
             </button>
           )}
           {selectedUnitCard.keywords.includes('agile') &&
@@ -279,19 +280,19 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
                 onClick={() => setSelection({ mode: 'move', ref: selection.ref })}
                 className="rounded bg-sky-800 px-2 py-1 font-semibold text-sky-100 hover:bg-sky-700"
               >
-                ↷ Presun
+                {t('action_move')}
               </button>
             )}
           <button onClick={reset} className="rounded bg-slate-700 px-2 py-1 text-slate-200 hover:bg-slate-600">
-            Zrušiť
+            {t('action_cancel')}
           </button>
         </div>
       )}
       {selection.mode === 'move' && (
         <div className="flex items-center justify-center gap-2 bg-slate-900/80 py-1.5 text-xs text-sky-200">
-          Vyber prázdny slot v druhej línii…
+          {t('move_hint')}
           <button onClick={reset} className="rounded bg-slate-700 px-2 py-1 text-slate-200 hover:bg-slate-600">
-            Zrušiť
+            {t('action_cancel')}
           </button>
         </div>
       )}
@@ -300,14 +301,14 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       <div className="border-t border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="mb-2 flex items-center justify-between">
           <span className="font-semibold text-slate-200">{me.name}</span>
-          <ManaBar mana={me.mana} maxMana={me.maxMana} />
+          <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
           <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
             ❤️ {me.nexusHp}
             <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
         <div className="flex justify-center gap-2 overflow-x-auto pb-1">
-          {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">Prázdna ruka</span>}
+          {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace
               key={`${cardId}-${i}`}
@@ -321,8 +322,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         {selectedHandCard && (
           <p className="mt-1 text-center text-xs text-slate-400">
             {selectedHandCard.type === 'unit'
-              ? `Vyber prázdny slot v línii ${LANE_LABEL[selectedHandCard.lane]}.`
-              : 'Vyber nepriateľskú jednotku ako cieľ kúzla.'}
+              ? t('place_hint', { lane: laneLabel(selectedHandCard.lane) })
+              : t('spell_hint')}
           </p>
         )}
       </div>
@@ -331,11 +332,13 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       {selection.mode === 'dicePrompt' && dicePromptCard?.dice && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/60">
           <div className="w-80 rounded-xl border border-slate-600 bg-slate-900 p-4 text-center shadow-2xl">
-            <p className="mb-1 font-semibold text-amber-100">{dicePromptCard.name}</p>
+            <p className="mb-1 font-semibold text-amber-100">{lx(dicePromptCard.name)}</p>
             <p className="mb-3 text-xs text-slate-300">
-              {dicePromptCard.dice.label} — potrebný hod{' '}
-              {effectiveThreshold(me.lanes[selection.attacker.lane][selection.attacker.slot]!)}+ za{' '}
-              {dicePromptCard.dice.manaCost} many.
+              {t('dice_prompt', {
+                label: lx(dicePromptCard.dice.label),
+                t: effectiveThreshold(me.lanes[selection.attacker.lane][selection.attacker.slot]!),
+                n: dicePromptCard.dice.manaCost,
+              })}
             </p>
             <div className="flex justify-center gap-2">
               <button
@@ -344,7 +347,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
                 }
                 className="rounded bg-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-600"
               >
-                ⚔ Základný útok
+                {t('dice_basic')}
               </button>
               <button
                 onClick={() =>
@@ -352,10 +355,10 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
                 }
                 className="rounded bg-amber-700 px-3 py-1.5 text-xs font-semibold text-amber-50 hover:bg-amber-600"
               >
-                🎲 Hodiť kockou (−{dicePromptCard.dice.manaCost} 💧)
+                {t('dice_roll_btn', { n: dicePromptCard.dice.manaCost })}
               </button>
               <button onClick={reset} className="rounded bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700">
-                Zrušiť
+                {t('action_cancel')}
               </button>
             </div>
           </div>

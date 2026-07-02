@@ -89,7 +89,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response | 
   }
 
   const player = await authenticate(env, body);
-  if (!player) return json({ error: 'Neplatné prihlásenie.' }, 401);
+  if (!player) return json({ error: 'badLogin' }, 401);
 
   if (path === '/api/decks/list') {
     const { results } = await env.DB.prepare(
@@ -105,7 +105,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response | 
   if (path === '/api/decks/save') {
     const cards = body.cards ?? [];
     const error = validateDeck(cards);
-    if (error) return json({ error }, 400);
+    if (error) return json({ error: error.code, params: error.params }, 400);
     const name = body.deckName?.trim().slice(0, 30) || 'Bez názvu';
     const deckId = body.deckId ?? crypto.randomUUID();
     await env.DB.prepare(

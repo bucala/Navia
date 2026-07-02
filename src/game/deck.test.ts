@@ -9,14 +9,14 @@ describe('validateDeck', () => {
   });
 
   it('rejects too small and too large decks', () => {
-    expect(validateDeck(STARTER_DECK.slice(0, DECK_MIN - 1))).toMatch(/aspoň/);
-    expect(validateDeck([...STARTER_DECK, ...STARTER_DECK])).toMatch(/najviac/);
+    expect(validateDeck(STARTER_DECK.slice(0, DECK_MIN - 1))?.code).toBe('deckTooSmall');
+    expect(validateDeck([...STARTER_DECK, ...STARTER_DECK])?.code).toBe('deckTooBig');
   });
 
   it('rejects unknown cards and too many copies', () => {
-    expect(validateDeck([...STARTER_DECK.slice(0, 14), 'falosna_karta'])).toMatch(/Neznáma/);
+    expect(validateDeck([...STARTER_DECK.slice(0, 14), 'falosna_karta'])?.code).toBe('deckUnknownCard');
     const tooMany = [...STARTER_DECK.slice(0, DECK_MIN - MAX_COPIES - 1), 'gorila', 'gorila', 'gorila'];
-    expect(validateDeck(tooMany)).toMatch(/najviac 2×/);
+    expect(validateDeck(tooMany)?.code).toBe('deckTooManyCopies');
   });
 });
 

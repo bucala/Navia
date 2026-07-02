@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { getUnitCard } from '../game/cards';
 import type { Faction, UnitState } from '../game/types';
+import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
 import type { SlotFx } from './useCombatFx';
 
@@ -31,6 +32,7 @@ interface Props {
 
 /** One recessed stone slot in a lane — empty, or holding an animated unit. */
 export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Props) {
+  const { lx } = useLang();
   const card = unit ? getUnitCard(unit.cardId) : null;
   const fxClasses = [
     fx?.lunge ? (enemySide ? 'animate-lunge-down' : 'animate-lunge-up') : '',
@@ -50,12 +52,12 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.4, opacity: 0, rotate: 10 }}
             transition={{ duration: 0.22 }}
-            title={card.text}
+            title={lx(card.text)}
             className={`absolute inset-0 overflow-hidden rounded-lg border-2 bg-slate-800 ${FACTION_FRAME[card.faction]} ${fxClasses}`}
           >
             <CardArt cardId={card.id} className="absolute inset-0 h-full w-full" glyphClass="text-3xl" />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-1 pb-0.5 pt-3 text-center">
-              <p className="truncate text-[9px] leading-tight text-slate-200">{card.name}</p>
+              <p className="truncate text-[9px] leading-tight text-slate-200">{lx(card.name)}</p>
               <div className="flex justify-center gap-1 text-[10px] font-bold">
                 <span className="text-orange-300">⚔{card.attack}</span>
                 {unit.armor > 0 && <span className="text-slate-300">🛡{unit.armor}</span>}
