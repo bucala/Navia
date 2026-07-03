@@ -19,12 +19,15 @@ export const STRINGS = {
   rarity_legendary: { sk: 'Legendárna', en: 'Legendary' },
 
   // ── Menu ──
+  menu_tagline: { sk: 'KOCKA OSUDU', en: 'DICE OF DESTINY' },
   menu_subtitle: {
     sk: 'Povolaj mýtické zvieracie božstvá, obsaď taktické línie a nechaj o osude útokov rozhodnúť Božský hod kockou.',
     en: 'Summon mythic beast deities, hold the tactical lanes and let the Divine Dice decide the fate of every attack.',
   },
   menu_single: { sk: 'Hra jedného hráča', en: 'Single Player' },
   menu_single_desc: { sk: 'Vyzvi Ducha Arény', en: 'Challenge the Arena Spirit' },
+  menu_rules: { sk: 'Ako hrať', en: 'How to Play' },
+  menu_rules_desc: { sk: 'Pravidlá a mechaniky hry', en: 'Rules and mechanics' },
   menu_multi: { sk: 'Hra viacerých hráčov', en: 'Multiplayer' },
   menu_multi_desc: { sk: 'Online alebo pri jednom stole', en: 'Online or at one table' },
   menu_decks: { sk: 'Balíčky', en: 'Decks' },
@@ -38,6 +41,57 @@ export const STRINGS = {
   header_menu: { sk: '← Menu', en: '← Menu' },
   mute_on: { sk: 'Zapnúť zvuk', en: 'Unmute' },
   mute_off: { sk: 'Vypnúť zvuk', en: 'Mute' },
+
+  // ── Ako hrať (How to Play) ──
+  rules_title: { sk: '📜 Ako hrať', en: '📜 How to Play' },
+  rules_intro: {
+    sk: 'Si Vyvolávač. Povolávaš mýtické božstvá do arény a snažíš sa zničiť Nexus súpera skôr, než on zničí ten tvoj. Tu je všetko, čo potrebuješ vedieť.',
+    en: 'You are a Summoner. You call mythic deities into the arena and try to destroy your opponent\'s Nexus before they destroy yours. Here is everything you need to know.',
+  },
+  rules_goal_title: { sk: '🎯 Cieľ hry', en: '🎯 Goal' },
+  rules_goal_body: {
+    sk: 'Každý hráč má Nexus s 30 HP. Vyhráva ten, kto prvý zníži Nexus súpera na 0.',
+    en: 'Each player has a Nexus with 30 HP. Whoever reduces the opponent\'s Nexus to 0 first wins.',
+  },
+  rules_mana_title: { sk: '💧 Ťah a mana', en: '💧 Turns & Mana' },
+  rules_mana_body: {
+    sk: 'Na začiatku každého tvojho ťahu dostaneš +1 maximálnu manu (až do 10) a manu si doplníš naplno. Za manu vykladáš karty z ruky.',
+    en: 'At the start of each of your turns you gain +1 maximum mana (up to 10) and it refills fully. You spend mana to play cards from your hand.',
+  },
+  rules_phases_body: {
+    sk: 'Ťah má dve fázy: v Hlavnej fáze vykladáš karty na plochu, v Bojovej fáze útočíš pripravenými jednotkami. Novo povolaná jednotka je pripravená útočiť až od tvojho ďalšieho ťahu.',
+    en: 'A turn has two phases: in the Main phase you play cards onto the board, in the Combat phase your ready units attack. A freshly summoned unit can only attack starting your next turn.',
+  },
+  rules_lanes_title: { sk: '🛡️ Taktické línie', en: '🛡️ Tactical Lanes' },
+  rules_lanes_body: {
+    sk: 'Každý hráč má dve línie: Vanguard vpredu a Sanctum vzadu. Kým má súper aspoň jednu jednotku vo Vanguarde, nemôžeš útočiť na jeho Sanctum ani na jeho Nexus — najprv musíš prebiť predný voj.',
+    en: 'Each player has two lanes: Vanguard in front and Sanctum behind it. As long as the opponent has at least one unit in the Vanguard, you cannot attack their Sanctum or Nexus — you must break through the front line first.',
+  },
+  rules_dice_title: { sk: '⚄ Božský hod kockou', en: '⚄ The Divine Dice Roll' },
+  rules_dice_body: {
+    sk: 'Základný útok nevyžaduje hod kockou a vždy udelí štandardné poškodenie. Ak zaplatíš manu navyše, môžeš pri útoku hodiť D6 — ak padne požadované číslo (napr. 3+), aktivuje sa silný efekt karty (plošný útok, extra poškodenie, liečenie a podobne).',
+    en: 'A basic attack needs no dice roll and always deals standard damage. If you pay extra mana, you may roll a D6 on the attack — rolling the required number or higher (e.g. 3+) triggers the card\'s powerful effect (area attack, bonus damage, healing, and more).',
+  },
+  rules_dice_advantage: {
+    sk: 'Niektoré karty majú Výhodu — hádžu dvomi kockami naraz a použije sa lepší výsledok.',
+    en: 'Some cards have Advantage — they roll two dice at once and use the better result.',
+  },
+  rules_dice_chain: {
+    sk: 'Kúzla typu Push-your-luck sa hádžu opakovane: úspech reťaz predlžuje a znásobuje efekt, no padnutá šestka reťaz preruší a spôsobí spätný náraz (Overload) tebe samému.',
+    en: 'Push-your-luck spells roll repeatedly: a success extends the chain and multiplies the effect, but rolling a six ends the chain and backfires on you (Overload).',
+  },
+  rules_keywords_title: { sk: '🗝️ Kľúčové slová', en: '🗝️ Keywords' },
+  rules_kw_lava: { sk: 'Láva ∞ — útoky nechajú cieľ horieť; oheň udelí ďalšie poškodenie na začiatku každého ťahu.', en: 'Lava ∞ — attacks set the target on fire; the burn deals extra damage at the start of every turn.' },
+  rules_kw_acid: { sk: 'Kyselina ∞ — útoky trvalo rozožierajú brnenie cieľa a pri jeho strate zraňujú priamo.', en: 'Acid ∞ — attacks permanently corrode the target\'s armor and, once it\'s gone, damage it directly.' },
+  rules_kw_pest: { sk: 'Vyhubenie — okamžite zabíja tokeny (jednotky s 1 HP), ignoruje ich štíty.', en: 'Extermination — instantly kills tokens (1 HP units), ignoring their shields.' },
+  rules_kw_agile: { sk: 'Agilná — raz za ťah sa počas boja môže presunúť medzi Vanguardom a Sanctom.', en: 'Agile — once per turn during combat it may hop between Vanguard and Sanctum.' },
+  rules_kw_berserker: { sk: 'Berserker — čím menej HP mu zostáva, tým nižšie číslo potrebuje na kocke.', en: 'Berserker — the less HP it has left, the lower the number it needs on the die.' },
+  rules_kw_flying: { sk: 'Letec — jednotka Nebeského zboru patriaca do Sanctum.', en: 'Flyer — a Celestial Chorus unit that belongs in the Sanctum.' },
+  rules_win_title: { sk: '🏆 Víťazstvo', en: '🏆 Victory' },
+  rules_win_body: {
+    sk: 'Zápas končí okamžite, keď niektorému hráčovi klesne Nexus na 0 HP. Veľa šťastia, Vyvolávač!',
+    en: 'The match ends the instant either player\'s Nexus drops to 0 HP. Good luck, Summoner!',
+  },
 
   // ── Multiplayer submenu ──
   multi_title: { sk: 'Hra viacerých hráčov', en: 'Multiplayer' },
@@ -75,6 +129,10 @@ export const STRINGS = {
   mana_label: { sk: 'Mana {m}/{max}', en: 'Mana {m}/{max}' },
   place_hint: { sk: 'Vyber prázdny slot v línii {lane}.', en: 'Pick an empty slot in the {lane} lane.' },
   spell_hint: { sk: 'Vyber nepriateľskú jednotku ako cieľ kúzla.', en: 'Pick an enemy unit as the spell target.' },
+  afford_hint: {
+    sk: 'Nedostatok many — táto karta stojí {cost}, máš {mana}.',
+    en: 'Not enough mana — this card costs {cost}, you have {mana}.',
+  },
   move_hint: { sk: 'Vyber prázdny slot v druhej línii…', en: 'Pick an empty slot in the other lane…' },
   action_exhausted: { sk: '(tento ťah už konala)', en: '(already acted this turn)' },
   action_move: { sk: '↷ Presun', en: '↷ Move' },

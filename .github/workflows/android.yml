@@ -1,0 +1,130 @@
+name: Android Build
+
+# Automatické generovanie aktuálnej verzie Android aplikácie: každý push do
+# main zostaví čerstvý APK (versionName z package.json, versionCode = číslo
+# behu) a priloží ho ako artefakt behu.
+#
+# Podpísaný release build sa spustí automaticky, len ak je v repozitári
+# nastavená sada secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
+# ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD — dovtedy sa builduje len debug
+# APK (dostupný ako artefakt behu, dá sa rovno nainštalovať na testovanie).
+# Push tagu v* vytvorí GitHub Release, ale iba keď existuje podpísaný
+# release APK — debug build sa ako verejný Release nikdy nepublikuje.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - 'docs/screenshots/**'
+      - 'docs/GDD.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Web build (production)
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+        run: npm run build
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Sync web build into the native Android project
+        run: npx cap sync android
+
+      - name: Derive version (versionName from package.json, versionCode from run number)
+        id: version
+        run: |
+          VERSION_NAME=$(node -p "require('./package.json').version")
+          VERSION_CODE=${{ github.run_number }}
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          sed -i "s/versionCode [0-9]\+/versionCode $VERSION_CODE/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle
+          echo "Building versionName=$VERSION_NAME versionCode=$VERSION_CODE"
+
+      - name: Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Decode signing keystore
+        id: signing
+        if: ${{ vars.ANDROID_KEYSTORE_CONFIGURED == 'true' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.keystore
+          echo "available=true" >> "$GITHUB_OUTPUT"
+
+      - name: Release APK (signed)
+        if: steps.signing.outputs.available == 'true'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file="$PWD/app/release.keystore" \
+            -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD"
+
+      - name: Collect and rename APK(s)
+        id: apk
+        run: |
+          mkdir -p out
+          NAME="navia-v${{ steps.version.outputs.name }}-build${{ steps.version.outputs.code }}"
+          if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk "out/${NAME}-release.apk"
+            echo "primary=out/${NAME}-release.apk" >> "$GITHUB_OUTPUT"
+          fi
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/${NAME}-debug.apk"
+          echo "debug=out/${NAME}-debug.apk" >> "$GITHUB_OUTPUT"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.name }}
+          path: out/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release (on version tag, signed build only)
+        if: startsWith(github.ref, 'refs/tags/v') && steps.apk.outputs.primary != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.apk.outputs.primary }}
+          generate_release_notes: true

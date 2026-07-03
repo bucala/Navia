@@ -81,15 +81,20 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       : null;
   const selectedUnitCard = selectedUnit ? getUnitCard(selectedUnit.cardId) : null;
 
+  // Selected hand card must actually be payable — otherwise every slot would
+  // light up as "playable" only to reject the card with a mana error on click.
+  const canAffordSelected = !selectedHandCard || me.mana >= selectedHandCard.cost;
+
   const canPlaceAt = (lane: LaneId, slot: number): boolean =>
     selectedHandCard?.type === 'unit' &&
     state.phase === 'main' &&
     selectedHandCard.lane === lane &&
+    canAffordSelected &&
     !me.lanes[lane][slot];
 
   const isAttackTarget = (lane: LaneId, slot: number): boolean => {
     if (!foe.lanes[lane][slot]) return false;
-    if (selectedHandCard?.type === 'spell') return true; // spells ignore the wall
+    if (selectedHandCard?.type === 'spell') return canAffordSelected; // spells ignore the wall
     if (selection.mode !== 'unit' || state.phase !== 'combat' || !selectedUnit?.ready) return false;
     return lane === 'vanguard' || !foeHasVanguard;
   };
@@ -131,7 +136,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const clickFoeSlot = (lane: LaneId, slot: number) => {
     if (!canAct || !foe.lanes[lane][slot]) return;
     const target: TargetRef = { kind: 'unit', player: foe.id, lane, slot };
-    if (selection.mode === 'hand' && selectedHandCard?.type === 'spell') {
+    if (selection.mode === 'hand' && selectedHandCard?.type === 'spell' && canAffordSelected) {
       act({ type: 'PLAY_CARD', player: me.id, handIndex: selection.index, target });
       return;
     }
@@ -320,10 +325,12 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           ))}
         </div>
         {selectedHandCard && (
-          <p className="mt-1 text-center text-xs text-slate-400">
-            {selectedHandCard.type === 'unit'
-              ? t('place_hint', { lane: laneLabel(selectedHandCard.lane) })
-              : t('spell_hint')}
+          <p className={`mt-1 text-center text-xs ${canAffordSelected ? 'text-slate-400' : 'text-red-400'}`}>
+            {!canAffordSelected
+              ? t('afford_hint', { cost: selectedHandCard.cost, mana: me.mana })
+              : selectedHandCard.type === 'unit'
+                ? t('place_hint', { lane: laneLabel(selectedHandCard.lane) })
+                : t('spell_hint')}
           </p>
         )}
       </div>

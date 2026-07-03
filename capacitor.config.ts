@@ -9,7 +9,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  */
 const config: CapacitorConfig = {
   appId: 'com.navia.pantheon',
-  appName: 'Pantheon: Dice of Destiny',
+  appName: 'Navia',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
