@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="public/icon.svg" alt="Pantheon: Dice of Destiny" width="96" height="96">
+<img src="public/icon.svg" alt="Navia" width="96" height="96">
 
-# ⚄ Pantheon: Dice of Destiny
+# ⚄ Navia
 
 **Ovládni silu zvieracích božstiev.** Zostav balíček z mýtických tvorov naprieč
 kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
@@ -31,17 +31,18 @@ kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
 
 ## 📖 O hre
 
-**Pantheon: Dice of Destiny** je multiplayer zberateľská kartová hra, ktorá
-spája prístupnosť a vizuálnu eleganciu hier ako *Hearthstone* s taktickým
-rozmiestňovaním na hracej ploche (*Gwent*) a nepredvídateľným vzrušením
-z hádzania kociek stolových RPG. Hráči preberajú rolu **Vyvolávačov**, ktorí
-v astrálnych arénach povolávajú do boja mýtické zvieracie božstvá — od
-slovanského Medvebora cez čínskeho Wukonga až po egyptského Chepriho.
-Jadrom stratégie nie je len to, akú kartu zahráš, ale ako dokážeš
-manažovať riziko pomocou **Božského hodu kockou (D6)**.
+**Navia** je multiplayer zberateľská kartová hra, ktorá spája prístupnosť
+a vizuálnu eleganciu hier ako *Hearthstone* s taktickým rozmiestňovaním na
+hracej ploche (*Gwent*) a nepredvídateľným vzrušením z hádzania kociek
+stolových RPG. Hráči preberajú rolu **Vyvolávačov**, ktorí v astrálnych
+arénach povolávajú do boja mýtické zvieracie božstvá — od slovanského
+Medvebora cez čínskeho Wukonga až po egyptského Chepriho. Jadrom stratégie
+nie je len to, akú kartu zahráš, ale ako dokážeš manažovať riziko pomocou
+**Božského hodu kockou (D6)**.
 
 Kompletný herný návrh (mechaniky, frakcie, technologická architektúra) je
-v [Game Design Document](docs/GDD.md).
+v [Game Design Document](docs/GDD.md) pod pracovným názvom *Pantheon: Dice
+of Destiny*.
 
 ## 🎮 Hrateľné funkcie
 
@@ -182,6 +183,7 @@ src/App.tsx           hlavné menu
 - [x] **Fáza 5:** D1 perzistencia — účty, ELO rating, rebríček, deckbuilder
 - [x] Tematické menu, hra jedného hráča, ďalší hrdinovia, SK/EN lokalizácia
 - [x] Dokumentácia (README, CHANGELOG) a CI/CD
+- [x] Oprava značky Navia naprieč appkou, oprava hrateľnosti a **📜 Ako hrať** v menu
 
 Detailná história zmien je v [CHANGELOG.md](CHANGELOG.md).
 

@@ -5,13 +5,24 @@ import { useProfile } from './net/profile';
 import { AiGame } from './ui/AiGame';
 import { Codex } from './ui/Codex';
 import { DeckBuilder } from './ui/DeckBuilder';
+import { HowToPlay } from './ui/HowToPlay';
 import { Leaderboard } from './ui/Leaderboard';
 import { LocalGame } from './ui/LocalGame';
 import { OnlineGame } from './ui/OnlineGame';
 import { Settings } from './ui/Settings';
 import { isMuted, setMuted } from './ui/sfx';
 
-type Screen = 'menu' | 'multi' | 'single' | 'local' | 'online' | 'codex' | 'decks' | 'ranking' | 'settings';
+type Screen =
+  | 'menu'
+  | 'multi'
+  | 'single'
+  | 'local'
+  | 'online'
+  | 'codex'
+  | 'decks'
+  | 'ranking'
+  | 'settings'
+  | 'rules';
 
 interface MenuItem {
   icon: string;
@@ -22,6 +33,7 @@ interface MenuItem {
 
 const MAIN_MENU: MenuItem[] = [
   { icon: '⚔️', label: 'menu_single', desc: 'menu_single_desc', screen: 'single' },
+  { icon: '📜', label: 'menu_rules', desc: 'menu_rules_desc', screen: 'rules' },
   { icon: '🌐', label: 'menu_multi', desc: 'menu_multi_desc', screen: 'multi' },
   { icon: '🃏', label: 'menu_decks', desc: 'menu_decks_desc', screen: 'decks' },
   { icon: '🏛️', label: 'menu_codex', desc: 'menu_codex_desc', screen: 'codex' },
@@ -61,7 +73,7 @@ export default function App() {
     <div className="app-bg flex h-screen flex-col text-slate-100">
       <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-1.5">
         <button onClick={toMenu} className="text-sm font-bold tracking-wide text-amber-200">
-          ⚄ Pantheon: Dice of Destiny
+          ⚄ Navia
         </button>
         <div className="flex items-center gap-2">
           {profile && (
@@ -94,9 +106,9 @@ export default function App() {
           <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
             <p className="menu-die text-6xl">⚄</p>
             <h1 className="menu-title text-center text-4xl font-black tracking-wide">
-              Pantheon
+              NAVIA
               <span className="mt-1 block text-lg font-semibold tracking-[0.35em] text-amber-200/90">
-                DICE OF DESTINY
+                {t('menu_tagline')}
               </span>
             </h1>
             <p className="max-w-md text-center text-sm leading-relaxed text-slate-400">{t('menu_subtitle')}</p>
@@ -137,6 +149,7 @@ export default function App() {
       {screen === 'decks' && <DeckBuilder onBack={toMenu} />}
       {screen === 'ranking' && <Leaderboard onBack={toMenu} />}
       {screen === 'settings' && <Settings onBack={toMenu} />}
+      {screen === 'rules' && <HowToPlay onBack={toMenu} />}
     </div>
   );
 }

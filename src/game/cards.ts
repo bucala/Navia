@@ -121,10 +121,14 @@ export const KAMENNY_STRAZCA = define<UnitCardDef>({
   name: { sk: 'Kamenný strážca', en: 'Stone Warden' },
   faction: 'nature',
   rarity: 'common',
-  cost: 2,
+  // Cost 1 (was 2): the starter deck only had one 1-cost card
+  // (lavovy_skriatok), so ~50% of opening hands had nothing playable
+  // on turn 1. A second cheap defender fixes that; stats trimmed down
+  // from the old 2-cost version to keep it a fair 1-drop.
+  cost: 1,
   attack: 1,
-  maxHp: 4,
-  armor: 1,
+  maxHp: 3,
+  armor: 0,
   lane: 'vanguard',
   keywords: [],
   text: {

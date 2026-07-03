@@ -1,10 +1,35 @@
 # Changelog
 
-Kronika vývoja **Pantheon: Dice of Destiny**. Formát vychádza z
+Kronika vývoja **Navia**. Formát vychádza z
 [Keep a Changelog](https://keepachangelog.com/) a projekt sa drží
 [sémantického verzovania](https://semver.org/).
 
 Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol.
+
+## [0.10.0] — Oprava značky Navia, hrateľnosti a pravidlá v menu
+
+### Opravené
+- **Hlavné menu, hlavička, `<title>`, PWA manifest, Android app label aj
+  Capacitor appName** doteraz natvrdo zobrazovali anglický text „Pantheon:
+  Dice of Destiny" bez ohľadu na zvolený jazyk. Hra sa teraz všade
+  jednotne volá **Navia** (GDD názov „Pantheon: Dice of Destiny" ostáva ako
+  pracovný podtitul dokumentu).
+- **Hlavná herná slučka bola prakticky nehrateľná pre nového hráča**: karta
+  v ruke, ktorú si hráč nemohol dovoliť (napr. 6-manová karta na 1. ťahu s
+  1 manou), sa aj tak dala „vybrať" a všetky prázdne sloty sa ukázali ako
+  platný cieľ; kliknutie potom tvrdo zlyhalo na „Nedostatok many" bez
+  ďalšieho vysvetlenia — pri hociktorej drahšej karte to pôsobilo, akoby hra
+  vôbec nereagovala na klikanie. Výber karty aj cieľové kúzlo teraz
+  kontrolujú manu už pri highlighte slotov a namiesto tichého zlyhania sa
+  zobrazí jasná hláška („Nedostatok many — táto karta stojí X, máš Y.").
+
+### Pridané
+- **📜 Ako hrať** — nová položka v hlavnom menu s pravidlami hry (cieľ,
+  mana a fázy ťahu, pravidlo predného voja, kockový systém vrátane Výhody
+  a Push-your-luck reťazí, prehľad kľúčových slov, víťazná podmienka),
+  plne dvojjazyčná.
+
+---
 
 ## [0.9.0] — Dokumentácia a CI/CD
 

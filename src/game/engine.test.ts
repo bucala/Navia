@@ -76,7 +76,7 @@ describe('playing cards', () => {
     const unit = next.players.p1.lanes.vanguard[1];
     expect(unit?.cardId).toBe('kamenny_strazca');
     expect(unit?.ready).toBe(false);
-    expect(next.players.p1.mana).toBe(1);
+    expect(next.players.p1.mana).toBe(2); // paid the 1-mana cost
     expect(next.players.p1.hand).toHaveLength(0);
   });
 
@@ -87,7 +87,7 @@ describe('playing cards', () => {
     expect(() =>
       applyAction(g, { type: 'PLAY_CARD', player: 'p1', handIndex: 0, lane: 'vanguard', slot: 0 }, Math.random),
     ).toThrow('wrongLane');
-    g.players.p1.mana = 1;
+    g.players.p1.mana = 0;
     expect(() =>
       applyAction(g, { type: 'PLAY_CARD', player: 'p1', handIndex: 1, lane: 'vanguard', slot: 0 }, Math.random),
     ).toThrow('noMana');
@@ -249,7 +249,8 @@ describe('dice-boosted attacks', () => {
     let g = newGame();
     place(g, 'p1', 'vanguard', 0, 'megadrak');
     place(g, 'p2', 'vanguard', 1, 'gorila', { armor: 0 });
-    place(g, 'p2', 'vanguard', 0, 'kamenny_strazca', { armor: 0 });
+    // hp/maxHp pinned explicitly so this test doesn't depend on kamenny_strazca's current base stats.
+    place(g, 'p2', 'vanguard', 0, 'kamenny_strazca', { armor: 0, hp: 4, maxHp: 4 });
     g.players.p1.mana = 5;
     g = inCombat(g);
     g = applyAction(
@@ -266,7 +267,8 @@ describe('dice-boosted attacks', () => {
     place(g, 'p1', 'vanguard', 0, 'medvebor'); // attack 3
     place(g, 'p2', 'vanguard', 0, 'gorila', { armor: 0 }); // left neighbour, 6 HP
     place(g, 'p2', 'vanguard', 1, 'mahisa', { armor: 0 }); // primary, 7 HP
-    place(g, 'p2', 'vanguard', 2, 'kamenny_strazca', { armor: 0 }); // right neighbour, 4 HP
+    // hp/maxHp pinned explicitly so this test doesn't depend on kamenny_strazca's current base stats.
+    place(g, 'p2', 'vanguard', 2, 'kamenny_strazca', { armor: 0, hp: 4, maxHp: 4 }); // right neighbour, 4 HP
     place(g, 'p2', 'sanctum', 1, 'nebesky_vrabec'); // aligned back slot must stay safe
     g.players.p1.mana = 5;
     g = inCombat(g);
