@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react';
 import { useLang } from '../i18n';
 import type { StringKey } from '../i18n/strings';
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-6 first:mt-0">
       <h2 className="text-lg font-bold text-amber-200">{title}</h2>

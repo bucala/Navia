@@ -2,13 +2,14 @@ name: Android Build
 
 # Automatické generovanie aktuálnej verzie Android aplikácie: každý push do
 # main zostaví čerstvý APK (versionName z package.json, versionCode = číslo
-# behu) a priloží ho ako artefakt behu. Push tagu v* naviac vytvorí GitHub
-# Release s priloženým APK.
+# behu) a priloží ho ako artefakt behu.
 #
 # Podpísaný release build sa spustí automaticky, len ak je v repozitári
 # nastavená sada secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
-# ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD — dovtedy sa builduje debug APK,
-# ktorý sa dá rovno nainštalovať na testovanie.
+# ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD — dovtedy sa builduje len debug
+# APK (dostupný ako artefakt behu, dá sa rovno nainštalovať na testovanie).
+# Push tagu v* vytvorí GitHub Release, ale iba keď existuje podpísaný
+# release APK — debug build sa ako verejný Release nikdy nepublikuje.
 
 on:
   push:
@@ -29,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
@@ -103,7 +106,7 @@ jobs:
         id: apk
         run: |
           mkdir -p out
-          NAME="pantheon-dice-of-destiny-v${{ steps.version.outputs.name }}-build${{ steps.version.outputs.code }}"
+          NAME="navia-v${{ steps.version.outputs.name }}-build${{ steps.version.outputs.code }}"
           if [ -f android/app/build/outputs/apk/release/app-release.apk ]; then
             cp android/app/build/outputs/apk/release/app-release.apk "out/${NAME}-release.apk"
             echo "primary=out/${NAME}-release.apk" >> "$GITHUB_OUTPUT"
@@ -119,9 +122,9 @@ jobs:
           path: out/*.apk
           retention-days: 30
 
-      - name: Create GitHub Release (on version tag)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Create GitHub Release (on version tag, signed build only)
+        if: startsWith(github.ref, 'refs/tags/v') && steps.apk.outputs.primary != ''
         uses: softprops/action-gh-release@v2
         with:
-          files: out/*.apk
+          files: ${{ steps.apk.outputs.primary }}
           generate_release_notes: true

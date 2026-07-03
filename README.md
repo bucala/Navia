@@ -17,11 +17,11 @@ kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white)](public/manifest.webmanifest)
 [![i18n](https://img.shields.io/badge/jazyky-SK%20%2F%20EN-informational)](src/i18n)
 
-[Hrateľné funkcie](#-hrateľné-funkcie) •
-[Galéria](#-galéria) •
-[Technológie](#-technológie) •
-[Rýchly štart](#-rýchly-štart) •
-[Android APK](#-android-apk) •
+[Hrateľné funkcie](#hrateľné-funkcie) •
+[Galéria](#galéria) •
+[Technológie](#technológie) •
+[Rýchly štart](#rýchly-štart) •
+[Android APK](#android-apk) •
 [Changelog](CHANGELOG.md) •
 [GDD](docs/GDD.md)
 
@@ -133,8 +133,8 @@ APK sa **builduje automaticky** pri každom pushi do `main`
 `versionName` sa berie z `package.json`, `versionCode` je číslo behu, takže
 každý build nesie presnú a rastúcu verziu.
 
-- **Najnovší build:** záložka [Actions → Android Build](https://github.com/bucala/Navia/actions/workflows/android.yml) → posledný úspešný beh → artefakt `pantheon-dice-of-destiny-v*` (obsahuje debug APK, prípadne aj podpísaný release APK, ak sú v repozitári nastavené signing secrets).
-- **Vydané verzie:** push tagu `v*` (napr. `v0.9.0`) navyše vytvorí [GitHub Release](https://github.com/bucala/Navia/releases) s priloženým APK.
+- **Najnovší build:** záložka [Actions → Android Build](https://github.com/bucala/Navia/actions/workflows/android.yml) → posledný úspešný beh → artefakt s názvom `navia-v<versionName>-build<číslo behu>` (napr. `navia-v0.10.0-build42`), obsahuje debug APK a prípadne aj podpísaný release APK, ak sú v repozitári nastavené signing secrets.
+- **Vydané verzie:** push tagu `v*` (napr. `v0.10.0`) vytvorí [GitHub Release](https://github.com/bucala/Navia/releases) s priloženým APK — ale iba ak je zostavený podpísaný release build (bez neho sa Release nevytvorí, debug APK ostáva len ako artefakt behu).
 
 Manuálny build:
 
@@ -152,7 +152,7 @@ cd android && ./gradlew assembleDebug
 
 ## 📂 Štruktúra
 
-```
+```text
 docs/GDD.md           herný návrh (Game Design Document)
 docs/screenshots/     obrázky pre README
 CHANGELOG.md          história vydaní

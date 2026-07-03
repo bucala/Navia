@@ -4,7 +4,27 @@ Kronika vývoja **Navia**. Formát vychádza z
 [Keep a Changelog](https://keepachangelog.com/) a projekt sa drží
 [sémantického verzovania](https://semver.org/).
 
-Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol.
+Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol —
+pridávajú sa spätne v momente, keď je commit už na vetve (najnovšia položka
+teda dočasne odkaz mať nemusí).
+
+## [0.10.1] — Bezpečnosť CI workflowov a drobné opravy dokumentácie
+
+### Opravené
+- **`persist-credentials: false`** na `actions/checkout` v oboch workflowoch
+  (`ci.yml`, `android.yml`) — job iba builduje/testuje, nepotrebuje ponechaný
+  GitHub token v git configu pre ďalšie kroky (`npm ci`, `npm run build`),
+  ktoré spúšťajú kód tretích strán.
+- **Android Release sa už nepublikuje s nepodpísaným debug APK.** Ak nie sú
+  nastavené signing secrets, push tagu `v*` teraz release jednoducho
+  nevytvorí (debug APK ostáva dostupný ako artefakt behu); predtým by sa
+  aj bez podpisu vytvoril verejný GitHub Release s debug buildom.
+- Názov Android artefaktu zjednotený na `navia-v*` (bol `pantheon-dice-of-destiny-v*`).
+- README: opravené kotvy v obsahu (GitHub z ID nadpisu odstráni emoji aj
+  medzeru za ním, takže napr. `#-galéria` bolo nefunkčné — správne je
+  `#galéria`), spresnený názov Android artefaktu a pridaný jazyk `text` do
+  bloku so štruktúrou projektu.
+- CHANGELOG: doplnené odkazy na commit pre 0.9.0 a 0.10.0.
 
 ## [0.10.0] — Oprava značky Navia, hrateľnosti a pravidlá v menu
 
@@ -29,6 +49,8 @@ Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol.
   a Push-your-luck reťazí, prehľad kľúčových slov, víťazná podmienka),
   plne dvojjazyčná.
 
+([11c6c5f](https://github.com/bucala/Navia/commit/11c6c5f))
+
 ---
 
 ## [0.9.0] — Dokumentácia a CI/CD
@@ -44,6 +66,8 @@ Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol.
   `package.json` (`versionName`) a čísla behu (`versionCode`), priloží sa
   ako stiahnuteľný artefakt behu; k tagom `v*` navyše vytvorí GitHub Release
   s priloženým APK.
+
+([0b506ba](https://github.com/bucala/Navia/commit/0b506ba))
 
 ---
 

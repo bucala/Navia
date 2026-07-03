@@ -1,7 +1,7 @@
 {
-  "name": "pantheon-dice-of-destiny",
+  "name": "navia",
   "private": true,
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Navia — multiplayer CCG s taktickými líniami a kockovým D6 enginom.",
   "type": "module",
   "scripts": {
