@@ -1,56 +1,144 @@
-# Navia — Pantheon: Dice of Destiny
+<div align="center">
 
-Ovládni silu zvieracích božstiev! Zostav balíček z mýtických tvorov, vylož svoje karty do taktických línií, prebuď pradávnu mágiu divočiny a rozdrv súperov v neľútostnom dueli — o osude každého útoku rozhoduje Božský hod kockou (D6).
+<img src="public/icon.svg" alt="Pantheon: Dice of Destiny" width="96" height="96">
 
-Kompletný herný návrh nájdeš v **[Game Design Document (docs/GDD.md)](docs/GDD.md)**.
+# ⚄ Pantheon: Dice of Destiny
 
-## Stav projektu — Fáza 1 ✅ · Fáza 2 ✅ · Fáza 3 ✅ · Fáza 4 ✅ · Fáza 5 ✅
+**Ovládni silu zvieracích božstiev.** Zostav balíček z mýtických tvorov naprieč
+kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
+útoku rozhodnúť Božský hod kockou.
 
-Hotové sú všetky štyri fázy MVP z GDD (§7) plus Fáza 5 (perzistencia z GDD §5.2):
+[![CI](https://github.com/bucala/Navia/actions/workflows/ci.yml/badge.svg)](https://github.com/bucala/Navia/actions/workflows/ci.yml)
+[![Android Build](https://github.com/bucala/Navia/actions/workflows/android.yml/badge.svg)](https://github.com/bucala/Navia/actions/workflows/android.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers%20%2B%20D1-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
+[![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white)](public/manifest.webmanifest)
+[![i18n](https://img.shields.io/badge/jazyky-SK%20%2F%20EN-informational)](src/i18n)
 
-- **TypeScript dátové modely kariet** (`src/game/types.ts`, `src/game/cards.ts`) — jednotky, kúzla, frakcie, kľúčové slová.
-- **Kockový engine D6** (`src/game/dice.ts`) — základný hod, Výhoda (2× D6, lepší výsledok), Push-your-luck reťaz s Overloadom na 6.
-- **Herný engine** (`src/game/engine.ts`) — čistý reducer nad stavom hry: mana ramp, línie Vanguard/Sanctum, ochranný múr predného voja, statusy Láva (∞) a Kyselina (∞), Vyhubenie tokenov, plošné útoky do kríža, presuny agilných jednotiek a víťazná podmienka (Nexus 30 HP).
-- **Základná React plocha + lokálna Pass & Play hra** (`src/ui/LocalGame.tsx`) pre dvoch hráčov na jednom zariadení, s animovaným hodom kociek a záznamom priebehu zápasu.
-- **Online multiplayer (Fáza 2)** — Cloudflare Worker (`src/worker/index.ts`) + **Durable Object `GameRoom`** (`src/worker/GameRoom.ts`): jedna inštancia na zápas, jediná autorita nad stavom hry aj hodmi kociek (klient si nikdy nehádže sám). Prísne typovaný WebSocket protokol (`src/net/protocol.ts`), klientsky hook `useMultiplayerGame` a lobby s kódom miestnosti / pozvánkovou linkou (`?room=KÓD`). Reconnect cez hráčsky token vráti hráča na jeho miesto.
-- **Sieň Božstiev** (`src/ui/Codex.tsx`) — listovateľný kódex 8 postáv s príbehmi a kultúrnymi odkazmi (Wukong, Medvebor, Rysoslav, Mahiša, Chepri, Khadga, Cuauhtli, Mahákapi).
-- **Hra jedného hráča** — súboj proti **Duchovi Arény** (`src/game/ai.ts`): jednoduchá AI, ktorá vykladá jednotky, útočí a používa kockové schopnosti.
-- **Tematické menu a vizuál** — ozdobný panel so zlatým rámom, hviezdna obloha s vinetou, plnohodnotné menu (jeden hráč / multiplayer / balíčky / kódex / rebríček / nastavenia); označovanie textu je v hre vypnuté.
-- **Dvojjazyčnosť SK/EN** (`src/i18n/`) — slovenčina je predvolená, angličtina kompletne paralelná (UI, texty kariet, príbehy, herný log aj chybové hlášky — engine loguje štruktúrované kľúče správ, ktoré si každý klient vykreslí vo svojom jazyku). Prepínanie v Nastaveniach.
-- **Vizuálna vrstva (Fáza 3)** — art pipeline pre všetky karty (`src/ui/CardArt.tsx`: obrázky z `public/art/` s emoji fallbackom, viď tamojší README), plnohodnotná **3D animácia kocky** s dopadom a odskokom (GDD §6), otrasenie obrazovky pri šestke, animácie útokov (výpad útočníka, záblesk zásahu, lietajúce čísla poškodenia/liečenia, úmrtia jednotiek cez Framer Motion), kamenná/astrálna aréna a **procedurálne zvuky** cez WebAudio (rachot kocky, úspech/neúspech, zásah) s prepínačom stlmenia.
-- **Matchmaking — „Rýchla hra" (Fáza 4)** — globálny **Matchmaker Durable Object** (`src/worker/Matchmaker.ts`) páruje hľadajúcich hráčov: prvý čaká vo fronte, druhý sa okamžite spáruje do spoločnej miestnosti. Opustené fronty rieši heartbeat + TTL, zrušenie hľadania je explicitná akcia hráča.
-- **PWA + Android (Fáza 4)** — web manifest s ikonou (inštalovateľná PWA) a **Capacitor** projekt v `android/` pre export do APK; adresa backendu sa do mobilného buildu zapeká cez `VITE_API_BASE`.
-- **Účty, ELO a Deckbuilder — D1 (Fáza 5)** — anonymné profily (playerId + tajný kľúč v localStorage, `POST /api/profile`), **ELO rating** (K=32) zapisovaný priamo GameRoom Durable Objectom po skončení hodnoteného zápasu (obaja hráči s profilom), história zápasov, **🏆 Rebríček** (top 10) a **🃏 Deckbuilder**: balíčky 15–25 kariet, max 2 kópie, serverová validácia aj vlastníctvo; aktívny balíček sa použije v online zápase namiesto štartovacieho. Schéma v `migrations/`.
-- **40 unit testov** enginu, kociek, pravidiel balíčkov a ELO (Vitest).
+[Hrateľné funkcie](#-hrateľné-funkcie) •
+[Galéria](#-galéria) •
+[Technológie](#-technológie) •
+[Rýchly štart](#-rýchly-štart) •
+[Android APK](#-android-apk) •
+[Changelog](CHANGELOG.md) •
+[GDD](docs/GDD.md)
 
-Implementované karty: Megadrak, Pekelné zaklínadlo, Gorila, Papagáj, Zlatý Gryf, Bojový Kohút, Wukong (Opičí Kráľ), Medvebor, Rysoslav, Mahiša, Chepri + základné jednotky pre hrateľnosť testovacieho balíčka.
+</div>
 
-> Poznámka k balansu: GDD definuje HP, vzácnosť a mechaniky kariet; hodnoty útoku a ceny kockových schopností sú predbežné odhady pre Fázu 1 a doladia sa počas Pass & Play testovania. Emoji glyfy sú dočasná náhrada za art z R2 (Fáza 3).
+---
 
-## Spustenie
+## 📖 O hre
+
+**Pantheon: Dice of Destiny** je multiplayer zberateľská kartová hra, ktorá
+spája prístupnosť a vizuálnu eleganciu hier ako *Hearthstone* s taktickým
+rozmiestňovaním na hracej ploche (*Gwent*) a nepredvídateľným vzrušením
+z hádzania kociek stolových RPG. Hráči preberajú rolu **Vyvolávačov**, ktorí
+v astrálnych arénach povolávajú do boja mýtické zvieracie božstvá — od
+slovanského Medvebora cez čínskeho Wukonga až po egyptského Chepriho.
+Jadrom stratégie nie je len to, akú kartu zahráš, ale ako dokážeš
+manažovať riziko pomocou **Božského hodu kockou (D6)**.
+
+Kompletný herný návrh (mechaniky, frakcie, technologická architektúra) je
+v [Game Design Document](docs/GDD.md).
+
+## 🎮 Hrateľné funkcie
+
+| | |
+|---|---|
+| ⚄ **Kockový D6 engine** | Základný útok bez rizika, alebo priplať za hod kockou a odomkni devastujúci efekt. Výhoda (2× D6, lepší výsledok) aj Push-your-luck reťaze s rizikom Overloadu na šestke. |
+| 🛡️ **Taktické línie** | Vanguard chráni Sanctum — kým stojí predný voj, zadná línia aj Nexus súpera sú mimo dosahu. |
+| 🏛️ **Sieň Božstiev** | Listovateľný kódex 8 hrdinov s vlastným menom, príbehom a kultúrnym odkazom (slovanská, čínska, aztécka, egyptská a hinduistická mytológia). |
+| ⚔️ **Hra jedného hráča** | Súboj proti **Duchovi Arény** — AI súperovi, ktorý vykladá jednotky, útočí podľa pravidla predného voja a platí za kockové schopnosti. |
+| 🌐 **Online multiplayer** | Rýchla hra (automatický matchmaking) alebo súkromná miestnosť s pozvánkovou linkou. Server je jediná autorita nad stavom hry aj hodmi kociek — klient si nikdy nehádže sám. |
+| 🃏 **Deckbuilder** | Balíčky 15–25 kariet, max 2 kópie od karty, validácia na klientovi aj serveri. |
+| 🏆 **ELO rebríček** | Hodnotené online zápasy zapisujú ELO (K=32), výhry/prehry aj históriu zápasov. |
+| 🇸🇰🇬🇧 **SK/EN lokalizácia** | Slovenčina predvolená, angličtina kompletne paralelná — vrátane živého herného logu a chybových hlášok. |
+| 📱 **PWA + Android** | Inštalovateľná webová appka, natívny Android build cez Capacitor (pozri [Android APK](#-android-apk)). |
+| 🎬 **Plnohodnotné efekty** | 3D animácia kocky s dopadom a odskokom, otrasenie obrazovky pri šestke, animácie súbojov cez Framer Motion, procedurálne zvuky cez WebAudio (bez jediného audio súboru). |
+
+## 🖼️ Galéria
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/menu.jpg" alt="Hlavné menu"><br><sub>Tematické hlavné menu</sub></td>
+<td width="50%"><img src="docs/screenshots/codex.jpg" alt="Sieň Božstiev"><br><sub>Sieň Božstiev — Medvebor, Velesov Šampión</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/board.jpg" alt="Hracia plocha"><br><sub>Taktické línie Vanguard / Sanctum</sub></td>
+<td width="50%"><img src="docs/screenshots/decks.jpg" alt="Deckbuilder"><br><sub>Deckbuilder s validáciou balíčka naživo</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/screenshots/leaderboard.jpg" alt="Rebríček"><br><sub align="center">ELO rebríček</sub></td>
+</tr>
+</table>
+
+## 🧩 Frakcie a postavy
+
+| Frakcia | Zameranie | Vybraní hrdinovia |
+|---|---|---|
+| 🔥 **Lávový dvor** | Útok a deštrukcia (Láva ∞, Kyselina ∞) | Megadrak, Pekelné zaklínadlo |
+| 🌿 **Prírodný a Zemský Pakt** | Obrana a stabilita | Mahákapi, Medvebor, Mahiša, Chepri, Khadga |
+| 🕊️ **Nebeský Zbor** | Mobilita a podfuky | Wukong, Cuauhtli, Rysoslav, Bojový Kohút |
+
+Každá postava má v [Sieni Božstiev](src/game/lore.ts) vlastný príbeh a
+kultúrny odkaz — slovanská mytológia (Veles, Perún), čínska *Cesta na
+západ* (Wukong), aztécki orlí bojovníci (Cuauhtli), staroegyptský Chepri,
+hinduistický Mahišásura a budhistická džátaka o Veľkej opici (Mahákapi).
+
+## 🛠️ Technológie
+
+| Vrstva | Technológia |
+|---|---|
+| **Frontend** | React 18 · TypeScript · Vite · Tailwind CSS · Framer Motion |
+| **Herný engine** | Čistý TypeScript reducer (`src/game/`), zdieľaný medzi klientom a serverom |
+| **Backend** | Cloudflare Workers · Durable Objects (`GameRoom`, `Matchmaker`) |
+| **Databáza** | Cloudflare D1 (SQLite na edge) — účty, balíčky, ELO, história zápasov |
+| **Sieťovanie** | WebSockets, prísne typovaný protokol |
+| **Mobilné** | Capacitor (Android), PWA manifest |
+| **Testovanie** | Vitest (41+ unit testov enginu, kociek, AI, balíčkov) |
+| **CI/CD** | GitHub Actions — testy/build pri každom PR, automatický Android build |
+
+## 🚀 Rýchly štart
 
 ```bash
+git clone https://github.com/bucala/Navia.git
+cd Navia
 npm install
-npx wrangler d1 migrations apply pantheon-db --local   # raz: lokálna D1 schéma
+
+# raz: lokálna D1 schéma
+npx wrangler d1 migrations apply pantheon-db --local
+
 npm run dev          # vývojový server (Vite) — /api sa proxuje na worker
-npm run dev:worker   # Cloudflare Worker + DO + D1 lokálne (port 8787)
-npm test             # unit testy enginu (Vitest)
+npm run dev:worker   # Cloudflare Worker + Durable Objects + D1 lokálne (port 8787)
+npm test             # unit testy (Vitest)
 npm run build        # typová kontrola (app + worker) + produkčný build
 npm run deploy       # build + wrangler deploy na Cloudflare
 ```
-
-Pred prvým nasadením vytvor produkčnú D1 databázu: `wrangler d1 create pantheon-db`,
-vlož vrátené `database_id` do `wrangler.toml` a spusti
-`wrangler d1 migrations apply pantheon-db --remote`.
 
 Online hru lokálne spustíš buď cez `npm run build && npm run dev:worker`
 (worker servuje aj frontend z `dist/`), alebo počas vývoja dvomi terminálmi:
 `npm run dev:worker` + `npm run dev`.
 
-### Android APK (Capacitor)
+Pred prvým nasadením na Cloudflare vytvor produkčnú D1 databázu:
+`wrangler d1 create pantheon-db`, vlož vrátené `database_id` do
+`wrangler.toml` a spusti `wrangler d1 migrations apply pantheon-db --remote`.
+
+## 📱 Android APK
+
+APK sa **builduje automaticky** pri každom pushi do `main`
+([`.github/workflows/android.yml`](.github/workflows/android.yml)) —
+`versionName` sa berie z `package.json`, `versionCode` je číslo behu, takže
+každý build nesie presnú a rastúcu verziu.
+
+- **Najnovší build:** záložka [Actions → Android Build](https://github.com/bucala/Navia/actions/workflows/android.yml) → posledný úspešný beh → artefakt `pantheon-dice-of-destiny-v*` (obsahuje debug APK, prípadne aj podpísaný release APK, ak sú v repozitári nastavené signing secrets).
+- **Vydané verzie:** push tagu `v*` (napr. `v0.9.0`) navyše vytvorí [GitHub Release](https://github.com/bucala/Navia/releases) s priloženým APK.
+
+Manuálny build:
 
 ```bash
-# 1. web build s adresou nasadeného Workera (backend nie je v APK)
+# 1. web build s adresou nasadeného Workera (backend nie je súčasťou APK)
 VITE_API_BASE=https://pantheon-dice-of-destiny.<ucet>.workers.dev npm run build
 
 # 2. skopírovanie web buildu do natívneho projektu
@@ -61,29 +149,42 @@ cd android && ./gradlew assembleDebug
 # → android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Štruktúra
+## 📂 Štruktúra
 
 ```
-docs/GDD.md          herný návrh (Game Design Document)
-wrangler.toml        Cloudflare Worker + Durable Objects konfigurácia
-capacitor.config.ts  Capacitor (Android) konfigurácia; natívny projekt je v android/
-src/game/            čistá herná logika (bez UI) — beží u klienta (lokálna hra) aj v Durable Objecte
-  types.ts           dátové modely (karty, stav hry, akcie)
-  cards.ts           katalóg kariet a testovací balíček
-  dice.ts            kockový engine D6
-  engine.ts          reducer herných akcií
-  lore.ts            príbehy a kultúrne odkazy postáv (Sieň Božstiev)
-migrations/          D1 schéma (hráči, balíčky, zápasy)
-src/net/             WebSocket protokol, profily (D1 účty) + klientsky hook useMultiplayerGame
-src/worker/          Cloudflare Worker router, profil/deck/leaderboard API + GameRoom a Matchmaker DO
-src/ui/              React komponenty (Board, karty, kocky, log, kódex, lobby, deckbuilder, rebríček)
-src/App.tsx          hlavné menu: lokálna hra / online hra / Sieň Božstiev
+docs/GDD.md           herný návrh (Game Design Document)
+docs/screenshots/     obrázky pre README
+CHANGELOG.md          história vydaní
+wrangler.toml         Cloudflare Worker + Durable Objects konfigurácia
+capacitor.config.ts   Capacitor (Android) konfigurácia; natívny projekt je v android/
+.github/workflows/    CI (testy/build) a automatický Android build
+migrations/           D1 schéma (hráči, balíčky, zápasy)
+src/game/             čistá herná logika (bez UI) — beží u klienta aj v Durable Objecte
+  types.ts              dátové modely (karty, stav hry, akcie)
+  cards.ts              katalóg kariet a testovací balíček
+  dice.ts               kockový engine D6
+  engine.ts             reducer herných akcií
+  ai.ts                 Duch Arény (AI súper)
+  lore.ts               príbehy a kultúrne odkazy (Sieň Božstiev)
+src/net/              WebSocket protokol, profily (D1 účty) + hook useMultiplayerGame
+src/worker/           Cloudflare Worker router, profil/deck/leaderboard API + GameRoom a Matchmaker DO
+src/i18n/             slovenské a anglické preklady
+src/ui/               React komponenty (plocha, karty, kocky, kódex, lobby, deckbuilder, rebríček)
+src/App.tsx           hlavné menu
 ```
 
-## Roadmapa (GDD §7)
+## 🗺️ Roadmapa
 
 - [x] **Fáza 1:** Core Engine + lokálna Pass & Play
-- [x] **Fáza 2:** Sieťovanie — Cloudflare Durable Objects + WebSockets (server-side authority, lobby, reconnect)
-- [x] **Fáza 3:** Assety a frakcie — art pipeline, 3D kocky, animácie útokov, zvuky (samotné obrazové súbory sa doplnia do `public/art/`, neskôr R2)
-- [x] **Fáza 4:** Matchmaking („Rýchla hra") a Android — PWA manifest + Capacitor projekt (APK sa builduje lokálne v Android Studio)
-- [x] **Fáza 5:** D1 perzistencia — účty, ELO rating, rebríček a deckbuilder (GDD §5.2)
+- [x] **Fáza 2:** Sieťovanie — Cloudflare Durable Objects + WebSockets
+- [x] **Fáza 3:** Assety a frakcie — art pipeline, 3D kocky, animácie, zvuky
+- [x] **Fáza 4:** Matchmaking („Rýchla hra") a Android/PWA
+- [x] **Fáza 5:** D1 perzistencia — účty, ELO rating, rebríček, deckbuilder
+- [x] Tematické menu, hra jedného hráča, ďalší hrdinovia, SK/EN lokalizácia
+- [x] Dokumentácia (README, CHANGELOG) a CI/CD
+
+Detailná história zmien je v [CHANGELOG.md](CHANGELOG.md).
+
+## 📄 Licencia
+
+Projekt je uvoľnený pod licenciou [MIT](LICENSE).
