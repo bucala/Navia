@@ -1,0 +1,21 @@
+<!--
+  Portrait medallion ring — overlaid on top of a circular avatar (see the
+  Sieň Božstiev character list in src/ui/Codex.tsx). Transparent center and
+  surround, so it only decorates the rim.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="m-bevel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8c07a"/>
+      <stop offset="100%" stop-color="#9c6b2e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="47" fill="none" stroke="url(#m-bevel)" stroke-width="4"/>
+  <circle cx="50" cy="50" r="40" fill="none" stroke="#000" stroke-width="1.5" opacity="0.4"/>
+  <g stroke="#c9a15a" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <line x1="50" y1="1" x2="50" y2="7"/>
+    <line x1="50" y1="93" x2="50" y2="99"/>
+    <line x1="1" y1="50" x2="7" y2="50"/>
+    <line x1="93" y1="50" x2="99" y2="50"/>
+  </g>
+</svg>

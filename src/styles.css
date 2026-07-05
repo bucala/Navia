@@ -75,24 +75,6 @@ textarea,
     inset 0 1px 0 rgb(251 191 36 / 0.15);
 }
 
-.menu-title {
-  background: linear-gradient(180deg, #fde68a 10%, #d97706 55%, #92400e 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 2px 10px rgb(217 119 6 / 0.35));
-}
-
-@keyframes die-float {
-  0%, 100% { transform: translateY(0) rotate(-8deg); }
-  50% { transform: translateY(-7px) rotate(6deg); }
-}
-
-.menu-die {
-  animation: die-float 4.5s ease-in-out infinite;
-  filter: drop-shadow(0 4px 14px rgb(251 191 36 / 0.35));
-}
-
 .menu-button {
   border: 1px solid rgb(180 130 40 / 0.35);
   border-radius: 0.9rem;
@@ -231,4 +213,57 @@ textarea,
 
 .shake {
   animation: screen-shake 0.45s ease-in-out 0.9s 1;
+}
+
+/* ── Card frame templates (art direction) ──
+   9-slice border-image frames per rarity, see public/art/frames/README.md.
+   The transparent middle lets the element's own background/art show through. */
+.card-frame {
+  border-style: solid;
+  border-width: 11px;
+  border-image-repeat: stretch;
+}
+.card-frame--common { border-image-source: url('/art/frames/frame-common.svg'); border-image-slice: 34; }
+.card-frame--rare { border-image-source: url('/art/frames/frame-rare.svg'); border-image-slice: 34; }
+.card-frame--legendary {
+  border-image-source: url('/art/frames/frame-legendary.svg');
+  border-image-slice: 40;
+  border-width: 13px;
+}
+
+.slot-frame {
+  border-style: solid;
+  border-width: 6px;
+  border-image-repeat: stretch;
+}
+.slot-frame--common { border-image-source: url('/art/frames/frame-common.svg'); border-image-slice: 34; }
+.slot-frame--rare { border-image-source: url('/art/frames/frame-rare.svg'); border-image-slice: 34; }
+.slot-frame--legendary {
+  border-image-source: url('/art/frames/frame-legendary.svg');
+  border-image-slice: 40;
+  border-width: 7px;
+}
+
+/* Recessed stone alcove for empty/filled board slots. */
+.slot-alcove {
+  border-style: solid;
+  border-width: 8px;
+  border-image-source: url('/art/frames/slot-alcove.svg');
+  border-image-slice: 28;
+  border-image-repeat: stretch;
+}
+
+/* Tileable stone/rune texture behind the arena, layered under the existing glows. */
+.arena-bg {
+  position: relative;
+}
+.arena-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/art/frames/board-texture.svg');
+  background-size: 220px 220px;
+  opacity: 0.5;
+  pointer-events: none;
 }

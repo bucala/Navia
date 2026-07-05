@@ -1,0 +1,40 @@
+<!--
+  Tileable stone-block texture for the arena background (GDD §6: "Kamenný /
+  Astrálny podklad"). Seamless at 220x220 — background-size must stay 220px
+  square (see .arena-bg::before in src/styles.css) if you resize this.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <g stroke="#cbd5e1" stroke-width="1.5" opacity="0.10" fill="none">
+    <line x1="0" y1="0" x2="220" y2="0"/>
+    <line x1="0" y1="55" x2="220" y2="55"/>
+    <line x1="0" y1="110" x2="220" y2="110"/>
+    <line x1="0" y1="165" x2="220" y2="165"/>
+    <line x1="0" y1="220" x2="220" y2="220"/>
+
+    <line x1="0" y1="0" x2="0" y2="55"/>
+    <line x1="55" y1="0" x2="55" y2="55"/>
+    <line x1="110" y1="0" x2="110" y2="55"/>
+    <line x1="165" y1="0" x2="165" y2="55"/>
+    <line x1="220" y1="0" x2="220" y2="55"/>
+
+    <line x1="27.5" y1="55" x2="27.5" y2="110"/>
+    <line x1="82.5" y1="55" x2="82.5" y2="110"/>
+    <line x1="137.5" y1="55" x2="137.5" y2="110"/>
+    <line x1="192.5" y1="55" x2="192.5" y2="110"/>
+
+    <line x1="0" y1="110" x2="0" y2="165"/>
+    <line x1="55" y1="110" x2="55" y2="165"/>
+    <line x1="110" y1="110" x2="110" y2="165"/>
+    <line x1="165" y1="110" x2="165" y2="165"/>
+    <line x1="220" y1="110" x2="220" y2="165"/>
+
+    <line x1="27.5" y1="165" x2="27.5" y2="220"/>
+    <line x1="82.5" y1="165" x2="82.5" y2="220"/>
+    <line x1="137.5" y1="165" x2="137.5" y2="220"/>
+    <line x1="192.5" y1="165" x2="192.5" y2="220"/>
+  </g>
+  <g stroke="#c9a15a" stroke-width="2" stroke-linecap="round" opacity="0.09">
+    <line x1="55" y1="20" x2="55" y2="35"/>
+    <line x1="165" y1="130" x2="165" y2="145"/>
+  </g>
+</svg>

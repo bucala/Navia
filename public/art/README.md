@@ -1,5 +1,8 @@
 # Art kariet
 
+> Rámy kariet/plochy a značka hry sú samostatne v [`frames/`](frames/README.md)
+> a [`branding/`](branding/README.md) — tento README je len o postavičkách nižšie.
+
 Finálne AI obrázky (extrahované zo zadania) sú nasadené pre 10 postáv;
 zvyšných 6 kariet používa vygenerované placeholder „astrálne erby" —
 prepíš ich súbormi s rovnakým názvom (pomer na výšku, ~1024 px šírka)
