@@ -38,7 +38,16 @@ export function Codex({ onBack }: { onBack: () => void }) {
                 i === index ? 'bg-slate-800/80 text-amber-200' : 'text-slate-300 hover:bg-slate-900'
               }`}
             >
-              <span className="text-2xl">{c.glyph}</span>
+              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900">
+                <CardArt cardId={item.cardId} className="h-full w-full rounded-full" glyphClass="text-lg" />
+                <img
+                  src="/art/frames/medallion.svg"
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  className="pointer-events-none absolute inset-0 h-full w-full"
+                />
+              </span>
               <span className="truncate">{lx(c.name)}</span>
             </button>
           );
@@ -59,7 +68,9 @@ export function Codex({ onBack }: { onBack: () => void }) {
 
           <div className="flex flex-col gap-6 md:flex-row">
             {/* Art */}
-            <div className="mx-auto flex h-80 w-64 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-amber-900/60 bg-gradient-to-b from-slate-800 to-slate-950 shadow-2xl">
+            <div
+              className={`card-frame card-frame--${card.rarity} mx-auto flex h-80 w-64 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-800 to-slate-950 shadow-2xl`}
+            >
               <CardArt cardId={entry.cardId} className="h-full w-full" glyphClass="text-8xl" />
             </div>
 

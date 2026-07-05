@@ -58,6 +58,7 @@ of Destiny*.
 | 🇸🇰🇬🇧 **SK/EN lokalizácia** | Slovenčina predvolená, angličtina kompletne paralelná — vrátane živého herného logu a chybových hlášok. |
 | 📱 **PWA + Android** | Inštalovateľná webová appka, natívny Android build cez Capacitor (pozri [Android APK](#-android-apk)). |
 | 🎬 **Plnohodnotné efekty** | 3D animácia kocky s dopadom a odskokom, otrasenie obrazovky pri šestke, animácie súbojov cez Framer Motion, procedurálne zvuky cez WebAudio (bez jediného audio súboru). |
+| 🎨 **Vizuálna identita** | Logo a značka Navia, editovateľné SVG templaty rámov kariet/plochy/portrétov (`public/art/`, 9-slice `border-image`) a generátor favicon/PWA/Android ikon (`npm run icons`). |
 
 ## 🖼️ Galéria
 

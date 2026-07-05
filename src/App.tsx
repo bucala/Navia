@@ -72,8 +72,9 @@ export default function App() {
   return (
     <div className="app-bg flex h-screen flex-col text-slate-100">
       <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-1.5">
-        <button onClick={toMenu} className="text-sm font-bold tracking-wide text-amber-200">
-          ⚄ Navia
+        <button onClick={toMenu} className="flex items-center gap-2 text-sm font-bold tracking-wide text-amber-200">
+          <img src="/art/branding/navia-mark.svg" alt="" aria-hidden="true" className="h-6 w-6 rounded" />
+          Navia
         </button>
         <div className="flex items-center gap-2">
           {profile && (
@@ -102,15 +103,36 @@ export default function App() {
       </header>
 
       {screen === 'menu' && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-8">
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-8">
+          <img
+            src="/art/frames/ornament-corner.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2 top-2 h-16 w-16 opacity-70 sm:left-6 sm:top-6 sm:h-24 sm:w-24"
+          />
+          <img
+            src="/art/frames/ornament-corner.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute right-2 top-2 h-16 w-16 -scale-x-100 opacity-70 sm:right-6 sm:top-6 sm:h-24 sm:w-24"
+          />
+          <img
+            src="/art/frames/ornament-corner.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 left-2 h-16 w-16 -scale-y-100 opacity-70 sm:bottom-6 sm:left-6 sm:h-24 sm:w-24"
+          />
+          <img
+            src="/art/frames/ornament-corner.svg"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 right-2 h-16 w-16 -scale-x-100 -scale-y-100 opacity-70 sm:bottom-6 sm:right-6 sm:h-24 sm:w-24"
+          />
+
           <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
-            <p className="menu-die text-6xl">⚄</p>
-            <h1 className="menu-title text-center text-4xl font-black tracking-wide">
-              NAVIA
-              <span className="mt-1 block text-lg font-semibold tracking-[0.35em] text-amber-200/90">
-                {t('menu_tagline')}
-              </span>
-            </h1>
+            <img src="/art/branding/navia-logo.svg" alt="Navia" className="w-full max-w-sm" />
+            <p className="-mt-1 text-lg font-semibold tracking-[0.35em] text-amber-200/90">{t('menu_tagline')}</p>
+            <img src="/art/frames/ornament-divider.svg" alt="" aria-hidden="true" className="h-3 w-40" />
             <p className="max-w-md text-center text-sm leading-relaxed text-slate-400">{t('menu_subtitle')}</p>
             <div className="mt-5 flex flex-col gap-2.5">
               {MAIN_MENU.map((item) => (

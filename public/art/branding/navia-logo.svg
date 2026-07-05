@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <defs>
+    <radialGradient id="stoneBg" cx="50%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#4a3826"/>
+      <stop offset="60%" stop-color="#2c2013"/>
+      <stop offset="100%" stop-color="#160f08"/>
+    </radialGradient>
+    <linearGradient id="stoneBevel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8a6a3f"/>
+      <stop offset="100%" stop-color="#332512"/>
+    </linearGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8c07a"/>
+      <stop offset="100%" stop-color="#9c6b2e"/>
+    </linearGradient>
+    <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe58a"/>
+      <stop offset="45%" stop-color="#f6a723"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Animal medallions, local box 0 0 100 100 -->
+    <g id="buffalo">
+      <path d="M48 40 C 26 34, 8 24, 6 6 C 18 16, 32 28, 42 34 Z" fill="url(#bronze)"/>
+      <path d="M52 40 C 74 34, 92 24, 94 6 C 82 16, 68 28, 58 34 Z" fill="url(#bronze)"/>
+      <ellipse cx="50" cy="66" rx="26" ry="24" fill="url(#bronze)"/>
+      <ellipse cx="50" cy="88" rx="14" ry="10" fill="#4a2f17"/>
+      <circle cx="40" cy="60" r="3.5" fill="#241b13"/>
+      <circle cx="60" cy="60" r="3.5" fill="#241b13"/>
+    </g>
+    <g id="monkey">
+      <path d="M50 6 L58 22 L50 18 L42 22 Z" fill="url(#bronze)"/>
+      <path d="M32 14 L44 26 L36 30 Z" fill="url(#bronze)"/>
+      <path d="M68 14 L56 26 L64 30 Z" fill="url(#bronze)"/>
+      <circle cx="50" cy="58" r="30" fill="url(#bronze)"/>
+      <circle cx="24" cy="52" r="8" fill="url(#bronze)"/>
+      <circle cx="76" cy="52" r="8" fill="url(#bronze)"/>
+      <ellipse cx="50" cy="66" rx="14" ry="11" fill="#4a2f17"/>
+      <circle cx="40" cy="52" r="3.5" fill="#241b13"/>
+      <circle cx="60" cy="52" r="3.5" fill="#241b13"/>
+    </g>
+    <g id="elephant">
+      <path d="M22 40 C 2 44, 0 74, 20 82 C 32 86, 40 76, 34 64 C 42 68, 46 56, 36 48 Z" fill="url(#bronze)"/>
+      <path d="M78 40 C 98 44, 100 74, 80 82 C 68 86, 60 76, 66 64 C 58 68, 54 56, 64 48 Z" fill="url(#bronze)"/>
+      <ellipse cx="50" cy="56" rx="24" ry="22" fill="url(#bronze)"/>
+      <path d="M40 66 C 38 84, 42 96, 36 108 C 33 111, 40 114, 44 110 C 50 100, 48 82, 48 66 Z" fill="url(#bronze)"/>
+      <path d="M30 70 C 24 82, 26 90, 20 92" fill="none" stroke="#f1e6cf" stroke-width="4" stroke-linecap="round"/>
+      <path d="M56 70 C 60 80, 58 86, 62 88" fill="none" stroke="#f1e6cf" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="42" cy="52" r="3.5" fill="#241b13"/>
+      <circle cx="58" cy="52" r="3.5" fill="#241b13"/>
+    </g>
+    <g id="eagle">
+      <path d="M46 6 L50 -6 L54 6 Z" fill="url(#bronze)"/>
+      <path d="M50 10 C 22 10, 10 30, 14 48 C 17 62, 30 72, 50 74 C 70 72, 83 62, 86 48 C 90 30, 78 10, 50 10 Z" fill="url(#bronze)"/>
+      <path d="M32 50 Q50 44 68 50 L52 62 Q50 66 48 62 Z" fill="#f1e6cf"/>
+      <circle cx="36" cy="42" r="4" fill="#241b13"/>
+      <circle cx="64" cy="42" r="4" fill="#241b13"/>
+    </g>
+    <g id="bear">
+      <circle cx="24" cy="26" r="12" fill="url(#bronze)"/>
+      <circle cx="76" cy="26" r="12" fill="url(#bronze)"/>
+      <circle cx="24" cy="26" r="6" fill="#4a2f17"/>
+      <circle cx="76" cy="26" r="6" fill="#4a2f17"/>
+      <ellipse cx="50" cy="58" rx="32" ry="28" fill="url(#bronze)"/>
+      <ellipse cx="50" cy="76" rx="16" ry="12" fill="#c9a15a"/>
+      <ellipse cx="50" cy="80" rx="7" ry="5.5" fill="#241b13"/>
+      <circle cx="38" cy="54" r="3.5" fill="#241b13"/>
+      <circle cx="62" cy="54" r="3.5" fill="#241b13"/>
+    </g>
+
+    <g id="medallionRing">
+      <circle cx="50" cy="50" r="49" fill="#1c140b" stroke="url(#stoneBevel)" stroke-width="4"/>
+      <circle cx="50" cy="50" r="41" fill="none" stroke="#000" stroke-width="2" opacity="0.5"/>
+    </g>
+  </defs>
+
+  <!-- Outer stone tablet -->
+  <rect x="16" y="30" width="968" height="540" rx="46" fill="url(#stoneBg)" stroke="url(#stoneBevel)" stroke-width="10"/>
+  <rect x="40" y="54" width="920" height="492" rx="30" fill="none" stroke="#000" stroke-width="4" opacity="0.35"/>
+
+  <!-- Rune tick rows -->
+  <g stroke="#c9a15a" stroke-width="5" stroke-linecap="round" opacity="0.7">
+    <line x1="270" y1="68" x2="270" y2="86"/>
+    <line x1="300" y1="70" x2="310" y2="84"/>
+    <line x1="335" y1="68" x2="335" y2="86"/>
+    <line x1="665" y1="68" x2="665" y2="86"/>
+    <line x1="690" y1="70" x2="700" y2="84"/>
+    <line x1="730" y1="68" x2="730" y2="86"/>
+
+    <line x1="120" y1="514" x2="120" y2="532"/>
+    <line x1="150" y1="516" x2="160" y2="530"/>
+    <line x1="185" y1="514" x2="185" y2="532"/>
+    <line x1="815" y1="514" x2="815" y2="532"/>
+    <line x1="840" y1="516" x2="850" y2="530"/>
+    <line x1="880" y1="514" x2="880" y2="532"/>
+  </g>
+
+  <!-- Top medallions -->
+  <use href="#medallionRing" x="95" y="34" width="110" height="110"/>
+  <use href="#buffalo" x="106" y="45" width="88" height="88"/>
+
+  <use href="#medallionRing" x="445" y="-6" width="110" height="110"/>
+  <use href="#monkey" x="456" y="5" width="88" height="88"/>
+
+  <g transform="translate(850,0) scale(-1,1) translate(-850,0)">
+    <use href="#medallionRing" x="795" y="34" width="110" height="110"/>
+    <use href="#elephant" x="806" y="45" width="88" height="88"/>
+  </g>
+
+  <!-- Bottom medallions -->
+  <use href="#medallionRing" x="255" y="472" width="110" height="110"/>
+  <use href="#eagle" x="266" y="483" width="88" height="88"/>
+
+  <use href="#medallionRing" x="635" y="472" width="110" height="110"/>
+  <use href="#bear" x="646" y="483" width="88" height="88"/>
+
+  <!-- Wordmark -->
+  <g filter="url(#glow)">
+    <text x="500" y="345" text-anchor="middle" font-family="'Arial Black', Impact, Haettenschweiler, sans-serif"
+          font-size="200" font-weight="900" letter-spacing="6"
+          fill="url(#fire)" stroke="#1a1108" stroke-width="10" paint-order="stroke fill" stroke-linejoin="round">NAVIA</text>
+  </g>
+</svg>

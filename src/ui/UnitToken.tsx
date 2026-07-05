@@ -15,10 +15,10 @@ const HIGHLIGHT_RING: Record<SlotHighlight, string> = {
   selected: 'ring-2 ring-yellow-300',
 };
 
-const FACTION_FRAME: Record<Faction, string> = {
-  lava: 'border-red-800/90',
-  nature: 'border-emerald-800/90',
-  celestial: 'border-sky-800/90',
+const FACTION_BG: Record<Faction, string> = {
+  lava: 'from-red-950 to-orange-900',
+  nature: 'from-emerald-950 to-green-900',
+  celestial: 'from-sky-950 to-indigo-900',
 };
 
 interface Props {
@@ -42,7 +42,7 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
   return (
     <div
       onClick={onClick}
-      className={`relative h-24 w-20 rounded-lg border border-slate-700/80 bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition ${HIGHLIGHT_RING[highlight]}`}
+      className={`slot-alcove relative h-24 w-20 rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition ${HIGHLIGHT_RING[highlight]}`}
     >
       <AnimatePresence>
         {unit && card && (
@@ -53,7 +53,7 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
             exit={{ scale: 0.4, opacity: 0, rotate: 10 }}
             transition={{ duration: 0.22 }}
             title={lx(card.text)}
-            className={`absolute inset-0 overflow-hidden rounded-lg border-2 bg-slate-800 ${FACTION_FRAME[card.faction]} ${fxClasses}`}
+            className={`slot-frame slot-frame--${card.rarity} absolute inset-0 overflow-hidden rounded-lg bg-gradient-to-b ${FACTION_BG[card.faction]} ${fxClasses}`}
           >
             <CardArt cardId={card.id} className="absolute inset-0 h-full w-full" glyphClass="text-3xl" />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-1 pb-0.5 pt-3 text-center">

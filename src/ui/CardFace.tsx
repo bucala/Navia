@@ -1,5 +1,5 @@
 import { getCard } from '../game/cards';
-import type { Faction, Rarity } from '../game/types';
+import type { Faction } from '../game/types';
 import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
 
@@ -7,12 +7,6 @@ const FACTION_BG: Record<Faction, string> = {
   lava: 'from-red-950 to-orange-950',
   nature: 'from-emerald-950 to-green-950',
   celestial: 'from-sky-950 to-indigo-950',
-};
-
-const RARITY_BORDER: Record<Rarity, string> = {
-  common: 'border-slate-500',
-  rare: 'border-violet-400',
-  legendary: 'border-amber-400',
 };
 
 interface Props {
@@ -30,7 +24,7 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
     <button
       onClick={onClick}
       title={lx(card.text)}
-      className={`relative flex h-48 w-30 shrink-0 flex-col overflow-hidden rounded-xl border-2 bg-gradient-to-b transition-transform ${FACTION_BG[card.faction]} ${RARITY_BORDER[card.rarity]} ${
+      className={`card-frame card-frame--${card.rarity} relative flex h-48 w-30 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-transform ${FACTION_BG[card.faction]} ${
         selected ? '-translate-y-3 ring-2 ring-yellow-300' : 'hover:-translate-y-1.5'
       } ${affordable ? '' : 'opacity-50 grayscale'}`}
     >
