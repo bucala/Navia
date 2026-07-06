@@ -32,8 +32,8 @@ kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
 ## 📖 O hre
 
 **Navia** je multiplayer zberateľská kartová hra, ktorá spája prístupnosť
-a vizuálnu eleganciu hier ako *Hearthstone* s taktickým rozmiestňovaním na
-hracej ploche (*Gwent*) a nepredvídateľným vzrušením z hádzania kociek
+a vizuálnu eleganciu hier s taktickým rozmiestňovaním na
+hracej ploche a nepredvídateľným vzrušením z hádzania kociek
 stolových RPG. Hráči preberajú rolu **Vyvolávačov**, ktorí v astrálnych
 arénach povolávajú do boja mýtické zvieracie božstvá — od slovanského
 Medvebora cez čínskeho Wukonga až po egyptského Chepriho. Jadrom stratégie
