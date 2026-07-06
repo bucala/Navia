@@ -2,7 +2,7 @@
 
 <img src="public/icon.svg" alt="Navia" width="96" height="96">
 
-#Navia
+Navia
 
 **Ovládni silu zvieracích božstiev.** Zostav balíček z mýtických tvorov naprieč
 kultúrami sveta, vylož karty do taktických línií a nechaj o osude každého
