@@ -24,12 +24,12 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
     <button
       onClick={onClick}
       title={lx(card.text)}
-      className={`card-frame card-frame--${card.rarity} relative flex h-48 w-30 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-transform ${FACTION_BG[card.faction]} ${
+      className={`card-frame card-frame--${card.rarity} relative flex h-40 w-28 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-transform sm:h-44 sm:w-30 md:h-52 md:w-34 lg:h-60 lg:w-40 ${FACTION_BG[card.faction]} ${
         selected ? '-translate-y-3 ring-2 ring-yellow-300' : 'hover:-translate-y-1.5'
       } ${affordable ? '' : 'opacity-50 grayscale'}`}
     >
       {/* Art fills the top half of the card. */}
-      <div className="relative h-24 w-full shrink-0">
+      <div className="relative h-16 w-full shrink-0 sm:h-20 md:h-24 lg:h-28">
         <CardArt cardId={cardId} className="h-full w-full" glyphClass="text-5xl" />
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/70 to-transparent" />
         <span className="absolute left-1 top-1 flex h-7 w-7 rotate-45 items-center justify-center rounded-sm border border-cyan-200 bg-gradient-to-br from-cyan-400 to-blue-700 shadow-lg">

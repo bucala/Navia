@@ -168,35 +168,37 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const renderLane = (owner: 'me' | 'foe', lane: LaneId) => {
     const player = owner === 'me' ? me : foe;
     return (
-      <div className="flex items-center justify-center gap-2 py-1">
-        <span className="w-20 text-right text-[10px] uppercase tracking-widest text-slate-500">
+      <div className="flex items-center justify-center gap-1 py-1 sm:gap-2">
+        <span className="w-8 shrink-0 text-right text-[8px] uppercase tracking-widest text-slate-500 sm:w-14 sm:text-[9px] md:w-16 lg:w-20 lg:text-[10px]">
           {laneLabel(lane)}
         </span>
-        {player.lanes[lane].map((unit, slot) => {
-          let highlight: SlotHighlight = 'none';
-          if (owner === 'me') {
-            if (canPlaceAt(lane, slot)) highlight = 'place';
-            else if (canMoveTo(lane, slot)) highlight = 'move';
-            else if (
-              (selection.mode === 'unit' || selection.mode === 'move') &&
-              sameSlot(selection.ref, { lane, slot })
-            )
-              highlight = 'selected';
-          } else if (isAttackTarget(lane, slot)) {
-            highlight = 'attack';
-          }
-          return (
-            <UnitSlot
-              key={slot}
-              unit={unit}
-              highlight={highlight}
-              enemySide={owner === 'foe'}
-              fx={fx[slotFxKey(player.id, lane, slot)]}
-              onClick={() => (owner === 'me' ? clickMySlot(lane, slot) : clickFoeSlot(lane, slot))}
-            />
-          );
-        })}
-        <span className="w-20" />
+        <div className="flex flex-1 justify-center gap-1 sm:gap-2">
+          {player.lanes[lane].map((unit, slot) => {
+            let highlight: SlotHighlight = 'none';
+            if (owner === 'me') {
+              if (canPlaceAt(lane, slot)) highlight = 'place';
+              else if (canMoveTo(lane, slot)) highlight = 'move';
+              else if (
+                (selection.mode === 'unit' || selection.mode === 'move') &&
+                sameSlot(selection.ref, { lane, slot })
+              )
+                highlight = 'selected';
+            } else if (isAttackTarget(lane, slot)) {
+              highlight = 'attack';
+            }
+            return (
+              <UnitSlot
+                key={slot}
+                unit={unit}
+                highlight={highlight}
+                enemySide={owner === 'foe'}
+                fx={fx[slotFxKey(player.id, lane, slot)]}
+                onClick={() => (owner === 'me' ? clickMySlot(lane, slot) : clickFoeSlot(lane, slot))}
+              />
+            );
+          })}
+        </div>
+        <span className="hidden w-14 shrink-0 sm:block md:w-16 lg:w-20" />
       </div>
     );
   };

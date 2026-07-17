@@ -44,11 +44,16 @@ const MAIN_MENU: MenuItem[] = [
 function MenuButton({ item, onClick }: { item: MenuItem; onClick: () => void }) {
   const { t } = useLang();
   return (
-    <button onClick={onClick} className="menu-button group flex w-80 items-center gap-4 px-5 py-3 text-left">
-      <span className="text-3xl drop-shadow-lg transition-transform group-hover:scale-110">{item.icon}</span>
+    <button
+      onClick={onClick}
+      className="menu-button group flex w-full items-center gap-4 px-5 py-3.5 text-left sm:py-4"
+    >
+      <span className="text-3xl drop-shadow-lg transition-transform group-hover:scale-110 sm:text-4xl">
+        {item.icon}
+      </span>
       <span className="min-w-0">
-        <span className="block font-semibold tracking-wide text-amber-100">{t(item.label)}</span>
-        <span className="block truncate text-xs text-slate-400">{t(item.desc)}</span>
+        <span className="block font-semibold tracking-wide text-amber-100 sm:text-lg">{t(item.label)}</span>
+        <span className="block truncate text-xs text-slate-400 sm:text-sm">{t(item.desc)}</span>
       </span>
       <span className="ml-auto text-amber-700 transition-transform group-hover:translate-x-1">❯</span>
     </button>
@@ -70,7 +75,7 @@ export default function App() {
   const toMenu = () => setScreen('menu');
 
   return (
-    <div className="app-bg flex h-screen flex-col text-slate-100">
+    <div className="app-bg flex h-[100dvh] flex-col text-slate-100">
       <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-1.5">
         <button onClick={toMenu} className="flex items-center gap-2 text-sm font-bold tracking-wide text-amber-200">
           <img src="/art/branding/navia-mark.svg" alt="" aria-hidden="true" className="h-6 w-6 rounded" />
@@ -103,7 +108,7 @@ export default function App() {
       </header>
 
       {screen === 'menu' && (
-        <div className="relative flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-8">
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-3 py-4 sm:gap-6 sm:px-6 sm:py-8">
           <img
             src="/art/frames/ornament-corner.svg"
             alt=""
@@ -129,12 +134,13 @@ export default function App() {
             className="pointer-events-none absolute bottom-2 right-2 h-16 w-16 -scale-x-100 -scale-y-100 opacity-70 sm:bottom-6 sm:right-6 sm:h-24 sm:w-24"
           />
 
-          <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
-            <img src="/art/branding/navia-logo.svg" alt="Navia" className="w-full max-w-sm" />
-            <p className="-mt-1 text-lg font-semibold tracking-[0.35em] text-amber-200/90">{t('menu_tagline')}</p>
+          <div className="menu-panel flex w-full max-w-2xl flex-col items-center gap-3 px-6 py-8 sm:px-14 sm:py-12">
+            <img src="/art/branding/navia-logo.svg" alt="Navia" className="w-full max-w-md sm:max-w-lg" />
             <img src="/art/frames/ornament-divider.svg" alt="" aria-hidden="true" className="h-3 w-40" />
-            <p className="max-w-md text-center text-sm leading-relaxed text-slate-400">{t('menu_subtitle')}</p>
-            <div className="mt-5 flex flex-col gap-2.5">
+            <p className="max-w-lg text-center text-sm leading-relaxed text-slate-400 sm:text-base">
+              {t('menu_subtitle')}
+            </p>
+            <div className="mt-6 flex w-full max-w-md flex-col gap-3">
               {MAIN_MENU.map((item) => (
                 <MenuButton key={item.screen} item={item} onClick={() => setScreen(item.screen)} />
               ))}
@@ -144,10 +150,10 @@ export default function App() {
       )}
 
       {screen === 'multi' && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
-          <div className="menu-panel flex flex-col items-center gap-2 px-8 py-6 sm:px-14">
-            <h2 className="text-2xl font-bold text-amber-100">🌐 {t('multi_title')}</h2>
-            <div className="mt-4 flex flex-col gap-2.5">
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-3 sm:px-4">
+          <div className="menu-panel flex w-full max-w-2xl flex-col items-center gap-3 px-6 py-8 sm:px-14 sm:py-12">
+            <h2 className="text-2xl font-bold text-amber-100 sm:text-3xl">🌐 {t('multi_title')}</h2>
+            <div className="mt-4 flex w-full max-w-md flex-col gap-3">
               <MenuButton
                 item={{ icon: '⚡', label: 'multi_online', desc: 'multi_online_desc', screen: 'online' }}
                 onClick={() => setScreen('online')}

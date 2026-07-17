@@ -144,6 +144,8 @@ export const STRINGS = {
   dice_success: { sk: 'Úspech! ({t}+)', en: 'Success! ({t}+)' },
   dice_failure: { sk: 'Neúspech ({t}+)', en: 'Failure ({t}+)' },
   log_title: { sk: 'Priebeh zápasu', en: 'Match log' },
+  log_hide: { sk: 'Skryť panel', en: 'Hide panel' },
+  log_show: { sk: 'Zobraziť panel', en: 'Show panel' },
   vs_threshold: { sk: 'proti {t}+', en: 'vs {t}+' },
   roll_success: { sk: 'úspech', en: 'success' },
   roll_failure: { sk: 'neúspech', en: 'failure' },

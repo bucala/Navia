@@ -42,7 +42,7 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
   return (
     <div
       onClick={onClick}
-      className={`slot-alcove relative h-24 w-20 rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition ${HIGHLIGHT_RING[highlight]}`}
+      className={`slot-alcove relative aspect-[4/5] w-full min-w-[3rem] max-w-[4rem] flex-1 rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition sm:max-w-[5rem] md:max-w-[5.75rem] lg:max-w-[7rem] ${HIGHLIGHT_RING[highlight]}`}
     >
       <AnimatePresence>
         {unit && card && (

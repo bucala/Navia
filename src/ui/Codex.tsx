@@ -38,8 +38,12 @@ export function Codex({ onBack }: { onBack: () => void }) {
                 i === index ? 'bg-slate-800/80 text-amber-200' : 'text-slate-300 hover:bg-slate-900'
               }`}
             >
-              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900">
-                <CardArt cardId={item.cardId} className="h-full w-full rounded-full" glyphClass="text-lg" />
+              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-900">
+                <CardArt
+                  cardId={item.cardId}
+                  className="h-full w-full origin-top scale-[1.7] object-top"
+                  glyphClass="text-lg"
+                />
                 <img
                   src="/art/frames/medallion.svg"
                   alt=""
