@@ -1,15 +1,15 @@
-name: Android Build
+﻿name: Android Build
 
-# Automatické generovanie aktuálnej verzie Android aplikácie: každý push do
-# main zostaví čerstvý APK (versionName z package.json, versionCode = číslo
-# behu) a priloží ho ako artefakt behu.
+# AutomatickĂ© generovanie aktuĂˇlnej verzie Android aplikĂˇcie: kaĹľdĂ˝ push do
+# main zostavĂ­ ÄŤerstvĂ˝ APK (versionName z package.json, versionCode = ÄŤĂ­slo
+# behu) a priloĹľĂ­ ho ako artefakt behu.
 #
-# Podpísaný release build sa spustí automaticky, len ak je v repozitári
-# nastavená sada secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
-# ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD — dovtedy sa builduje len debug
-# APK (dostupný ako artefakt behu, dá sa rovno nainštalovať na testovanie).
-# Push tagu v* vytvorí GitHub Release, ale iba keď existuje podpísaný
-# release APK — debug build sa ako verejný Release nikdy nepublikuje.
+# PodpĂ­sanĂ˝ release build sa spustĂ­ automaticky, len ak je v repozitĂˇri
+# nastavenĂˇ sada secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
+# ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD â€” dovtedy sa builduje len debug
+# APK (dostupnĂ˝ ako artefakt behu, dĂˇ sa rovno nainĹˇtalovaĹĄ na testovanie).
+# Push tagu v* vytvorĂ­ GitHub Release, ale iba keÄŹ existuje podpĂ­sanĂ˝
+# release APK â€” debug build sa ako verejnĂ˝ Release nikdy nepublikuje.
 
 on:
   push:
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - uses: android-actions/setup-android@v3
 
@@ -128,3 +128,4 @@ jobs:
         with:
           files: ${{ steps.apk.outputs.primary }}
           generate_release_notes: true
+
