@@ -72,8 +72,8 @@ export function Settings({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      <button onClick={onBack} className="mt-8 text-xs text-slate-400 hover:text-slate-200">
-        {t('back_menu')}
+      <button onClick={onBack} className="navia-back-btn mt-8">
+        ← {t('back_menu')}
       </button>
     </div>
   );

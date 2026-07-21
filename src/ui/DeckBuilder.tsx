@@ -44,8 +44,8 @@ export function DeckBuilder({ onBack }: { onBack: () => void }) {
     return (
       <Center>
         {t('profile_missing')}
-        <button onClick={onBack} className="mt-4 rounded bg-slate-700 px-4 py-2 text-sm hover:bg-slate-600">
-          {t('back_menu')}
+        <button onClick={onBack} className="navia-back-btn mt-4">
+          ← {t('back_menu')}
         </button>
       </Center>
     );
@@ -153,8 +153,8 @@ export function DeckBuilder({ onBack }: { onBack: () => void }) {
         ))}
       </div>
 
-      <button onClick={onBack} className="mt-6 text-xs text-slate-400 hover:text-slate-200">
-        {t('back_menu')}
+      <button onClick={onBack} className="navia-back-btn mt-6">
+        ← {t('back_menu')}
       </button>
       {toast && <Toast message={toast} />}
     </div>

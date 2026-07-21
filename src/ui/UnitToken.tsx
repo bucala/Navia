@@ -9,10 +9,10 @@ export type SlotHighlight = 'none' | 'place' | 'attack' | 'move' | 'selected';
 
 const HIGHLIGHT_RING: Record<SlotHighlight, string> = {
   none: '',
-  place: 'ring-2 ring-emerald-400 cursor-pointer',
-  attack: 'ring-2 ring-red-500 cursor-pointer',
-  move: 'ring-2 ring-sky-400 cursor-pointer',
-  selected: 'ring-2 ring-yellow-300',
+  place: 'shadow-[0_0_15px_rgba(52,211,153,0.85)] border border-emerald-400 cursor-pointer scale-[1.02] transition-all duration-200',
+  attack: 'shadow-[0_0_18px_rgba(239,68,68,0.9)] border border-red-500 cursor-pointer animate-pulse',
+  move: 'shadow-[0_0_15px_rgba(56,189,248,0.85)] border border-sky-400 cursor-pointer scale-[1.02] transition-all duration-200',
+  selected: 'shadow-[0_0_20px_rgba(251,191,36,0.95)] border-2 border-yellow-300 scale-105 z-10',
 };
 
 const FACTION_BG: Record<Faction, string> = {
@@ -67,7 +67,12 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
             {unit.burn > 0 && (
               <span className="absolute right-0.5 top-0.5 rounded-full bg-red-900/90 px-1 text-[9px]">🔥{unit.burn}</span>
             )}
-            {unit.ready && <span className="absolute left-1 top-1 h-2.5 w-2.5 rounded-full bg-emerald-400 shadow" />}
+            {unit.ready && (
+              <span className="absolute left-1.5 top-1.5 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_#34d399]"></span>
+              </span>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

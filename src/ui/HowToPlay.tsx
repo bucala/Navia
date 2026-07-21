@@ -59,8 +59,8 @@ export function HowToPlay({ onBack }: { onBack: () => void }) {
         <p>{t('rules_win_body')}</p>
       </Section>
 
-      <button onClick={onBack} className="mt-8 text-xs text-slate-400 hover:text-slate-200">
-        {t('back_menu')}
+      <button onClick={onBack} className="navia-back-btn mt-8">
+        ← {t('back_menu')}
       </button>
     </div>
   );

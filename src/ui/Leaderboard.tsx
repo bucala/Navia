@@ -53,8 +53,8 @@ export function Leaderboard({ onBack }: { onBack: () => void }) {
           </tbody>
         </table>
       )}
-      <button onClick={onBack} className="mt-6 text-xs text-slate-400 hover:text-slate-200">
-        {t('back_menu')}
+      <button onClick={onBack} className="navia-back-btn mt-6">
+        ← {t('back_menu')}
       </button>
     </div>
   );

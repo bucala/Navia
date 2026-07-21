@@ -89,6 +89,38 @@ textarea,
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 8px 22px rgb(0 0 0 / 0.5), 0 0 18px rgb(251 191 36 / 0.12);
 }
 
+/* Unified back/return buttons matching the Navia aesthetic */
+.navia-back-btn {
+  border: 1px solid rgb(180 130 40 / 0.35);
+  border-radius: 0.5rem;
+  background: linear-gradient(175deg, rgb(38 31 64 / 0.9), rgb(13 11 26 / 0.95));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 3px 8px rgb(0 0 0 / 0.4);
+  color: #fde68a; /* amber-200 */
+  font-weight: 700;
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+}
+
+.navia-back-btn:hover {
+  border-color: rgb(251 191 36 / 0.85);
+  color: #ffffff;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.2), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+}
+
+.navia-back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
 /* ── 3D dice (GDD §6: falling die with a satisfying bounce) ── */
 .die-scene {
   width: 3.5rem;
@@ -222,26 +254,39 @@ textarea,
   border-style: solid;
   border-width: 11px;
   border-image-repeat: stretch;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 10px rgba(245, 158, 11, 0.25);
+  transition: all 0.2s ease-in-out;
 }
 .card-frame--common { border-image-source: url('/art/frames/frame-common.svg'); border-image-slice: 34; }
-.card-frame--rare { border-image-source: url('/art/frames/frame-rare.svg'); border-image-slice: 34; }
+.card-frame--rare {
+  border-image-source: url('/art/frames/frame-rare.svg');
+  border-image-slice: 34;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 12px rgba(56, 189, 248, 0.35);
+}
 .card-frame--legendary {
   border-image-source: url('/art/frames/frame-legendary.svg');
   border-image-slice: 40;
   border-width: 13px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75), 0 0 18px rgba(251, 191, 36, 0.5);
 }
 
 .slot-frame {
   border-style: solid;
   border-width: 6px;
   border-image-repeat: stretch;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 6px rgba(245, 158, 11, 0.15);
 }
 .slot-frame--common { border-image-source: url('/art/frames/frame-common.svg'); border-image-slice: 34; }
-.slot-frame--rare { border-image-source: url('/art/frames/frame-rare.svg'); border-image-slice: 34; }
+.slot-frame--rare {
+  border-image-source: url('/art/frames/frame-rare.svg');
+  border-image-slice: 34;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 8px rgba(56, 189, 248, 0.25);
+}
 .slot-frame--legendary {
   border-image-source: url('/art/frames/frame-legendary.svg');
   border-image-slice: 40;
   border-width: 7px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75), 0 0 12px rgba(251, 191, 36, 0.4);
 }
 
 /* Recessed stone alcove for empty/filled board slots. */
@@ -251,11 +296,14 @@ textarea,
   border-image-source: url('/art/frames/slot-alcove.svg');
   border-image-slice: 28;
   border-image-repeat: stretch;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(255, 255, 255, 0.05);
 }
 
 /* Tileable stone/rune texture behind the arena, layered under the existing glows. */
 .arena-bg {
   position: relative;
+  background: radial-gradient(circle at center, #17142b 0%, #080712 100%);
+  overflow: hidden;
 }
 .arena-bg::before {
   content: '';
@@ -263,7 +311,26 @@ textarea,
   inset: 0;
   z-index: -1;
   background-image: url('/art/frames/board-texture.svg');
-  background-size: 220px 220px;
-  opacity: 0.5;
+  background-size: 200px 200px;
+  opacity: 0.35;
   pointer-events: none;
+}
+/* Rotating golden-magenta magical nebula center effect */
+.arena-bg::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(219, 39, 119, 0.05) 50%, transparent 80%);
+  z-index: -1;
+  pointer-events: none;
+  animation: bg-swirl 24s linear infinite;
+}
+
+@keyframes bg-swirl {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }

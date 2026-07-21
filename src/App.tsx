@@ -99,9 +99,9 @@ export default function App() {
           {screen !== 'menu' && (
             <button
               onClick={toMenu}
-              className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
+              className="navia-back-btn"
             >
-              {t('header_menu')}
+              ← {t('header_menu')}
             </button>
           )}
         </div>
@@ -137,9 +137,6 @@ export default function App() {
           <div className="menu-panel flex w-full max-w-2xl flex-col items-center gap-3 px-6 py-8 sm:px-14 sm:py-12">
             <img src="/art/branding/navia-logo.svg" alt="Navia" className="w-full max-w-md sm:max-w-lg" />
             <img src="/art/frames/ornament-divider.svg" alt="" aria-hidden="true" className="h-3 w-40" />
-            <p className="max-w-lg text-center text-sm leading-relaxed text-slate-400 sm:text-base">
-              {t('menu_subtitle')}
-            </p>
             <div className="mt-6 flex w-full max-w-md flex-col gap-3">
               {MAIN_MENU.map((item) => (
                 <MenuButton key={item.screen} item={item} onClick={() => setScreen(item.screen)} />

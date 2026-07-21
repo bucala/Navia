@@ -24,9 +24,11 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
     <button
       onClick={onClick}
       title={lx(card.text)}
-      className={`card-frame card-frame--${card.rarity} relative flex h-40 w-28 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-transform sm:h-44 sm:w-30 md:h-52 md:w-34 lg:h-60 lg:w-40 ${FACTION_BG[card.faction]} ${
-        selected ? '-translate-y-3 ring-2 ring-yellow-300' : 'hover:-translate-y-1.5'
-      } ${affordable ? '' : 'opacity-50 grayscale'}`}
+      className={`card-frame card-frame--${card.rarity} relative flex h-40 w-28 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-all duration-300 sm:h-44 sm:w-30 md:h-52 md:w-34 lg:h-60 lg:w-40 ${FACTION_BG[card.faction]} ${
+        selected
+          ? '-translate-y-8 scale-125 z-20 shadow-[0_0_35px_rgba(245,158,11,0.95)] ring-4 ring-amber-400 border-amber-400 animate-pulse'
+          : 'hover:-translate-y-2 hover:scale-105 hover:z-10 hover:shadow-[0_4px_15px_rgba(0,0,0,0.5)]'
+      } ${affordable ? '' : 'opacity-40 grayscale'}`}
     >
       {/* Art fills the top half of the card. */}
       <div className="relative h-16 w-full shrink-0 sm:h-20 md:h-24 lg:h-28">

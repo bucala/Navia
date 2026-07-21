@@ -11,6 +11,12 @@ const FACTION_CHIP: Record<Faction, string> = {
   celestial: 'bg-sky-950 text-sky-200 border-sky-700',
 };
 
+const FACTION_BG: Record<Faction, string> = {
+  lava: 'from-red-950 via-slate-950 to-orange-950',
+  nature: 'from-emerald-950 via-slate-950 to-green-950',
+  celestial: 'from-sky-950 via-slate-950 to-indigo-950',
+};
+
 /** Sieň Božstiev — browse the pantheon's characters and their stories. */
 export function Codex({ onBack }: { onBack: () => void }) {
   const { t, lx } = useLang();
@@ -35,13 +41,13 @@ export function Codex({ onBack }: { onBack: () => void }) {
               key={item.cardId}
               onClick={() => setIndex(i)}
               className={`flex items-center gap-2 border-b border-slate-900 px-3 py-2.5 text-left text-sm transition ${
-                i === index ? 'bg-slate-800/80 text-amber-200' : 'text-slate-300 hover:bg-slate-900'
+                i === index ? 'bg-slate-800/80 text-amber-200 font-semibold' : 'text-slate-300 hover:bg-slate-900'
               }`}
             >
-              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-900">
+              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-900 border border-amber-900/30">
                 <CardArt
                   cardId={item.cardId}
-                  className="h-full w-full origin-top scale-[1.7] object-top"
+                  className="h-full w-full scale-[2.5] origin-center object-cover"
                   glyphClass="text-lg"
                 />
                 <img
@@ -56,30 +62,59 @@ export function Codex({ onBack }: { onBack: () => void }) {
             </button>
           );
         })}
-        <button onClick={onBack} className="mt-auto px-3 py-3 text-left text-xs text-slate-500 hover:text-slate-300">
-          {t('back_menu')}
-        </button>
+        <div className="mt-auto p-3 border-t border-slate-900/60 bg-slate-950/50">
+          <button onClick={onBack} className="navia-back-btn w-full justify-center">
+            ← {t('back_menu')}
+          </button>
+        </div>
       </aside>
 
       {/* Detail */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl p-4 md:p-8">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-slate-950/30">
+        <div className="mx-auto w-full max-w-4xl p-4 md:p-8">
           <div className="mb-4 flex items-center justify-between md:hidden">
-            <button onClick={onBack} className="text-xs text-slate-400">
-              {t('header_menu')}
+            <button onClick={onBack} className="navia-back-btn">
+              ← {t('header_menu')}
             </button>
           </div>
 
-          <div className="flex flex-col gap-6 md:flex-row">
-            {/* Art */}
+          <div className="flex flex-col gap-8 md:flex-row md:items-start">
+            {/* Beautiful Large Full Character Card */}
             <div
-              className={`card-frame card-frame--${card.rarity} mx-auto flex h-80 w-64 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-800 to-slate-950 shadow-2xl`}
+              className={`card-frame card-frame--${card.rarity} mx-auto flex h-[460px] w-76 shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${FACTION_BG[card.faction]} shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 hover:scale-[1.03]`}
             >
-              <CardArt cardId={entry.cardId} className="h-full w-full" glyphClass="text-8xl" />
+              <div className="relative h-[230px] w-full shrink-0">
+                <CardArt cardId={entry.cardId} className="h-full w-full object-cover" glyphClass="text-8xl" />
+                <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                <span className="absolute left-3 top-3 flex h-10 w-10 rotate-45 items-center justify-center rounded border border-cyan-200 bg-gradient-to-br from-cyan-400 to-blue-700 shadow-xl">
+                  <span className="-rotate-45 text-base font-extrabold text-white drop-shadow-md">{card.cost}</span>
+                </span>
+              </div>
+
+              <div className="flex flex-1 flex-col p-4 bg-slate-950/90 border-t border-amber-900/20">
+                <span className="text-center text-sm font-bold text-amber-100 tracking-wider border-b border-amber-900/30 pb-1.5 uppercase">
+                  {lx(card.name)}
+                </span>
+                <p className="flex-1 mt-3 text-[11px] leading-relaxed text-slate-300 text-center italic px-1 font-medium">
+                  {lx(card.text)}
+                </p>
+                
+                <div className="flex items-center justify-around bg-slate-900/80 rounded-xl py-1.5 px-4 mt-2 text-xs font-bold border border-slate-800/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+                  {card.type === 'unit' ? (
+                    <>
+                      <span className="text-orange-400 flex items-center gap-1.5 drop-shadow">⚔️ <span className="text-sm font-extrabold">{card.attack}</span></span>
+                      {card.armor > 0 && <span className="text-slate-300 flex items-center gap-1.5 drop-shadow">🛡️ <span className="text-sm font-extrabold">{card.armor}</span></span>}
+                      <span className="text-red-500 flex items-center gap-1.5 drop-shadow">🩸 <span className="text-sm font-extrabold">{card.maxHp}</span></span>
+                    </>
+                  ) : (
+                    <span className="mx-auto uppercase tracking-wider text-fuchsia-300 font-extrabold text-[10px]">{t('spell_badge')}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Facts */}
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 bg-slate-900/30 rounded-2xl border border-slate-800/50 p-6 shadow-xl">
               <h1 className="text-2xl font-bold text-amber-100">{lx(card.name)}</h1>
               <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
                 <span className={`rounded-full border px-2 py-0.5 ${FACTION_CHIP[card.faction]}`}>
