@@ -37,7 +37,7 @@ export function LocalGame() {
   };
 
   return (
-    <div className={`flex min-h-0 flex-1 overflow-y-auto ${shake ? 'shake' : ''}`}>
+    <div className={`flex min-h-0 flex-1 overflow-hidden ${shake ? 'shake' : ''}`}>
       <Board state={state} dispatch={dispatch} viewpoint={state.active} canAct />
       <LogPanel state={state} />
 

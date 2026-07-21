@@ -209,7 +209,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       : null;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full max-w-full">
       {/* Opponent bar */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
@@ -314,7 +314,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
-        <div className="relative z-10 -mt-20 flex justify-center gap-4 overflow-x-auto pt-20 pb-6 mb-14 px-6">
+        <div className="relative z-10 flex w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-hidden pt-8 pb-4 px-4 sm:pt-12 sm:pb-6 sm:px-5 md:pt-16 md:pb-8 md:px-6">
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace

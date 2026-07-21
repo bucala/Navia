@@ -268,7 +268,7 @@ function OnlineMatch({
         )}
         <span className="text-slate-500">{t('room_label', { id: roomId })}</span>
       </div>
-      <div className="flex min-h-0 flex-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <Board state={state} dispatch={sendAction} viewpoint={seat} canAct={canAct} />
         <LogPanel state={state} />
       </div>

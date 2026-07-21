@@ -56,7 +56,7 @@ export function AiGame() {
           <span className="animate-pulse">🔮 {t('ai_thinking')}</span>
         </div>
       )}
-      <div className="flex min-h-0 flex-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <Board state={state} dispatch={dispatch} viewpoint="p1" canAct={myTurn && !state.winner} />
         <LogPanel state={state} />
       </div>
