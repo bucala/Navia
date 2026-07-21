@@ -30,7 +30,7 @@ export function CardArt({ cardId, className = '', glyphClass = 'text-3xl' }: Pro
       src={card.art}
       alt={lx(card.name)}
       draggable={false}
-      className={`object-cover ${className}`}
+      className={`object-cover object-top ${className}`}
       onError={() => {
         missingArt.add(card.art);
         setBroken(true);

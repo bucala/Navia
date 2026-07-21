@@ -314,7 +314,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
-        <div className="flex justify-center gap-4 overflow-x-auto pt-10 pb-6 px-6">
+        <div className="relative z-10 -mt-20 flex justify-center gap-4 overflow-x-auto pt-20 pb-6 mb-14 px-6">
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace

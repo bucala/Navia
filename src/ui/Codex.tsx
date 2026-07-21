@@ -47,7 +47,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
               <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-900 border border-amber-900/30">
                 <CardArt
                   cardId={item.cardId}
-                  className="h-full w-full scale-[2.5] origin-center object-cover"
+                  className="h-full w-full scale-[1.9] origin-top object-cover object-top"
                   glyphClass="text-lg"
                 />
                 <img
@@ -81,10 +81,10 @@ export function Codex({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-8 md:flex-row md:items-start">
             {/* Beautiful Large Full Character Card */}
             <div
-              className={`card-frame card-frame--${card.rarity} mx-auto flex h-[460px] w-76 shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${FACTION_BG[card.faction]} shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 hover:scale-[1.03]`}
+              className={`card-frame card-frame--${card.rarity} mx-auto md:mx-0 flex h-[460px] w-72 md:w-80 shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${FACTION_BG[card.faction]} shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 hover:scale-[1.03]`}
             >
               <div className="relative h-[230px] w-full shrink-0">
-                <CardArt cardId={entry.cardId} className="h-full w-full object-cover" glyphClass="text-8xl" />
+                <CardArt cardId={entry.cardId} className="h-full w-full object-cover object-top" glyphClass="text-8xl" />
                 <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                 <span className="absolute left-3 top-3 flex h-10 w-10 rotate-45 items-center justify-center rounded border border-cyan-200 bg-gradient-to-br from-cyan-400 to-blue-700 shadow-xl">
                   <span className="-rotate-45 text-base font-extrabold text-white drop-shadow-md">{card.cost}</span>
