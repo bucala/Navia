@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a4035" />
+      <stop offset="50%" stop-color="#2d261e" />
+      <stop offset="100%" stop-color="#18130e" />
+    </linearGradient>
+    <linearGradient id="runeGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <filter id="pGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shadow Base -->
+  <ellipse cx="80" cy="295" rx="65" ry="18" fill="#000000" opacity="0.65" />
+
+  <!-- Stone Base Pedestal -->
+  <polygon points="25,290 135,290 120,265 40,265" fill="#241e17" stroke="#3d3226" stroke-width="2" />
+
+  <!-- Main Monolith Body -->
+  <polygon points="40,265 120,265 105,30 80,10 55,30" fill="url(#stoneGrad)" stroke="#5e4f3f" stroke-width="2" />
+  <!-- Bevel / Facet line -->
+  <polygon points="80,10 105,30 120,265 80,265" fill="#ffffff" opacity="0.08" />
+
+  <!-- Etched Glowing Runes -->
+  <g filter="url(#pGlow)" stroke="url(#runeGlow)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 80 50 L 80 90 M 68 60 L 80 75 L 92 65" />
+    <path d="M 80 115 L 68 135 L 92 135 L 80 155" />
+    <path d="M 70 180 L 80 170 L 90 180 M 80 170 L 80 210 M 70 200 L 90 200" />
+    <path d="M 72 235 L 88 235 M 80 225 L 80 250" />
+  </g>
+
+  <!-- Vine Accents -->
+  <path d="M 35,270 C 45,220 30,170 50,120" stroke="#15803d" stroke-width="2.5" fill="none" opacity="0.8" />
+  <circle cx="48" cy="125" r="3" fill="#22c55e" />
+  <circle cx="38" cy="180" r="2.5" fill="#22c55e" />
+</svg>

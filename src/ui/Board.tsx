@@ -3,6 +3,7 @@ import { getCard, getUnitCard } from '../game/cards';
 import { effectiveThreshold, opponentOf } from '../game/engine';
 import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
+import { CardArt } from './CardArt';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
 import { useLang } from '../i18n';
@@ -232,13 +233,39 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       </div>
 
       {/* Arena */}
-      <div className="arena-bg flex flex-1 flex-col justify-center relative">
+      <div className="arena-bg flex flex-1 flex-col justify-center relative overflow-hidden">
+        {/* Environmental Battlefield Assets */}
+        <img
+          src="/art/assets/rune_monolith.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1 sm:left-4 top-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
+        />
+        <img
+          src="/art/assets/mana_crystals.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute right-1 sm:right-4 top-4 h-20 sm:h-32 md:h-40 w-auto z-0 opacity-85 drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)]"
+        />
+        <img
+          src="/art/assets/battle_banner.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-2 sm:left-6 bottom-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
+        />
+        <img
+          src="/art/assets/rune_altar.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute right-2 sm:right-6 bottom-3 h-16 sm:h-24 md:h-32 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
+        />
+
         <div className="relative z-10 flex flex-col justify-center flex-1 py-1">
           {renderLane('foe', 'sanctum')}
           {renderLane('foe', 'vanguard')}
 
           {/* Mid controls */}
-          <div className="my-1 flex items-center justify-center gap-4 border-y border-amber-900/40 bg-slate-950/70 backdrop-blur-md py-1.5 shadow-lg">
+          <div className="my-1 flex items-center justify-center gap-4 border-y border-amber-900/40 bg-slate-950/80 backdrop-blur-md py-1.5 shadow-lg">
             <span className="text-xs text-slate-200">
               {t('turn_label', { n: state.turn })} ·{' '}
               <span className="font-semibold text-amber-300">
@@ -270,14 +297,22 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
 
       {/* Selected-unit action bar */}
       {selection.mode === 'unit' && selectedUnit && selectedUnitCard && (
-        <div className="flex items-center justify-center gap-2 bg-slate-900/80 py-1.5 text-xs">
-          <span className="font-semibold text-amber-100">{lx(selectedUnitCard.name)}</span>
-          {!selectedUnit.ready && <span className="text-slate-500">{t('action_exhausted')}</span>}
+        <div className="flex flex-wrap items-center justify-center gap-3 bg-slate-950/90 border-t border-amber-900/50 py-2 px-4 text-xs shadow-xl backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-8 shrink-0 overflow-hidden rounded border border-amber-500/60 shadow">
+              <CardArt cardId={selectedUnitCard.id} className="h-full w-full object-cover object-[center_15%]" />
+            </div>
+            <div className="text-left">
+              <span className="font-bold text-amber-100 block">{lx(selectedUnitCard.name)}</span>
+              <span className="text-[10px] text-slate-300">⚔ {selectedUnitCard.attack} · 🛡 {selectedUnit.armor} · 🩸 {selectedUnit.hp}/{selectedUnitCard.maxHp}</span>
+            </div>
+          </div>
+          {!selectedUnit.ready && <span className="text-slate-500 italic">{t('action_exhausted')}</span>}
           {selectedUnitCard.dice?.activation && selectedUnit.ready && (
             <button
               onClick={() => act({ type: 'ACTIVATE', player: me.id, unit: selection.ref })}
               disabled={me.mana < selectedUnitCard.dice.manaCost}
-              className="rounded bg-emerald-800 px-2 py-1 font-semibold text-emerald-100 hover:bg-emerald-700 disabled:opacity-40"
+              className="rounded bg-emerald-800 px-3 py-1.5 font-semibold text-emerald-100 hover:bg-emerald-700 disabled:opacity-40 shadow"
             >
               🎲 {lx(selectedUnitCard.dice.label)} ({selectedUnitCard.dice.threshold}+, {selectedUnitCard.dice.manaCost} 💧)
             </button>
@@ -287,12 +322,12 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             !selectedUnit.movedThisTurn && (
               <button
                 onClick={() => setSelection({ mode: 'move', ref: selection.ref })}
-                className="rounded bg-sky-800 px-2 py-1 font-semibold text-sky-100 hover:bg-sky-700"
+                className="rounded bg-sky-800 px-3 py-1.5 font-semibold text-sky-100 hover:bg-sky-700 shadow"
               >
                 {t('action_move')}
               </button>
             )}
-          <button onClick={reset} className="rounded bg-slate-700 px-2 py-1 text-slate-200 hover:bg-slate-600">
+          <button onClick={reset} className="rounded bg-slate-800 px-3 py-1.5 text-slate-300 hover:bg-slate-700 border border-slate-700">
             {t('action_cancel')}
           </button>
         </div>

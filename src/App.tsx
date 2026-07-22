@@ -76,14 +76,14 @@ export default function App() {
 
   return (
     <div className="app-bg flex h-[100dvh] flex-col text-slate-100">
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-1.5">
-        <button onClick={toMenu} className="flex items-center gap-2 text-sm font-bold tracking-wide text-amber-200">
-          <img src="/art/branding/navia-mark.svg" alt="" aria-hidden="true" className="h-6 w-6 rounded" />
+      <header className="flex items-center justify-between border-b border-amber-900/40 bg-stone-950/85 px-4 py-1.5 shadow-md">
+        <button onClick={toMenu} className="flex items-center gap-2 text-sm font-bold tracking-wide text-amber-200 hover:text-amber-100">
+          <img src="/art/branding/navia-mark.svg" alt="" aria-hidden="true" className="h-6 w-6 rounded shadow" />
           Navia
         </button>
         <div className="flex items-center gap-2">
           {profile && (
-            <span className="hidden text-xs text-slate-400 sm:inline">
+            <span className="hidden text-xs text-amber-100/70 sm:inline">
               🧙 {profile.name} · <span className="font-bold text-amber-200">{profile.elo}</span> ELO ·{' '}
               <span className="text-emerald-400">{profile.wins}</span>/
               <span className="text-red-400">{profile.losses}</span>
@@ -92,7 +92,7 @@ export default function App() {
           <button
             onClick={toggleMute}
             title={t(muted ? 'mute_on' : 'mute_off')}
-            className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700"
+            className="rounded border border-amber-900/30 bg-stone-900 px-2 py-1 text-xs text-amber-200/80 hover:bg-stone-800"
           >
             {muted ? '🔇' : '🔊'}
           </button>

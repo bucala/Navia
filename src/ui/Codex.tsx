@@ -30,8 +30,8 @@ export function Codex({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex min-h-0 flex-1">
       {/* Character list */}
-      <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-800 bg-slate-950/70 md:flex">
-        <h2 className="border-b border-slate-800 px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+      <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-amber-900/40 bg-stone-950/80 md:flex">
+        <h2 className="border-b border-amber-900/30 px-3 py-2 text-xs font-bold uppercase tracking-widest text-amber-200/70">
           {t('codex_title')}
         </h2>
         {LORE.map((item, i) => {
@@ -40,14 +40,14 @@ export function Codex({ onBack }: { onBack: () => void }) {
             <button
               key={item.cardId}
               onClick={() => setIndex(i)}
-              className={`flex items-center gap-2 border-b border-slate-900 px-3 py-2.5 text-left text-sm transition ${
-                i === index ? 'bg-slate-800/80 text-amber-200 font-semibold' : 'text-slate-300 hover:bg-slate-900'
+              className={`flex items-center gap-2.5 border-b border-stone-900/80 px-3 py-2.5 text-left text-sm transition ${
+                i === index ? 'bg-amber-900/40 text-amber-200 font-bold border-l-4 border-l-amber-500' : 'text-stone-300 hover:bg-stone-900/60'
               }`}
             >
-              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-900 border border-amber-900/30">
+              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-stone-900 border border-amber-500/50 shadow">
                 <CardArt
                   cardId={item.cardId}
-                  className="h-full w-full scale-[1.9] origin-top object-cover object-top"
+                  className="h-full w-full object-cover object-[center_12%]"
                   glyphClass="text-lg"
                 />
                 <img
@@ -55,7 +55,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
                   alt=""
                   aria-hidden="true"
                   draggable={false}
-                  className="pointer-events-none absolute inset-0 h-full w-full"
+                  className="pointer-events-none absolute inset-0 h-full w-full opacity-90"
                 />
               </span>
               <span className="truncate">{lx(c.name)}</span>

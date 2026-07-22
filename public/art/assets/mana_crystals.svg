@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="crystalMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe" />
+      <stop offset="35%" stop-color="#38bdf8" />
+      <stop offset="75%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+
+    <linearGradient id="crystalHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1" />
+    </linearGradient>
+
+    <radialGradient id="crystalAura" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0" />
+    </radialGradient>
+
+    <filter id="c3dGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Aura -->
+  <ellipse cx="100" cy="180" rx="80" ry="30" fill="url(#crystalAura)" />
+  <ellipse cx="100" cy="195" rx="70" ry="16" fill="#000000" opacity="0.6" />
+
+  <g filter="url(#c3dGlow)">
+    <!-- Back / Left Small Crystal -->
+    <polygon points="55,190 40,120 60,85 75,130 70,190" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5" />
+    <polygon points="55,190 60,85 75,130" fill="url(#crystalHighlight)" />
+
+    <!-- Back / Right Medium Crystal -->
+    <polygon points="135,190 120,110 145,70 160,125 150,190" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5" />
+    <polygon points="135,190 145,70 160,125" fill="url(#crystalHighlight)" opacity="0.8" />
+
+    <!-- Center Giant Crystal -->
+    <polygon points="100,20 130,85 120,185 80,185 70,85" fill="url(#crystalMain)" stroke="#e0f2fe" stroke-width="2" />
+    <!-- Facets -->
+    <polygon points="100,20 130,85 100,185" fill="url(#crystalHighlight)" opacity="0.6" />
+    <polygon points="100,20 100,185 80,185" fill="#0284c7" opacity="0.4" />
+
+    <!-- Front Tiny Spikes -->
+    <polygon points="80,195 72,150 88,140 92,195" fill="#38bdf8" stroke="#bae6fd" stroke-width="1" />
+    <polygon points="115,195 110,155 122,145 125,195" fill="#38bdf8" stroke="#bae6fd" stroke-width="1" />
+  </g>
+
+  <!-- Floating Sparkles -->
+  <circle cx="100" cy="12" r="2.5" fill="#ffffff" />
+  <circle cx="148" cy="62" r="2" fill="#e0f2fe" />
+  <circle cx="58" cy="78" r="2" fill="#e0f2fe" />
+</svg>
