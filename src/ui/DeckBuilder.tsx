@@ -92,70 +92,72 @@ export function DeckBuilder({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto p-6">
-      <h2 className="text-2xl font-bold text-amber-100">{t('decks_title')}</h2>
-      <p className="mt-1 text-xs text-slate-400">
-        {t('decks_hint')}
-      </p>
+      <div className="menu-panel p-6">
+        <h2 className="text-2xl font-bold text-amber-100">{t('decks_title')}</h2>
+        <p className="mt-1 text-xs text-slate-400">
+          {t('decks_hint')}
+        </p>
 
-      <button
-        onClick={() => openEditor()}
-        className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 font-semibold text-amber-50 hover:bg-amber-600"
-      >
-        {t('decks_new')}
-      </button>
+        <button
+          onClick={() => openEditor()}
+          className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 font-semibold text-amber-50 hover:bg-amber-600"
+        >
+          {t('decks_new')}
+        </button>
 
-      <div className="mt-4 space-y-2">
-        {decks.length === 0 && <p className="text-sm text-slate-500">{t('decks_none')}</p>}
-        {decks.map((deck) => (
-          <div key={deck.id} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold text-slate-100">
-                {deck.name}{' '}
-                {active === deck.id && <span className="text-xs font-normal text-emerald-400">{t('decks_active')}</span>}
-              </p>
-              <p className="text-xs text-slate-500">{t('decks_cards', { n: deck.cards.length })}</p>
-            </div>
-            {active !== deck.id && (
+        <div className="mt-4 space-y-2">
+          {decks.length === 0 && <p className="text-sm text-slate-500">{t('decks_none')}</p>}
+          {decks.map((deck) => (
+            <div key={deck.id} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold text-slate-100">
+                  {deck.name}{' '}
+                  {active === deck.id && <span className="text-xs font-normal text-emerald-400">{t('decks_active')}</span>}
+                </p>
+                <p className="text-xs text-slate-500">{t('decks_cards', { n: deck.cards.length })}</p>
+              </div>
+              {active !== deck.id && (
+                <button
+                  onClick={() => {
+                    setActiveDeckId(deck.id);
+                    setActive(deck.id);
+                  }}
+                  className="rounded bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-700"
+                >
+                  {t('decks_set_active')}
+                </button>
+              )}
               <button
-                onClick={() => {
-                  setActiveDeckId(deck.id);
-                  setActive(deck.id);
-                }}
-                className="rounded bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-700"
+                onClick={() => openEditor(deck)}
+                className="rounded bg-slate-700 px-3 py-1.5 text-xs text-slate-100 hover:bg-slate-600"
               >
-                {t('decks_set_active')}
+                {t('decks_edit')}
               </button>
-            )}
-            <button
-              onClick={() => openEditor(deck)}
-              className="rounded bg-slate-700 px-3 py-1.5 text-xs text-slate-100 hover:bg-slate-600"
-            >
-              {t('decks_edit')}
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  await deckApi('/api/decks/delete', profile, { deckId: deck.id });
-                  setDecks((prev) => prev.filter((d) => d.id !== deck.id));
-                  if (active === deck.id) {
-                    setActiveDeckId(null);
-                    setActive(null);
+              <button
+                onClick={async () => {
+                  try {
+                    await deckApi('/api/decks/delete', profile, { deckId: deck.id });
+                    setDecks((prev) => prev.filter((d) => d.id !== deck.id));
+                    if (active === deck.id) {
+                      setActiveDeckId(null);
+                      setActive(null);
+                    }
+                  } catch (e) {
+                    showToast(e instanceof Error ? e.message : String(e));
                   }
-                } catch (e) {
-                  showToast(e instanceof Error ? e.message : String(e));
-                }
-              }}
-              className="rounded bg-red-900 px-3 py-1.5 text-xs text-red-200 hover:bg-red-800"
-            >
-              {t('decks_delete')}
-            </button>
-          </div>
-        ))}
-      </div>
+                }}
+                className="rounded bg-red-900 px-3 py-1.5 text-xs text-red-200 hover:bg-red-800"
+              >
+                {t('decks_delete')}
+              </button>
+            </div>
+          ))}
+        </div>
 
-      <button onClick={onBack} className="navia-back-btn mt-6">
-        ← {t('back_menu')}
-      </button>
+        <button onClick={onBack} className="navia-back-btn mt-6">
+          ← {t('back_menu')}
+        </button>
+      </div>
       {toast && <Toast message={toast} />}
     </div>
   );
@@ -250,5 +252,9 @@ function DeckEditor({
 }
 
 function Center({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-1 flex-col items-center justify-center p-6 text-sm text-slate-400">{children}</div>;
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center p-6">
+      <div className="menu-panel p-6 text-sm text-slate-400">{children}</div>
+    </div>
+  );
 }
