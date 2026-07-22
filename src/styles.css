@@ -299,38 +299,43 @@ textarea,
   box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(255, 255, 255, 0.05);
 }
 
-/* Tileable stone/rune texture behind the arena, layered under the existing glows. */
+/* High resolution arena battlefield map + light beige parchment stone rune overlay */
 .arena-bg {
   position: relative;
-  background: radial-gradient(circle at center, #17142b 0%, #080712 100%);
+  background-color: #1e1b18;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(245, 230, 210, 0.12) 0%, rgba(15, 12, 22, 0.65) 100%),
+    url('/art/assets/arena_battlefield_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
+
 .arena-bg::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background-image: url('/art/frames/board-texture.svg');
-  background-size: 200px 200px;
-  opacity: 0.35;
+  z-index: 0;
+  background-image: url('/art/assets/arena_beige_texture.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.42;
+  mix-blend-mode: overlay;
   pointer-events: none;
 }
-/* Rotating golden-magenta magical nebula center effect */
+
+/* Subtle glowing central line separating battlefield halves */
 .arena-bg::after {
   content: '';
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(219, 39, 119, 0.05) 50%, transparent 80%);
-  z-index: -1;
+  left: 3%;
+  right: 3%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent 0%, rgba(251, 191, 36, 0.35) 20%, rgba(56, 189, 248, 0.5) 50%, rgba(251, 191, 36, 0.35) 80%, transparent 100%);
+  z-index: 0;
   pointer-events: none;
-  animation: bg-swirl 24s linear infinite;
-}
-
-@keyframes bg-swirl {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }

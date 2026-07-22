@@ -232,38 +232,40 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       </div>
 
       {/* Arena */}
-      <div className="arena-bg flex flex-1 flex-col justify-center">
-        {renderLane('foe', 'sanctum')}
-        {renderLane('foe', 'vanguard')}
+      <div className="arena-bg flex flex-1 flex-col justify-center relative">
+        <div className="relative z-10 flex flex-col justify-center flex-1 py-1">
+          {renderLane('foe', 'sanctum')}
+          {renderLane('foe', 'vanguard')}
 
-        {/* Mid controls */}
-        <div className="my-1 flex items-center justify-center gap-4 border-y border-slate-800/70 bg-slate-950/40 py-1.5">
-          <span className="text-xs text-slate-400">
-            {t('turn_label', { n: state.turn })} ·{' '}
-            <span className="font-semibold text-amber-200">
-              {state.phase === 'main' ? t('phase_main') : t('phase_combat')}
+          {/* Mid controls */}
+          <div className="my-1 flex items-center justify-center gap-4 border-y border-amber-900/40 bg-slate-950/70 backdrop-blur-md py-1.5 shadow-lg">
+            <span className="text-xs text-slate-200">
+              {t('turn_label', { n: state.turn })} ·{' '}
+              <span className="font-semibold text-amber-300">
+                {state.phase === 'main' ? t('phase_main') : t('phase_combat')}
+              </span>
             </span>
-          </span>
-          {state.phase === 'main' && (
+            {state.phase === 'main' && (
+              <button
+                onClick={() => act({ type: 'ENTER_COMBAT', player: me.id })}
+                disabled={!canAct}
+                className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40 shadow"
+              >
+                {t('btn_combat')}
+              </button>
+            )}
             <button
-              onClick={() => act({ type: 'ENTER_COMBAT', player: me.id })}
+              onClick={() => act({ type: 'END_TURN', player: me.id })}
               disabled={!canAct}
-              className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40"
+              className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40 shadow"
             >
-              {t('btn_combat')}
+              {t('btn_endturn')}
             </button>
-          )}
-          <button
-            onClick={() => act({ type: 'END_TURN', player: me.id })}
-            disabled={!canAct}
-            className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40"
-          >
-            {t('btn_endturn')}
-          </button>
-        </div>
+          </div>
 
-        {renderLane('me', 'vanguard')}
-        {renderLane('me', 'sanctum')}
+          {renderLane('me', 'vanguard')}
+          {renderLane('me', 'sanctum')}
+        </div>
       </div>
 
       {/* Selected-unit action bar */}

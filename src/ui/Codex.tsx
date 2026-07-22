@@ -78,10 +78,10 @@ export function Codex({ onBack }: { onBack: () => void }) {
             </button>
           </div>
 
-          <div className="flex flex-col gap-8 md:flex-row md:items-start">
+          <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 md:gap-8 w-full">
             {/* Beautiful Large Full Character Card */}
             <div
-              className={`card-frame card-frame--${card.rarity} mx-auto md:mx-0 flex h-[460px] w-72 md:w-80 shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${FACTION_BG[card.faction]} shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 hover:scale-[1.03]`}
+              className={`card-frame card-frame--${card.rarity} mx-auto xl:mx-0 flex h-[460px] w-72 sm:w-80 shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${FACTION_BG[card.faction]} shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 hover:scale-[1.03]`}
             >
               <div className="relative h-[230px] w-full shrink-0">
                 <CardArt cardId={entry.cardId} className="h-full w-full object-cover object-top" glyphClass="text-8xl" />
@@ -113,46 +113,46 @@ export function Codex({ onBack }: { onBack: () => void }) {
               </div>
             </div>
 
-            {/* Facts */}
-            <div className="min-w-0 flex-1 bg-slate-900/30 rounded-2xl border border-slate-800/50 p-6 shadow-xl">
-              <h1 className="text-2xl font-bold text-amber-100">{lx(card.name)}</h1>
-              <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                <span className={`rounded-full border px-2 py-0.5 ${FACTION_CHIP[card.faction]}`}>
+            {/* Full Width Facts & Story Panel */}
+            <div className="w-full flex-1 bg-slate-950/80 backdrop-blur-md rounded-2xl border border-amber-900/30 p-6 md:p-8 shadow-2xl min-w-0">
+              <h1 className="text-2xl md:text-3xl font-black text-amber-100 tracking-wide">{lx(card.name)}</h1>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
+                <span className={`rounded-full border px-3 py-1 ${FACTION_CHIP[card.faction]}`}>
                   {t(`faction_${card.faction}`)}
                 </span>
-                <span className="rounded-full border border-amber-700 bg-amber-950 px-2 py-0.5 text-amber-200">
+                <span className="rounded-full border border-amber-700 bg-amber-950/80 px-3 py-1 text-amber-200">
                   {t(`rarity_${card.rarity}`)}
                 </span>
-                <span className="rounded-full border border-cyan-700 bg-cyan-950 px-2 py-0.5 text-cyan-200">
+                <span className="rounded-full border border-cyan-700 bg-cyan-950/80 px-3 py-1 text-cyan-200 shadow-sm">
                   {t('codex_mana', { n: card.cost })}
                 </span>
                 {card.type === 'unit' && (
                   <>
-                    <span className="rounded-full border border-slate-600 bg-slate-900 px-2 py-0.5 text-slate-200">
+                    <span className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-1 text-slate-200 shadow-sm">
                       ⚔ {card.attack} · 🩸 {card.maxHp}
                       {card.armor > 0 ? ` · 🛡 ${card.armor}` : ''}
                     </span>
-                    <span className="rounded-full border border-slate-600 bg-slate-900 px-2 py-0.5 text-slate-200">
+                    <span className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-1 text-slate-200 shadow-sm">
                       {t(card.lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum')}
                     </span>
                   </>
                 )}
               </div>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+              <h3 className="mt-6 text-xs font-extrabold uppercase tracking-widest text-amber-400/90 border-b border-slate-800/80 pb-1">
                 {t('codex_abilities')}
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-300">{lx(card.text)}</p>
+              <p className="mt-2 text-sm md:text-base leading-relaxed text-slate-200 font-medium">{lx(card.text)}</p>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+              <h3 className="mt-6 text-xs font-extrabold uppercase tracking-widest text-amber-400/90 border-b border-slate-800/80 pb-1">
                 {t('codex_story')}
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-200">{lx(entry.story)}</p>
+              <p className="mt-2 text-sm md:text-base leading-relaxed text-slate-200">{lx(entry.story)}</p>
 
-              <h3 className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+              <h3 className="mt-6 text-xs font-extrabold uppercase tracking-widest text-amber-400/90 border-b border-slate-800/80 pb-1">
                 {t('codex_culture')}
               </h3>
-              <p className="mt-1 text-sm italic leading-relaxed text-slate-400">{lx(entry.culture)}</p>
+              <p className="mt-2 text-sm md:text-base italic leading-relaxed text-slate-300">{lx(entry.culture)}</p>
             </div>
           </div>
 
