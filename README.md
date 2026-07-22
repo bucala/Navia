@@ -40,9 +40,11 @@ Medvebora cez čínskeho Wukonga až po egyptského Chepriho. Jadrom stratégie
 nie je len to, akú kartu zahráš, ale ako dokážeš manažovať riziko pomocou
 **Božského hodu kockou (D6)**.
 
-Kompletný herný návrh (mechaniky, frakcie, technologická architektúra) je
-v [Game Design Document](docs/GDD.md) pod pracovným názvom *Pantheon: Dice
-of Destiny*.
+Kompletný pôvodný herný návrh (mechaniky, frakcie, technologická architektúra)
+je v [Game Design Document](docs/GDD.md) pod pracovným názvom *Pantheon: Dice
+of Destiny* — slúži ako pôvodná vízia projektu, viaceré detaily (roster
+kariet, hostovanie, D1/ELO/i18n vrstva, vizuál) sa odvtedy posunuli ďalej;
+aktuálny stav sleduje [CHANGELOG.md](CHANGELOG.md).
 
 ## 🎮 Hrateľné funkcie
 
@@ -59,6 +61,7 @@ of Destiny*.
 | 📱 **PWA + Android** | Inštalovateľná webová appka, natívny Android build cez Capacitor (pozri [Android APK](#-android-apk)). |
 | 🎬 **Plnohodnotné efekty** | 3D animácia kocky s dopadom a odskokom, otrasenie obrazovky pri šestke, animácie súbojov cez Framer Motion, procedurálne zvuky cez WebAudio (bez jediného audio súboru). |
 | 🎨 **Vizuálna identita** | Logo a značka Navia, editovateľné SVG templaty rámov kariet/plochy/portrétov (`public/art/`, 9-slice `border-image`) a generátor favicon/PWA/Android ikon (`npm run icons`). |
+| 🏜️ **Kamenno-pergamenový redizajn** | Svetlá kamenná/pergamenová téma s vysokým rozlíšením ilustrovaných pozadí arény (ľadová vs. džungľová polovica plochy), responzívne rozloženie bez pretekania stránky, plynulejšie karty a haptická odozva v Android builde. |
 
 ## 🖼️ Galéria
 
@@ -78,16 +81,19 @@ of Destiny*.
 
 ## 🧩 Frakcie a postavy
 
-| Frakcia | Zameranie | Vybraní hrdinovia |
-|---|---|---|
-| 🔥 **Lávový dvor** | Útok a deštrukcia (Láva ∞, Kyselina ∞) | Megadrak, Pekelné zaklínadlo |
-| 🌿 **Prírodný a Zemský Pakt** | Obrana a stabilita | Mahákapi, Medvebor, Mahiša, Chepri, Khadga |
-| 🕊️ **Nebeský Zbor** | Mobilita a podfuky | Wukong, Cuauhtli, Rysoslav, Bojový Kohút |
+16 kariet naprieč tromi frakciami (`src/game/cards.ts`):
 
-Každá postava má v [Sieni Božstiev](src/game/lore.ts) vlastný príbeh a
-kultúrny odkaz — slovanská mytológia (Veles, Perún), čínska *Cesta na
+| Frakcia | Zameranie | Karty |
+|---|---|---|
+| 🔥 **Lávový dvor** | Útok a deštrukcia (Láva ∞, Kyselina ∞) | Megadrak, Pekelné zaklínadlo, Lávový škriatok |
+| 🌿 **Prírodný a Zemský Pakt** | Obrana a stabilita | Mahákapi, Medvebor, Mahiša, Chepri, Khadga, Kamenný strážca, Zlatý Gryf |
+| 🕊️ **Nebeský Zbor** | Mobilita a podfuky | Wukong, Cuauhtli, Rysoslav, Bojový Kohút, Papagáj, Nebeský vrabec |
+
+8 z týchto postáv má v [Sieni Božstiev](src/game/lore.ts) vlastný príbeh a
+kultúrny odkaz — slovanská mytológia (Medvebor, Rysoslav), čínska *Cesta na
 západ* (Wukong), aztécki orlí bojovníci (Cuauhtli), staroegyptský Chepri,
-hinduistický Mahišásura a budhistická džátaka o Veľkej opici (Mahákapi).
+hinduistický Mahišásura (Mahiša), juhoázijská tradícia Angkoru (Khadga) a
+budhistická džátaka o Veľkej opici (Mahákapi).
 
 ## 🛠️ Technológie
 
@@ -185,6 +191,9 @@ src/App.tsx           hlavné menu
 - [x] Tematické menu, hra jedného hráča, ďalší hrdinovia, SK/EN lokalizácia
 - [x] Dokumentácia (README, CHANGELOG) a CI/CD
 - [x] Oprava značky Navia naprieč appkou, oprava hrateľnosti a **📜 Ako hrať** v menu
+- [x] **Vizuálna identita** — logo, favicon/PWA/Android ikony, editovateľné SVG rámy kariet/plochy/portrétov
+- [x] Kamenno-pergamenový redizajn, responzívne rozloženie, Android haptika
+- [x] Oprava poškodených binárnych assetov (art, ikony, splash, screenshoty) a čitateľnosti textu na Rebríčku/Ako hrať/Nastaveniach/Balíčkoch
 
 Detailná história zmien je v [CHANGELOG.md](CHANGELOG.md).
 

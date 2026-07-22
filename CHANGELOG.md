@@ -8,6 +8,84 @@ Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol 
 pridávajú sa spätne v momente, keď je commit už na vetve (najnovšia položka
 teda dočasne odkaz mať nemusí).
 
+## [0.12.1] — Oprava poškodených assetov a čitateľnosti UI
+
+### Opravené
+- **62 binárnych súborov bolo poškodených** commitom `68d67e8` (16 artov
+  kariet, 15 favicon/PWA ikon, 15 Android launcher/adaptívnych ikon, 11
+  Capacitor splash obrazoviek a 5 screenshotov v README) — každý súbor, cez
+  ktorý táto zmena prešla, mal svoje bajty (vrátane hlavičky JPG/PNG)
+  nahradené UTF-8 náhradným znakom, čo poukazuje na to, že prešli cez
+  textový/UTF-8 kanál namiesto binárneho čítania/zápisu. Výsledkom boli
+  nefunkčné (nerenderovateľné) obrázky ~1,7–1,8× väčšie než originál. Art
+  kariet, splash obrazovky a screenshoty obnovené z posledného čistého
+  commitu (`1cc79b4`); favicon/PWA a Android ikony prerenderované nanovo
+  cez `npm run icons` priamo z loga.
+- **Nečitateľný text na obrazovkách Rebríček, Ako hrať, Nastavenia a
+  Balíčky** — tieto štyri obrazovky vykresľovali svetlosivý text (navrhnutý
+  pre pôvodnú tmavú astrálnu tému) priamo na svetlom kamenno-pergamenovom
+  pozadí bez tmavého podkladu, takže boli miestami až úplne nečitateľné.
+  Obsah je teraz zabalený do existujúceho `.menu-panel` (rovnaký zlatý
+  rámovaný panel ako hlavné menu).
+- Screenshoty v README galérii preosnímané proti aktuálnemu (opravenému)
+  vzhľadu appky.
+- Faktické nezrovnalosti v README (neúplná tabuľka frakcií/kariet, README
+  odkaz na GDD tváriaci sa ako aktuálny stav) a v CHANGELOG (chýbajúce
+  položky pre vizuálnu identitu aj kamenno-pergamenový redizajn nižšie).
+
+([ad0e249](https://github.com/bucala/Navia/commit/ad0e249), [854b83d](https://github.com/bucala/Navia/commit/854b83d), [53b28a4](https://github.com/bucala/Navia/commit/53b28a4))
+
+## [0.12.0] — Kamenno-pergamenový redizajn a responzivita
+
+### Pridané
+- **Svetlá kamenná/pergamenová téma** nahrádza pôvodnú tmavú astrálnu —
+  vysokorozlíšené ilustrované pozadie arény (ľadová polovica súpera,
+  džungľová polovica hráča), prekreslené App ikony a Android splash
+  obrazovky v novej palete.
+- **Responzívne rozloženie**: odstránené vodorovné aj zvislé pretekanie
+  stránky, vycentrované línie na ploche, karty v ruke sa už neorezávajú,
+  zbaliteľný panel s priebehom zápasu, priblíženie portrétu v Sieni
+  Božstiev na mobile.
+- **Android**: haptická odozva pri hraní kariet/kockách, oprava buildu pod
+  Java 21.
+
+### Poznámka
+Táto práca pristála priamo na `main` mimo bežného PR flow tejto vetvy;
+záznam je doplnený spätne, keďže v čase commitov CHANGELOG nebol
+aktualizovaný.
+
+([6809685](https://github.com/bucala/Navia/commit/6809685), [cd98edb](https://github.com/bucala/Navia/commit/cd98edb), [00f3f67](https://github.com/bucala/Navia/commit/00f3f67), [68d67e8](https://github.com/bucala/Navia/commit/68d67e8))
+
+## [0.11.0] — Vizuálna identita: logo, ikony a rámy kariet
+
+### Pridané
+- **Logo a značka Navia** (`public/art/branding/`) — kamenná tabuľka s
+  ohnivým nápisom „NAVIA" a piatimi zvieracími medailónmi (byvol, opica,
+  slon, orol, medveď), zjednodušená štvorcová značka pre malé rozmery a
+  samostatná priehľadná verzia pre Android adaptívne ikony. Priamy upload
+  obrázka z chatu do repozitára nie je možný, takže ide o vektorovú
+  rekonštrukciu podľa referenčného obrázka, nie pixel kópiu.
+- **Generátor ikon** (`npm run icons` → `scripts/generate-icons.mjs`,
+  balík `sharp`) — z loga vyrenderuje celú sadu favicon/PWA manifest ikon
+  (16–512 px vrátane maskable) aj Android launcher/adaptívne ikony vo
+  všetkých hustotách (`mipmap-*`), adaptívne pozadie zladené s farbou loga.
+- **Editovateľné SVG rámy kariet** (`public/art/frames/`) — ornamentálne
+  9-slice rámy podľa vzácnosti (`frame-common/rare/legendary.svg`) cez CSS
+  `border-image`, aplikované na kartu v ruke, jednotku na ploche aj veľký
+  art panel v Sieni Božstiev. Priehľadný stred necháva presvitať existujúci
+  frakčný gradient/art — nič nie je zapečené v kóde, súbory sa dajú
+  nahradiť/upraviť priamo.
+- Dlaždicovateľná kamenná textúra hernej plochy, vyhĺbený rám slotov
+  jednotiek (`slot-alcove.svg`), kruhové medailóny portrétov v zozname
+  postáv Siene Božstiev a rohové/deliace ornamenty hlavného menu.
+- Dokumentácia šablón: `public/art/frames/README.md`,
+  `public/art/branding/README.md`.
+- **docs/website-brief.md** — hotový prompt na vygenerovanie
+  marketingovej/landing stránky pre Naviu (značka, paleta, štruktúra
+  sekcií, texty čerpané priamo z herných dát, dostupné assety).
+
+([8e2305f](https://github.com/bucala/Navia/commit/8e2305f))
+
 ## [0.10.1] — Bezpečnosť CI workflowov a drobné opravy dokumentácie
 
 ### Opravené
