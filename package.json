@@ -1,7 +1,7 @@
 {
   "name": "navia",
   "private": true,
-  "version": "0.10.1",
+  "version": "0.12.1",
   "description": "Navia — multiplayer CCG s taktickými líniami a kockovým D6 enginom.",
   "type": "module",
   "scripts": {
