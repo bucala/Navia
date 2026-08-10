@@ -119,6 +119,36 @@ textarea,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
+.navia-back-btn::before {
+  content: '';
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  background-color: currentColor;
+  -webkit-mask: url('/art/icons/icon-arrow-back.svg') center / contain no-repeat;
+  mask: url('/art/icons/icon-arrow-back.svg') center / contain no-repeat;
+}
+
+/* Small utility glyphs recolored via CSS mask so they inherit the
+   surrounding text color instead of being baked into the SVG. */
+.icon-mask {
+  display: inline-block;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+.icon-mask--chevron-left {
+  -webkit-mask-image: url('/art/icons/icon-chevron-left.svg');
+  mask-image: url('/art/icons/icon-chevron-left.svg');
+}
+.icon-mask--chevron-right {
+  -webkit-mask-image: url('/art/icons/icon-chevron-right.svg');
+  mask-image: url('/art/icons/icon-chevron-right.svg');
+}
+
 /* ── 3D dice (GDD §6: falling die with a satisfying bounce) ── */
 .die-scene {
   width: 3.5rem;

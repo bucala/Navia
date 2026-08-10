@@ -32,13 +32,13 @@ interface MenuItem {
 }
 
 const MAIN_MENU: MenuItem[] = [
-  { icon: '⚔️', label: 'menu_single', desc: 'menu_single_desc', screen: 'single' },
-  { icon: '📜', label: 'menu_rules', desc: 'menu_rules_desc', screen: 'rules' },
-  { icon: '🌐', label: 'menu_multi', desc: 'menu_multi_desc', screen: 'multi' },
-  { icon: '🃏', label: 'menu_decks', desc: 'menu_decks_desc', screen: 'decks' },
-  { icon: '🏛️', label: 'menu_codex', desc: 'menu_codex_desc', screen: 'codex' },
-  { icon: '🏆', label: 'menu_ranking', desc: 'menu_ranking_desc', screen: 'ranking' },
-  { icon: '⚙️', label: 'menu_settings', desc: 'menu_settings_desc', screen: 'settings' },
+  { icon: '/art/icons/icon-sword.svg', label: 'menu_single', desc: 'menu_single_desc', screen: 'single' },
+  { icon: '/art/icons/icon-scroll.svg', label: 'menu_rules', desc: 'menu_rules_desc', screen: 'rules' },
+  { icon: '/art/icons/icon-globe-rune.svg', label: 'menu_multi', desc: 'menu_multi_desc', screen: 'multi' },
+  { icon: '/art/icons/icon-cards.svg', label: 'menu_decks', desc: 'menu_decks_desc', screen: 'decks' },
+  { icon: '/art/icons/icon-temple.svg', label: 'menu_codex', desc: 'menu_codex_desc', screen: 'codex' },
+  { icon: '/art/icons/icon-trophy.svg', label: 'menu_ranking', desc: 'menu_ranking_desc', screen: 'ranking' },
+  { icon: '/art/icons/icon-gear.svg', label: 'menu_settings', desc: 'menu_settings_desc', screen: 'settings' },
 ];
 
 function MenuButton({ item, onClick }: { item: MenuItem; onClick: () => void }) {
@@ -48,14 +48,20 @@ function MenuButton({ item, onClick }: { item: MenuItem; onClick: () => void }) 
       onClick={onClick}
       className="menu-button group flex w-full items-center gap-4 px-5 py-3.5 text-left sm:py-4"
     >
-      <span className="text-3xl drop-shadow-lg transition-transform group-hover:scale-110 sm:text-4xl">
-        {item.icon}
-      </span>
+      <img
+        src={item.icon}
+        alt=""
+        aria-hidden="true"
+        className="h-8 w-8 shrink-0 drop-shadow-lg transition-transform group-hover:scale-110 sm:h-9 sm:w-9"
+      />
       <span className="min-w-0">
         <span className="block font-semibold tracking-wide text-amber-100 sm:text-lg">{t(item.label)}</span>
         <span className="block truncate text-xs text-slate-400 sm:text-sm">{t(item.desc)}</span>
       </span>
-      <span className="ml-auto text-amber-700 transition-transform group-hover:translate-x-1">❯</span>
+      <span
+        aria-hidden="true"
+        className="icon-mask icon-mask--chevron-right ml-auto h-4 w-4 shrink-0 bg-amber-700 transition-transform group-hover:translate-x-1"
+      />
     </button>
   );
 }
@@ -92,23 +98,28 @@ export default function App() {
           <button
             onClick={toggleMute}
             title={t(muted ? 'mute_on' : 'mute_off')}
-            className="rounded border border-amber-900/30 bg-stone-900 px-2 py-1 text-xs text-amber-200/80 hover:bg-stone-800"
+            className="rounded border border-amber-900/30 bg-stone-900 p-1.5 hover:bg-stone-800"
           >
-            {muted ? '🔇' : '🔊'}
+            <img
+              src={muted ? '/art/icons/icon-speaker-off.svg' : '/art/icons/icon-speaker-on.svg'}
+              alt=""
+              aria-hidden="true"
+              className="h-4 w-4"
+            />
           </button>
           {screen !== 'menu' && (
             <button
               onClick={toMenu}
               className="navia-back-btn"
             >
-              ← {t('header_menu')}
+              {t('header_menu')}
             </button>
           )}
         </div>
       </header>
 
       {screen === 'menu' && (
-        <div className="relative flex flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-3 py-4 sm:gap-6 sm:px-6 sm:py-8">
+        <div className="relative flex flex-1 flex-col items-center gap-3 overflow-y-auto px-3 py-3 sm:gap-6 sm:px-6 sm:py-8">
           <img
             src="/art/frames/ornament-corner.svg"
             alt=""
@@ -134,8 +145,8 @@ export default function App() {
             className="pointer-events-none absolute bottom-2 right-2 h-16 w-16 -scale-x-100 -scale-y-100 opacity-70 sm:bottom-6 sm:right-6 sm:h-24 sm:w-24"
           />
 
-          <div className="menu-panel flex w-full max-w-2xl flex-col items-center gap-3 px-6 py-8 sm:px-14 sm:py-12">
-            <img src="/art/branding/navia-logo.svg" alt="Navia" className="w-full max-w-md sm:max-w-lg" />
+          <div className="menu-panel my-auto flex w-full max-w-2xl flex-col items-center gap-3 px-5 py-6 sm:px-14 sm:py-12">
+            <img src="/art/branding/navia-logo.webp" alt="Navia" className="w-full max-w-md sm:max-w-lg" />
             <img src="/art/frames/ornament-divider.svg" alt="" aria-hidden="true" className="h-3 w-40" />
             <div className="mt-6 flex w-full max-w-md flex-col gap-3">
               {MAIN_MENU.map((item) => (
@@ -149,14 +160,17 @@ export default function App() {
       {screen === 'multi' && (
         <div className="flex flex-1 flex-col items-center justify-center gap-6 px-3 sm:px-4">
           <div className="menu-panel flex w-full max-w-2xl flex-col items-center gap-3 px-6 py-8 sm:px-14 sm:py-12">
-            <h2 className="text-2xl font-bold text-amber-100 sm:text-3xl">🌐 {t('multi_title')}</h2>
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-amber-100 sm:text-3xl">
+              <img src="/art/icons/icon-globe-rune.svg" alt="" aria-hidden="true" className="h-7 w-7 sm:h-8 sm:w-8" />
+              {t('multi_title')}
+            </h2>
             <div className="mt-4 flex w-full max-w-md flex-col gap-3">
               <MenuButton
-                item={{ icon: '⚡', label: 'multi_online', desc: 'multi_online_desc', screen: 'online' }}
+                item={{ icon: '/art/icons/icon-lightning.svg', label: 'multi_online', desc: 'multi_online_desc', screen: 'online' }}
                 onClick={() => setScreen('online')}
               />
               <MenuButton
-                item={{ icon: '🤝', label: 'multi_local', desc: 'multi_local_desc', screen: 'local' }}
+                item={{ icon: '/art/icons/icon-handshake.svg', label: 'multi_local', desc: 'multi_local_desc', screen: 'local' }}
                 onClick={() => setScreen('local')}
               />
             </div>

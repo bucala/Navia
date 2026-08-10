@@ -45,7 +45,7 @@ export function DeckBuilder({ onBack }: { onBack: () => void }) {
       <Center>
         {t('profile_missing')}
         <button onClick={onBack} className="navia-back-btn mt-4">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
       </Center>
     );
@@ -155,7 +155,7 @@ export function DeckBuilder({ onBack }: { onBack: () => void }) {
         </div>
 
         <button onClick={onBack} className="navia-back-btn mt-6">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
       </div>
       {toast && <Toast message={toast} />}

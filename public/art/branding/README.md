@@ -1,8 +1,10 @@
 # Navia — branding
 
-* `navia-logo.svg` — plné logo (kamenná tabuľka, zvieracie hlavy, ohnivý
-  nápis „NAVIA“), použité v hlavnom menu (`src/App.tsx`). Čisté SVG,
-  zobrazuje sa priamo v prehliadači bez rasterizácie.
+* `navia-logo.webp` — plné logo (kamenná tabuľka, zvieracie hlavy, ohnivý
+  nápis „NAVIA“), použité v hlavnom menu (`src/App.tsx`). Maľované rastrové
+  logo (~300 KB WebP) — ak ho nahrádzaš, exportuj nový obrázok cez sharp
+  (`.resize({ width: 1200 }).webp({ quality: 85 })`) namiesto priameho
+  uploadu veľkého PNG/SVG, aby zostal ľahký.
 * `navia-mark.svg` — zjednodušená štvorcová značka (runové „N“ na kamennej
   doske), základ pre favicon/app ikony a hlavičku (`src/App.tsx`).
   Je to aj `public/icon.svg` (kópia — pozri nižšie).

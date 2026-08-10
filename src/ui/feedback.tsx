@@ -73,7 +73,7 @@ export function WinnerOverlay({ name, onNewGame, backToMenu = false }: {
   const { t } = useLang();
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80">
-      <p className="text-6xl">🏆</p>
+      <img src="/art/icons/icon-trophy.svg" alt="" aria-hidden="true" className="h-20 w-20 drop-shadow-lg" />
       <p className="mt-4 text-2xl font-bold text-amber-200">{t('winner_title', { player: name })}</p>
       <p className="mt-1 text-sm text-slate-400">{t('winner_sub')}</p>
       <button

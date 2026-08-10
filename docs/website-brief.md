@@ -83,8 +83,8 @@ vysokokontrastný fantasy (podobne ako art na kartách).
 humanistické písmo pre telo textu. Nepoužívaj hravé/zaoblené fonty — hra má
 seriózny, mytologický tón.
 
-**Logo:** k dispozícii ako čisté SVG (vektor, škáluje bez straty kvality) —
-`public/art/branding/navia-logo.svg` (plné logo s nápisom a 5 zvieracími
+**Logo:** k dispozícii ako maľované rastrové logo —
+`public/art/branding/navia-logo.webp` (plné logo s nápisom a 5 zvieracími
 medailónmi: byvol, opica, slon, orol, medveď na kamennej tabuli) a
 `public/art/branding/navia-mark.svg` (zjednodušená štvorcová značka/favicon
 s runovým „N"). Ak generátor nemá prístup k súborom repozitára, popíš/vytvor
@@ -178,7 +178,7 @@ Použi ako krátke citácie/popisky pod portrétmi (skráť podľa potreby):
 
 ### 8. Dostupné assety
 
-- `public/art/branding/navia-logo.svg` — plné logo (wordmark).
+- `public/art/branding/navia-logo.webp` — plné logo (wordmark).
 - `public/art/branding/navia-mark.svg` — štvorcová značka/favicon.
 - `public/icons/icon-{16…512}.png` — hotová sada rastrových ikon.
 - `docs/screenshots/*.jpg` — 5 aktuálnych screenshotov appky (1920×1200).

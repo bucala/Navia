@@ -34,7 +34,10 @@ export function Settings({ onBack }: { onBack: () => void }) {
   return (
     <div className="mx-auto w-full max-w-md flex-1 overflow-y-auto p-6">
       <div className="menu-panel p-6">
-        <h2 className="text-2xl font-bold text-amber-100">⚙ {t('set_title')}</h2>
+        <h2 className="flex items-center gap-2 text-2xl font-bold text-amber-100">
+          <img src="/art/icons/icon-gear.svg" alt="" aria-hidden="true" className="h-6 w-6" />
+          {t('set_title')}
+        </h2>
 
         <h3 className="mt-6 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t('set_lang')}</h3>
         <div className="mt-2 flex gap-2">
@@ -48,11 +51,13 @@ export function Settings({ onBack }: { onBack: () => void }) {
 
         <h3 className="mt-6 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t('set_sound')}</h3>
         <div className="mt-2 flex gap-2">
-          <button onClick={() => toggleSound(true)} className={choice(!muted)}>
-            🔊 {t('set_sound_on')}
+          <button onClick={() => toggleSound(true)} className={`${choice(!muted)} inline-flex items-center gap-1.5`}>
+            <img src="/art/icons/icon-speaker-on.svg" alt="" aria-hidden="true" className="h-4 w-4" />
+            {t('set_sound_on')}
           </button>
-          <button onClick={() => toggleSound(false)} className={choice(muted)}>
-            🔇 {t('set_sound_off')}
+          <button onClick={() => toggleSound(false)} className={`${choice(muted)} inline-flex items-center gap-1.5`}>
+            <img src="/art/icons/icon-speaker-off.svg" alt="" aria-hidden="true" className="h-4 w-4" />
+            {t('set_sound_off')}
           </button>
         </div>
 
@@ -74,7 +79,7 @@ export function Settings({ onBack }: { onBack: () => void }) {
         </div>
 
         <button onClick={onBack} className="navia-back-btn mt-8">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
       </div>
     </div>

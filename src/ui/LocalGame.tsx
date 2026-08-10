@@ -46,7 +46,7 @@ export function LocalGame() {
 
       {handoff && !state.winner && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950">
-          <p className="text-4xl">🔄</p>
+          <img src="/art/icons/icon-refresh.svg" alt="" aria-hidden="true" className="h-14 w-14" />
           <p className="mt-3 text-lg text-slate-200">
             {t('handoff_pass')}{' '}
             <span className="font-bold text-amber-200">{state.players[state.active].name}</span>.
