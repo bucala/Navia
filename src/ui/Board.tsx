@@ -213,7 +213,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto w-full max-w-full">
       {/* Opponent bar */}
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
+      <div className="flex shrink-0 items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-200">{foe.name}</span>
           <span className="text-xs text-slate-400">🂠 {t('cards_in_hand', { n: foe.hand.length })}</span>
@@ -234,7 +234,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       </div>
 
       {/* Arena */}
-      <div className="arena-bg flex flex-1 flex-col justify-center relative overflow-hidden">
+      <div className="arena-bg flex flex-1 min-h-[8rem] flex-col justify-center relative overflow-hidden">
         {/* Environmental Battlefield Assets */}
         <img
           src="/art/assets/rune_monolith.svg"
@@ -298,7 +298,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
 
       {/* Selected-unit action bar */}
       {selection.mode === 'unit' && selectedUnit && selectedUnitCard && (
-        <div className="flex flex-wrap items-center justify-center gap-3 bg-slate-950/90 border-t border-amber-900/50 py-2 px-4 text-xs shadow-xl backdrop-blur-md">
+        <div className="flex shrink-0 flex-wrap items-center justify-center gap-3 bg-slate-950/90 border-t border-amber-900/50 py-2 px-4 text-xs shadow-xl backdrop-blur-md">
           <div className="flex items-center gap-2">
             <div className="h-10 w-8 shrink-0 overflow-hidden rounded border border-amber-500/60 shadow">
               <CardArt cardId={selectedUnitCard.id} className="h-full w-full object-cover object-[center_15%]" />
@@ -340,7 +340,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         </div>
       )}
       {selection.mode === 'move' && (
-        <div className="flex items-center justify-center gap-2 bg-slate-900/80 py-1.5 text-xs text-sky-200">
+        <div className="flex shrink-0 items-center justify-center gap-2 bg-slate-900/80 py-1.5 text-xs text-sky-200">
           {t('move_hint')}
           <button onClick={reset} className="rounded bg-slate-700 px-2 py-1 text-slate-200 hover:bg-slate-600">
             {t('action_cancel')}
@@ -349,8 +349,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       )}
 
       {/* Player bar + hand */}
-      <div className="border-t border-slate-800 bg-slate-950/60 px-4 py-2">
-        <div className="mb-2 flex items-center justify-between">
+      <div className="flex shrink grow-0 min-h-[12rem] basis-[clamp(18rem,38dvh,24rem)] flex-col border-t border-slate-800 bg-slate-950/60 px-4 py-2">
+        <div className="mb-2 flex shrink-0 items-center justify-between">
           <span className="font-semibold text-slate-200">{me.name}</span>
           <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
           <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
@@ -358,7 +358,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
-        <div className="relative z-10 flex w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-hidden pt-8 pb-8 px-4 sm:pt-12 sm:pb-12 sm:px-5 md:pt-16 md:pb-16 md:px-6">
+        <div className="relative z-10 flex flex-1 min-h-0 items-stretch w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-auto pt-14 pb-4 px-4">
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace
@@ -371,7 +371,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           ))}
         </div>
         {selectedHandCard && (
-          <p className={`mt-1 text-center text-xs ${canAffordSelected ? 'text-slate-400' : 'text-red-400'}`}>
+          <p className={`mt-1 shrink-0 text-center text-xs ${canAffordSelected ? 'text-slate-400' : 'text-red-400'}`}>
             {!canAffordSelected
               ? t('afford_hint', { cost: selectedHandCard.cost, mana: me.mana })
               : selectedHandCard.type === 'unit'
