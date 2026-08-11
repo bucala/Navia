@@ -1,0 +1,18 @@
+<!-- menu_codex — pantheon temple facade. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="icoBronze" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8c07a"/>
+      <stop offset="100%" stop-color="#9c6b2e"/>
+    </linearGradient>
+  </defs>
+  <path d="M24 5 L41 16 H7 Z" fill="none" stroke="url(#icoBronze)" stroke-width="2.6" stroke-linejoin="round"/>
+  <line x1="6" y1="19" x2="42" y2="19" stroke="url(#icoBronze)" stroke-width="2.6"/>
+  <g stroke="url(#icoBronze)" stroke-width="2.6" stroke-linecap="round">
+    <line x1="11" y1="22" x2="11" y2="37"/>
+    <line x1="19" y1="22" x2="19" y2="37"/>
+    <line x1="29" y1="22" x2="29" y2="37"/>
+    <line x1="37" y1="22" x2="37" y2="37"/>
+  </g>
+  <rect x="6" y="38" width="36" height="4.5" rx="1" fill="url(#icoBronze)"/>
+</svg>

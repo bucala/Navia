@@ -4,6 +4,7 @@ import { effectiveThreshold, opponentOf } from '../game/engine';
 import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { CardArt } from './CardArt';
+import { ArmorIcon, AttackIcon, HpIcon, ManaIcon, NexusHeartIcon } from './icons';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
 import { useLang } from '../i18n';
@@ -210,7 +211,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       : null;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full max-w-full">
+    <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto w-full max-w-full">
       {/* Opponent bar */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
@@ -227,7 +228,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           }`}
           title={t('nexus_title')}
         >
-          ❤️ {foe.nexusHp}
+          <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {foe.nexusHp}</span>
           <NexusPopup popup={nexusFx[foe.id]} />
         </button>
       </div>
@@ -304,7 +305,11 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             </div>
             <div className="text-left">
               <span className="font-bold text-amber-100 block">{lx(selectedUnitCard.name)}</span>
-              <span className="text-[10px] text-slate-300">⚔ {selectedUnitCard.attack} · 🛡 {selectedUnit.armor} · 🩸 {selectedUnit.hp}/{selectedUnitCard.maxHp}</span>
+              <span className="inline-flex items-center gap-1 text-[10px] text-slate-300">
+                <AttackIcon className="h-2.5 w-2.5" /> {selectedUnitCard.attack} ·
+                <ArmorIcon className="h-2.5 w-2.5" /> {selectedUnit.armor} ·
+                <HpIcon className="h-2.5 w-2.5" /> {selectedUnit.hp}/{selectedUnitCard.maxHp}
+              </span>
             </div>
           </div>
           {!selectedUnit.ready && <span className="text-slate-500 italic">{t('action_exhausted')}</span>}
@@ -312,9 +317,11 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             <button
               onClick={() => act({ type: 'ACTIVATE', player: me.id, unit: selection.ref })}
               disabled={me.mana < selectedUnitCard.dice.manaCost}
-              className="rounded bg-emerald-800 px-3 py-1.5 font-semibold text-emerald-100 hover:bg-emerald-700 disabled:opacity-40 shadow"
+              className="inline-flex items-center gap-1 rounded bg-emerald-800 px-3 py-1.5 font-semibold text-emerald-100 hover:bg-emerald-700 disabled:opacity-40 shadow"
             >
-              🎲 {lx(selectedUnitCard.dice.label)} ({selectedUnitCard.dice.threshold}+, {selectedUnitCard.dice.manaCost} 💧)
+              <img src="/art/icons/icon-dice.svg" alt="" aria-hidden="true" className="h-4 w-4" />
+              {lx(selectedUnitCard.dice.label)} ({selectedUnitCard.dice.threshold}+, {selectedUnitCard.dice.manaCost}
+              <ManaIcon className="h-2.5 w-2.5" />)
             </button>
           )}
           {selectedUnitCard.keywords.includes('agile') &&
@@ -347,11 +354,11 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           <span className="font-semibold text-slate-200">{me.name}</span>
           <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
           <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
-            ❤️ {me.nexusHp}
+            <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {me.nexusHp}</span>
             <NexusPopup popup={nexusFx[me.id]} />
           </span>
         </div>
-        <div className="relative z-10 flex w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-hidden pt-8 pb-4 px-4 sm:pt-12 sm:pb-6 sm:px-5 md:pt-16 md:pb-8 md:px-6">
+        <div className="relative z-10 flex w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-hidden pt-8 pb-8 px-4 sm:pt-12 sm:pb-12 sm:px-5 md:pt-16 md:pb-16 md:px-6">
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace

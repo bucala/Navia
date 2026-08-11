@@ -2,6 +2,7 @@ import { getCard } from '../game/cards';
 import type { Faction } from '../game/types';
 import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
+import { ArmorIcon, AttackIcon, HpIcon } from './icons';
 
 const FACTION_BG: Record<Faction, string> = {
   lava: 'from-red-950 to-orange-950',
@@ -48,9 +49,9 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
       <div className="flex items-center justify-between bg-black/40 px-1.5 py-0.5 text-[11px] font-bold">
         {card.type === 'unit' ? (
           <>
-            <span className="text-orange-300">⚔ {card.attack}</span>
-            {card.armor > 0 && <span className="text-slate-300">🛡 {card.armor}</span>}
-            <span className="text-red-400">🩸 {card.maxHp}</span>
+            <span className="flex items-center gap-0.5 text-orange-300"><AttackIcon className="h-2.5 w-2.5" /> {card.attack}</span>
+            {card.armor > 0 && <span className="flex items-center gap-0.5 text-slate-300"><ArmorIcon className="h-2.5 w-2.5" /> {card.armor}</span>}
+            <span className="flex items-center gap-0.5 text-red-400"><HpIcon className="h-2.5 w-2.5" /> {card.maxHp}</span>
           </>
         ) : (
           <span className="mx-auto uppercase tracking-widest text-fuchsia-300">{t('spell_badge')}</span>

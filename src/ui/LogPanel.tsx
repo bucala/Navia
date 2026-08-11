@@ -6,7 +6,10 @@ function DiceLine({ event }: { event: Extract<LogEvent, { kind: 'dice' }> }) {
   const { lang, t } = useLang();
   return (
     <div className="rounded bg-slate-800/80 px-2 py-1">
-      <span className="text-amber-200">🎲 {diceLabel(lang, event)}</span>{' '}
+      <span className="inline-flex items-center gap-1 text-amber-200">
+        <img src="/art/icons/icon-dice.svg" alt="" aria-hidden="true" className="h-3.5 w-3.5" />
+        {diceLabel(lang, event)}
+      </span>{' '}
       <span className="text-slate-300">
         [{event.rolls.join(', ')}] {t('vs_threshold', { t: event.threshold })} —{' '}
         {event.success ? (
@@ -35,7 +38,7 @@ export function LogPanel({ state }: { state: GameState }) {
         title={t('log_show')}
         className="hidden w-6 shrink-0 flex-col items-center justify-center gap-1 border-l border-slate-700 bg-slate-950/70 text-slate-500 hover:bg-slate-900 hover:text-slate-300 lg:flex"
       >
-        <span aria-hidden="true">❮</span>
+        <span aria-hidden="true" className="icon-mask icon-mask--chevron-left h-3 w-3 bg-current" />
       </button>
     );
   }
@@ -49,7 +52,7 @@ export function LogPanel({ state }: { state: GameState }) {
           title={t('log_hide')}
           className="text-slate-500 hover:text-slate-300"
         >
-          ❯
+          <span aria-hidden="true" className="icon-mask icon-mask--chevron-right h-3 w-3 bg-current" />
         </button>
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto p-2 text-[11px] leading-snug text-slate-300">

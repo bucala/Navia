@@ -38,7 +38,7 @@ export const STRINGS = {
   menu_ranking_desc: { sk: 'Najlepší Vyvolávači', en: 'The greatest Summoners' },
   menu_settings: { sk: 'Nastavenia', en: 'Settings' },
   menu_settings_desc: { sk: 'Jazyk, zvuk, meno', en: 'Language, sound, name' },
-  header_menu: { sk: '← Menu', en: '← Menu' },
+  header_menu: { sk: 'Menu', en: 'Menu' },
   mute_on: { sk: 'Zapnúť zvuk', en: 'Unmute' },
   mute_off: { sk: 'Vypnúť zvuk', en: 'Mute' },
 
@@ -110,7 +110,7 @@ export const STRINGS = {
   set_name_ph: { sk: 'Vyvolávač', en: 'Summoner' },
   set_save: { sk: 'Uložiť', en: 'Save' },
   set_saved: { sk: 'Uložené ✓', en: 'Saved ✓' },
-  back_menu: { sk: '← Späť do menu', en: '← Back to menu' },
+  back_menu: { sk: 'Späť do menu', en: 'Back to menu' },
 
   // ── Single player ──
   ai_name: { sk: 'Duch Arény', en: 'Arena Spirit' },
@@ -184,8 +184,8 @@ export const STRINGS = {
   codex_abilities: { sk: 'Schopnosti', en: 'Abilities' },
   codex_story: { sk: 'Príbeh', en: 'Story' },
   codex_culture: { sk: 'Kultúrny odkaz', en: 'Cultural reference' },
-  codex_prev: { sk: '◀ Predchádzajúca', en: '◀ Previous' },
-  codex_next: { sk: 'Ďalšia ▶', en: 'Next ▶' },
+  codex_prev: { sk: 'Predchádzajúca', en: 'Previous' },
+  codex_next: { sk: 'Ďalšia', en: 'Next' },
   codex_mana: { sk: '💎 {n} many', en: '💎 {n} mana' },
 
   // ── Decks ──

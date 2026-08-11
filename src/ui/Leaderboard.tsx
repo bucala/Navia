@@ -55,7 +55,7 @@ export function Leaderboard({ onBack }: { onBack: () => void }) {
           </table>
         )}
         <button onClick={onBack} className="navia-back-btn mt-6">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
       </div>
     </div>
