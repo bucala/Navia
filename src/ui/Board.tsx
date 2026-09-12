@@ -168,11 +168,11 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const renderLane = (owner: 'me' | 'foe', lane: LaneId) => {
     const player = owner === 'me' ? me : foe;
     return (
-      <div className="flex items-center justify-center gap-1 py-1 sm:gap-2">
+      <div className="flex min-h-0 items-center justify-center gap-1 py-1 sm:gap-2">
         <span className="w-8 shrink-0 text-right text-[8px] uppercase tracking-widest text-slate-500 sm:w-14 sm:text-[9px] md:w-16 lg:w-20 lg:text-[10px]">
           {laneLabel(lane)}
         </span>
-        <div className="flex flex-1 justify-center gap-1 sm:gap-2">
+        <div className="flex h-full min-h-0 flex-1 items-stretch justify-center gap-1 sm:gap-2">
           {player.lanes[lane].map((unit, slot) => {
             let highlight: SlotHighlight = 'none';
             if (owner === 'me') {
@@ -248,28 +248,36 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           src="/art/assets/rune_monolith.png"
           alt=""
           aria-hidden="true"
+          draggable={false}
+          decoding="async"
           className="pointer-events-none absolute left-1 sm:left-4 top-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
           src="/art/assets/mana_crystals.png"
           alt=""
           aria-hidden="true"
+          draggable={false}
+          decoding="async"
           className="pointer-events-none absolute right-1 sm:right-4 top-4 h-20 sm:h-32 md:h-40 w-auto z-0 opacity-85 drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)]"
         />
         <img
           src="/art/assets/battle_banner.png"
           alt=""
           aria-hidden="true"
+          draggable={false}
+          decoding="async"
           className="pointer-events-none absolute left-2 sm:left-6 bottom-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
           src="/art/assets/rune_altar.png"
           alt=""
           aria-hidden="true"
+          draggable={false}
+          decoding="async"
           className="pointer-events-none absolute right-2 sm:right-6 bottom-3 h-16 sm:h-24 md:h-32 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
 
-        <div className="relative z-10 flex flex-col justify-center flex-1 py-1">
+        <div className="relative z-10 grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)_auto_minmax(0,1fr)_minmax(0,1fr)] py-1">
           {renderLane('foe', 'sanctum')}
           {renderLane('foe', 'vanguard')}
 

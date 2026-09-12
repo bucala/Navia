@@ -67,7 +67,7 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, inte
       disabled={!interactive}
       aria-label={action ? `${description}. ${action}` : description}
       aria-pressed={highlight === 'selected'}
-      className={`slot-alcove relative aspect-[4/5] w-full min-w-[3rem] max-w-[4rem] flex-1 rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition sm:max-w-[5rem] md:max-w-[5.75rem] lg:max-w-[7rem] ${HIGHLIGHT_RING[highlight]}`}
+      className={`slot-alcove relative h-full min-h-0 min-w-0 aspect-[4/5] w-auto max-w-[4rem] flex-none rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition sm:max-w-[5rem] md:max-w-[5.75rem] lg:max-w-[7rem] ${HIGHLIGHT_RING[highlight]}`}
     >
       <AnimatePresence>
         {unit && card && (

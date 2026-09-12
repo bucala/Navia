@@ -35,6 +35,13 @@ teda dočasne odkaz mať nemusí).
   nemení výšku hernej plochy ani veľkosť kariet.
 - Jednoduché SVG dekorácie arény nahradili detailné transparentné PNG
   objekty: bojová zástava, mana kryštály, runový oltár a monolit.
+- Dekorácie arény sú zmenšené na rozlíšenie primerané ich zobrazovanej
+  veľkosti a dekódujú sa asynchrónne, takže sa po otvorení hry zobrazia
+  podstatne rýchlejšie. Celé herné rozhranie sa už nedá nechtiac označiť
+  myšou a obrázky sa nedajú potiahnuť ako natívny obsah stránky; výber textu
+  zostáva povolený iba v poliach a pri výslovne kopírovateľnom obsahu.
+- Riadky arény prispôsobujú výšku kariet dostupnému priestoru, takže prvý ani
+  posledný rad už herné pole neoreže.
 
 ## [0.12.1] — Oprava poškodených assetov a čitateľnosti UI
 

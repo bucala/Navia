@@ -12,22 +12,26 @@ body {
   color: #1a140e;
 }
 
-/* Buttons and art should not drag/select accidentally; rules and logs remain
-   selectable for accessibility and copying. */
-button {
+/* The app behaves like a game surface, not a selectable document. Apply this
+   to every rendered element so dragging across nested labels cannot create a
+   browser text selection. */
+#root,
+#root * {
   user-select: none;
   -webkit-user-select: none;
 }
 
-img {
+#root img {
   -webkit-user-drag: none;
   user-drag: none;
 }
 
-/* …except where the player actually types or copies. */
-input,
-textarea,
-.select-text {
+/* Preserve native editing and explicit copy targets. */
+#root input,
+#root textarea,
+#root [contenteditable='true'],
+#root .select-text,
+#root .select-text * {
   user-select: text;
   -webkit-user-select: text;
 }
