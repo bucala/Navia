@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { GameViewState, LogEvent } from '../game/types';
 import { useLang } from '../i18n';
 import { DiceOverlay } from './DiceOverlay';
@@ -73,6 +73,30 @@ export function Toast({ message }: { message: string }) {
   return (
     <div role="alert" aria-live="assertive" className="fixed left-1/2 top-14 z-50 -translate-x-1/2 rounded-lg border border-red-700 bg-red-950/95 px-4 py-2 text-sm text-red-100 shadow-xl">
       {message}
+    </div>
+  );
+}
+
+/** Compact match status that floats over the arena instead of resizing it. */
+export function GameStatusOverlay({
+  children,
+  className = '',
+  announcement,
+}: {
+  children: ReactNode;
+  className?: string;
+  announcement?: ReactNode;
+}) {
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-10 z-30 flex min-w-0 justify-center px-2">
+      {announcement && (
+        <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </span>
+      )}
+      <div className={`flex min-w-0 max-w-full items-center justify-center gap-2 overflow-hidden rounded-full border px-3 py-1 text-xs font-semibold shadow-xl backdrop-blur-md ${className}`}>
+        {children}
+      </div>
     </div>
   );
 }

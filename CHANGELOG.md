@@ -8,6 +8,30 @@ Odkazy pod jednotlivými fázami vedú na commit, ktorý danú prácu priniesol 
 pridávajú sa spätne v momente, keď je commit už na vetve (najnovšia položka
 teda dočasne odkaz mať nemusí).
 
+## [Unreleased]
+
+### Zmenené
+- README zodpovedá verzii 0.12.1, aktuálnej architektúre s tromi Durable
+  Objects, 93 testom, pravidlám férového začiatku, timeoutom, PWA a Android
+  build postupu.
+- Android splash používa aktuálnu generovanú Navia launcher ikonu na tmavom
+  kamennom pozadí. Odstránené boli predvolené splash a launcher templaty
+  Capacitoru.
+- PWA farby pri štarte a farba lišty prehliadača sú zladené so súčasnou
+  kamenno-pergamenovou identitou.
+- Generátor ikon teraz obnovuje aj `public/icon.svg` z kanonickej značky,
+  aby sa favicon nemohla rozísť s ostatnými výstupmi.
+- Galéria už neobsahuje starý screenshot tvorby balíčka bez aktuálneho
+  tmavého panelu.
+
+### Opravené
+- CSS používa platné JPG verzie textúry a arény namiesto poškodených PNG
+  duplikátov, ktoré niektoré dekódery nedokázali načítať.
+- Ruka kariet už nerozširuje herný kontajner a jej vodorovný scrollbar je
+  skrytý aj vo WebKit/Chromium; posúvanie dotykom, myšou a kolieskom zostáva.
+- Stav AI a online ťahu je prekryvná lišta nad arénou, takže pri zobrazení
+  nemení výšku hernej plochy ani veľkosť kariet.
+
 ## [0.12.1] — Oprava poškodených assetov a čitateľnosti UI
 
 ### Opravené

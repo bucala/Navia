@@ -4,7 +4,14 @@ import { apiUrl, publicAppUrl } from '../net/api';
 import { getPlayerName, setPlayerName as persistPlayerName } from '../net/profile';
 import { useMultiplayerGame } from '../net/useMultiplayerGame';
 import { Board } from './Board';
-import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
+import {
+  GameOverlays,
+  GameStatusOverlay,
+  Toast,
+  useDiceFeedback,
+  useToast,
+  WinnerOverlay,
+} from './feedback';
 import { LogPanel } from './LogPanel';
 
 function roomFromUrl(): string | null {
@@ -30,7 +37,7 @@ function TurnClock({ deadline }: { deadline?: number }) {
   if (!deadline) return null;
   const seconds = Math.max(0, Math.ceil((deadline - now) / 1_000));
   return (
-    <span aria-live={seconds <= 15 ? 'polite' : 'off'} className={seconds <= 15 ? 'text-red-300' : 'text-slate-400'}>
+    <span className={`shrink-0 ${seconds <= 15 ? 'text-red-300' : 'text-slate-400'}`}>
       {seconds}s
     </span>
   );
@@ -292,25 +299,27 @@ function OnlineMatch({
   const myTurn = state.active === seat;
   const canAct = myTurn && !pending && !state.winner;
   const foeName = seats[seat === 'p1' ? 'p2' : 'p1'] ?? t('opponent');
+  const turnStatus = pending
+    ? t('pending')
+    : myTurn
+      ? t('your_turn')
+      : t('opp_turn', { name: foeName });
 
   return (
-    <div className={`flex min-h-0 flex-1 flex-col ${shake ? 'shake' : ''}`}>
-      <div
-        className={`flex items-center justify-center gap-2 py-1 text-xs font-semibold ${
-          myTurn ? 'bg-amber-900/60 text-amber-100' : 'bg-slate-900/80 text-slate-400'
+    <div className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${shake ? 'shake' : ''}`}>
+      <GameStatusOverlay
+        announcement={turnStatus}
+        className={`${
+          myTurn
+            ? 'border-amber-700 bg-amber-950/90 text-amber-100'
+            : 'border-slate-700 bg-slate-950/90 text-slate-300'
         }`}
       >
-        {pending ? (
-          <span className="animate-pulse">{t('pending')}</span>
-        ) : myTurn ? (
-          <span>{t('your_turn')}</span>
-        ) : (
-          <span>{t('opp_turn', { name: foeName })}</span>
-        )}
+        <span className={`min-w-0 truncate ${pending ? 'animate-pulse' : ''}`}>{turnStatus}</span>
         <TurnClock deadline={state.turnDeadline} />
-        <span className="text-slate-500">{t('room_label', { id: roomId })}</span>
-      </div>
-      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <span className="hidden shrink-0 text-slate-500 sm:inline">{t('room_label', { id: roomId })}</span>
+      </GameStatusOverlay>
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         <Board state={state} dispatch={sendAction} viewpoint={seat} canAct={canAct} />
         <LogPanel state={state} />
       </div>

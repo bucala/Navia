@@ -7,10 +7,14 @@
   uploadu veľkého PNG/SVG, aby zostal ľahký.
 * `navia-mark.svg` — zjednodušená štvorcová značka (runové „N“ na kamennej
   doske), základ pre favicon/app ikony a hlavičku (`src/App.tsx`).
-  Je to aj `public/icon.svg` (kópia — pozri nižšie).
+  Generátor ju kopíruje aj do `public/icon.svg`.
 * `navia-mark-foreground.svg` — rovnaký glyf ako `navia-mark.svg`, ale bez
   kamenného pozadia (priehľadné), pre Android adaptívne ikony (foreground
   vrstva; pozadie dodáva `@color/ic_launcher_background`).
+* Android splash je udržiavateľný XML drawable
+  `android/app/src/main/res/drawable/navia_splash.xml`. Používa vygenerovanú
+  launcher ikonu na tmavom kamennom pozadí; Android 12+ používa adaptívnu
+  foreground vrstvu a rovnakú farbu pozadia cez `values/styles.xml`.
 
 ## Nahradenie loga
 
@@ -26,12 +30,14 @@ vektorovým) súborom:
    `.png` namiesto `.svg` (sharp zvládne oboje).
 2. `npm run icons` — prerenderuje `public/icons/*.png` (favicon, PWA,
    maskable) aj Android `mipmap-*/ic_launcher*.png` vo všetkých hustotách.
-3. `public/icon.svg` je ručná kópia `navia-mark.svg` (favicon cez
-   `<link rel="icon" type="image/svg+xml">`) — skopíruj znova, ak meníš mark.
+   Android splash tieto launcher výstupy preberie automaticky, samostatné
+   splash PNG súbory sa negenerujú.
+3. Generátor zároveň obnoví `public/icon.svg`, ktorý používa
+   `<link rel="icon" type="image/svg+xml">`.
 
 ## Farby značky
 
-Kamenná doska `#241b13`/`#2c2013` (rovnaká hodnota je aj
+Kamenná doska `#241b13`, tmavé splash pozadie `#120d08` (farba dosky je aj
 `android/app/src/main/res/values/ic_launcher_background.xml` pre adaptívne
 ikony), ohnivý prechod `#ffe58a → #f6a723 → #c2410c`, bronz `#e8c07a →
 #9c6b2e`.

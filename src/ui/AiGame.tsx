@@ -5,7 +5,14 @@ import type { Action, GameState } from '../game/types';
 import { errorText, useLang } from '../i18n';
 import { getPlayerName } from '../net/profile';
 import { Board } from './Board';
-import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
+import {
+  GameOverlays,
+  GameStatusOverlay,
+  Toast,
+  useDiceFeedback,
+  useToast,
+  WinnerOverlay,
+} from './feedback';
 import { LogPanel } from './LogPanel';
 
 /** Single player vs the Arena Spirit (Duch Arény). */
@@ -51,9 +58,12 @@ export function AiGame() {
   }, [state]);
 
   return (
-    <div className={`flex min-h-0 flex-1 flex-col ${shake ? 'shake' : ''}`}>
+    <div className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${shake ? 'shake' : ''}`}>
       {!myTurn && !state.winner && (
-        <div className="flex items-center justify-center gap-1.5 bg-slate-900/80 py-1 text-xs font-semibold text-slate-400">
+        <GameStatusOverlay
+          announcement={t('ai_thinking')}
+          className="border-slate-700 bg-slate-950/90 text-slate-300"
+        >
           <img
             src="/art/icons/icon-crystal-ball.svg"
             alt=""
@@ -61,9 +71,9 @@ export function AiGame() {
             className="h-4 w-4 animate-pulse"
           />
           <span className="animate-pulse">{t('ai_thinking')}</span>
-        </div>
+        </GameStatusOverlay>
       )}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         <Board state={state} dispatch={dispatch} viewpoint="p1" canAct={myTurn && !state.winner} />
         <LogPanel state={state} />
       </div>

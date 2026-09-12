@@ -5,7 +5,7 @@ body {
   background-color: #d6caaf;
   background-image:
     radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 252, 245, 0.55), rgba(180, 160, 130, 0.25) 100%),
-    url('/art/assets/arena_beige_texture.png');
+    url('/art/assets/arena_beige_texture.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -326,7 +326,7 @@ textarea,
   background-color: #1e1b18;
   background-image: 
     radial-gradient(circle at 50% 50%, rgba(245, 230, 210, 0.08) 0%, rgba(12, 10, 8, 0.72) 100%),
-    url('/art/assets/arena_battlefield_bg.png');
+    url('/art/assets/arena_battlefield_bg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -361,6 +361,21 @@ textarea,
 :focus-visible {
   outline: 3px solid #fbbf24;
   outline-offset: 3px;
+}
+
+/* Scrollable strips (e.g. the card hand) scroll by touch/drag/wheel — no
+   visible scrollbar taking up space. */
+.no-scrollbar {
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+  -ms-overflow-style: none;
+  overscroll-behavior-inline: contain;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

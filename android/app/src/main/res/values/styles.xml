@@ -17,6 +17,13 @@
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <!-- Keep the native launch window in sync with the generated Navia
+             launcher assets instead of Capacitor's template artwork. -->
+        <item name="android:background">@drawable/navia_splash</item>
+        <item name="android:windowBackground">@drawable/navia_splash</item>
+        <item name="windowSplashScreenBackground">#120D08</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

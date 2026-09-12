@@ -6,13 +6,14 @@
  *   npm run icons
  */
 import sharp from 'sharp';
-import { mkdir, readFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const markSvg = path.join(root, 'public/art/branding/navia-mark.svg');
 const foregroundSvg = path.join(root, 'public/art/branding/navia-mark-foreground.svg');
+const faviconSvg = path.join(root, 'public/icon.svg');
 const iconsDir = path.join(root, 'public/icons');
 
 // PWA / favicon / apple-touch sizes rendered from the full mark (stone plaque background baked in).
@@ -52,6 +53,8 @@ async function renderPng(svgPath, size, outPath, { pad } = {}) {
 
 async function main() {
   await mkdir(iconsDir, { recursive: true });
+  await copyFile(markSvg, faviconSvg);
+  console.log('wrote', path.relative(root, faviconSvg));
 
   for (const size of WEB_SIZES) {
     await renderPng(markSvg, size, path.join(iconsDir, `icon-${size}.png`));
