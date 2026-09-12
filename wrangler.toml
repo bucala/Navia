@@ -41,7 +41,7 @@ new_sqlite_classes = ["RatingCoordinator"]
 [[d1_databases]]
 binding = "DB"
 database_name = "pantheon-db"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "847f2455-4f2c-491a-a6b2-265b495596ab"
 migrations_dir = "migrations"
 
 # Voliteľné ďalšie webové originy oddelené čiarkou. Capacitor localhost je

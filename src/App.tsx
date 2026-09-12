@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLang } from './i18n';
 import type { StringKey } from './i18n/strings';
-import { useProfile } from './net/profile';
+import { useProfileContext } from './net/ProfileContext';
 import { AiGame } from './ui/AiGame';
 import { Codex } from './ui/Codex';
 import { DeckBuilder } from './ui/DeckBuilder';
@@ -74,7 +74,7 @@ export default function App() {
     new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
   );
   const muted = useMuted();
-  const { profile } = useProfile();
+  const { profile } = useProfileContext();
   const [onlineCleanup, setOnlineCleanup] = useState<(() => void) | null>(null);
   const [updateReady, setUpdateReady] = useState(false);
   useEffect(() => subscribeToUpdate(() => setUpdateReady(true)), []);

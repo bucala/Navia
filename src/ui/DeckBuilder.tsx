@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CARDS } from '../game/cards';
 import { DECK_MAX, DECK_MIN, MAX_COPIES, validateDeck } from '../game/deck';
-import { activeDeckId, deckApi, setActiveDeckId, useProfile, type Profile } from '../net/profile';
+import { activeDeckId, deckApi, setActiveDeckId, type Profile } from '../net/profile';
+import { useProfileContext } from '../net/ProfileContext';
 import { errorText, useLang } from '../i18n';
 import { CardFace } from './CardFace';
 import { Toast, useToast } from './feedback';
@@ -25,7 +26,7 @@ function draftCards(draft: Draft): string[] {
 /** 🃏 Balíčky — build, save and pick the deck used for online matches. */
 export function DeckBuilder({ onBack }: { onBack: () => void }) {
   const { t } = useLang();
-  const { profile, loading } = useProfile();
+  const { profile, loading } = useProfileContext();
   const { toast, showToast } = useToast();
   const [decks, setDecks] = useState<DeckSummary[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);

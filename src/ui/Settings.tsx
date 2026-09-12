@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { useLang, type Lang } from '../i18n';
-import { ensureProfile, getPlayerName, setPlayerName } from '../net/profile';
+import { getPlayerName, setPlayerName } from '../net/profile';
+import { useProfileContext } from '../net/ProfileContext';
 import { setMuted, useMuted } from './sfx';
 
 /** ⚙ Nastavenia — language, sound and the summoner's name. */
 export function Settings({ onBack }: { onBack: () => void }) {
   const { lang, setLang, t } = useLang();
   const muted = useMuted();
+  const { refresh } = useProfileContext();
   const [name, setName] = useState(() => getPlayerName());
   const [saved, setSaved] = useState(false);
 
   const saveName = async () => {
     const trimmed = name.trim() || t('you');
     setPlayerName(trimmed);
-    await ensureProfile(trimmed); // sync the rename to the D1 profile when online
+    await refresh(trimmed); // sync the rename to the D1 profile and header when online
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };
