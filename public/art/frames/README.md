@@ -45,5 +45,5 @@ Ak nahrádzaš tieto súbory:
 * `ornament-corner.svg`, `ornament-divider.svg` — dekorácie hlavného menu
   (`App.tsx`).
 
-Vetva/logo (`navia-logo.webp`, `navia-mark.svg`) je v `public/art/branding/` —
-pozri tamojší README pre ikony a ich regeneráciu.
+Logo (`navia-logo.webp`) je v `public/art/branding/`; kanonický zdroj ikon je
+`public/icons/icon-512.png`. Postup regenerácie opisuje branding README.

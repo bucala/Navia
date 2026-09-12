@@ -95,7 +95,7 @@ export default function App() {
     <div className="app-bg flex h-[100dvh] min-w-0 flex-col overflow-hidden text-slate-100">
       <header className="flex items-center justify-between border-b border-amber-900/40 bg-stone-950/85 px-4 py-1.5 shadow-md">
         <button onClick={toMenu} className="flex items-center gap-2 text-sm font-bold tracking-wide text-amber-200 hover:text-amber-100">
-          <img src="/art/branding/navia-mark.svg" alt="" aria-hidden="true" className="h-6 w-6 rounded shadow" />
+          <img src="/icons/icon-48.png" alt="" aria-hidden="true" className="h-6 w-6 rounded shadow" />
           Navia
         </button>
         <div className="flex items-center gap-2">

@@ -147,15 +147,11 @@ použije sa `VITE_API_BASE`.
 
 ## Značka a ikony
 
-Zdrojom webových a Android ikon sú:
-
-* `public/art/branding/navia-mark.svg` – plná značka,
-* `public/art/branding/navia-mark-foreground.svg` – priehľadná vrstva
-  adaptívnej Android ikony.
-
-Po ich zmene spusti `npm run icons`. Príkaz vytvorí favicon/PWA ikony,
-maskable ikonu a všetky Android launcher ikony. Android splash používa tie
-isté launcher zdroje na tmavom kamennom pozadí, takže nezobrazuje predvolenú
+Kanonickým zdrojom favicon, PWA a Android ikon je detailný erb v
+`public/icons/icon-512.png`. Po jeho zmene spusti `npm run icons`. Príkaz
+vytvorí menšie webové ikony, bezpečne odsadenú maskable ikonu a všetky
+Android launcher, okrúhle a adaptívne ikony. Android splash používa tie isté
+launcher výstupy na tmavom kamennom pozadí, takže nezobrazuje predvolenú
 grafiku Capacitoru. Podrobný postup je v
 [`public/art/branding/README.md`](public/art/branding/README.md).
 

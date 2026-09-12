@@ -19,8 +19,10 @@ teda dočasne odkaz mať nemusí).
   Capacitoru.
 - PWA farby pri štarte a farba lišty prehliadača sú zladené so súčasnou
   kamenno-pergamenovou identitou.
-- Generátor ikon teraz obnovuje aj `public/icon.svg` z kanonickej značky,
-  aby sa favicon nemohla rozísť s ostatnými výstupmi.
+- Logo a všetky webové, PWA a Android ikony používajú dodané maľované
+  podklady. Kanonický 512 px erb nahradil starú vektorovú runu; generátor z
+  neho vytvára aj bezpečne odsadenú maskable ikonu, okrúhle Android ikony a
+  adaptívne foreground vrstvy.
 - Galéria už neobsahuje starý screenshot tvorby balíčka bez aktuálneho
   tmavého panelu.
 
@@ -31,6 +33,8 @@ teda dočasne odkaz mať nemusí).
   skrytý aj vo WebKit/Chromium; posúvanie dotykom, myšou a kolieskom zostáva.
 - Stav AI a online ťahu je prekryvná lišta nad arénou, takže pri zobrazení
   nemení výšku hernej plochy ani veľkosť kariet.
+- Jednoduché SVG dekorácie arény nahradili detailné transparentné PNG
+  objekty: bojová zástava, mana kryštály, runový oltár a monolit.
 
 ## [0.12.1] — Oprava poškodených assetov a čitateľnosti UI
 

@@ -245,25 +245,25 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       <div className="arena-bg flex flex-1 min-h-[8rem] flex-col justify-center relative overflow-hidden">
         {/* Environmental Battlefield Assets */}
         <img
-          src="/art/assets/rune_monolith.svg"
+          src="/art/assets/rune_monolith.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute left-1 sm:left-4 top-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
-          src="/art/assets/mana_crystals.svg"
+          src="/art/assets/mana_crystals.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute right-1 sm:right-4 top-4 h-20 sm:h-32 md:h-40 w-auto z-0 opacity-85 drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)]"
         />
         <img
-          src="/art/assets/battle_banner.svg"
+          src="/art/assets/battle_banner.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute left-2 sm:left-6 bottom-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
-          src="/art/assets/rune_altar.svg"
+          src="/art/assets/rune_altar.png"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute right-2 sm:right-6 bottom-3 h-16 sm:h-24 md:h-32 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"

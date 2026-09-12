@@ -1,6 +1,6 @@
 // Replaced after each production build so every release installs a fresh SW.
 const CACHE_NAME = 'navia-app-__NAVIA_BUILD_ID__';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-32.png'];
 // Only build-hashed static assets are runtime-cached — arbitrary paths and
 // query variants must never fill storage.
 const RUNTIME_ASSET_PATH = /^\/(assets|icons)\/[^?]+$/;
