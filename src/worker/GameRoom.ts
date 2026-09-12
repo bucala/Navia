@@ -86,7 +86,10 @@ export class GameRoom {
 
       // Tie the seat to a D1 profile and load the chosen deck (never trust
       // the client: credentials checked, deck ownership + rules validated).
-      const profile = await authenticate(this.env, msg).catch(() => null);
+      const profile = await authenticate(this.env, msg).catch((e) => {
+        console.error('authenticate failed', e);
+        return null;
+      });
       if (profile) {
         meta.profiles[seat] = profile.id;
         meta.names[seat] = profile.name;
@@ -118,7 +121,8 @@ export class GameRoom {
       if (!row) return null;
       const cards = JSON.parse(row.cards) as string[];
       return validateDeck(cards) === null ? cards : null;
-    } catch {
+    } catch (e) {
+      console.error('loadDeck failed', e);
       return null;
     }
   }
@@ -183,8 +187,9 @@ export class GameRoom {
         msgKey: 'eloUpdate',
         params: { winner: w.name, loser: l.name, delta, welo: w.elo + delta, lelo: Math.max(0, l.elo - delta) },
       });
-    } catch {
+    } catch (e) {
       // D1 unavailable — the match result stays unranked but the game is unaffected.
+      console.error('recordResult failed', e);
     }
   }
 

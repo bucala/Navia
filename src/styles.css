@@ -224,14 +224,6 @@ textarea,
 
 .animate-popup { animation: popup-rise 0.9s ease-out both; }
 
-/* Stone/astral arena with faint faction glows on each half (GDD §6). */
-.arena-bg {
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 0%, rgb(127 29 29 / 0.14), transparent 60%),
-    radial-gradient(ellipse 70% 45% at 50% 100%, rgb(6 78 59 / 0.14), transparent 60%),
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.012) 0 2px, transparent 2px 14px);
-}
-
 /* Gentle screen shake on a rolled 6 (GDD §6). */
 @keyframes screen-shake {
   0%, 100% { transform: translate(0, 0); }

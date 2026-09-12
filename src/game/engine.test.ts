@@ -345,6 +345,81 @@ describe('Pekelné zaklínadlo (push-your-luck spell)', () => {
   });
 });
 
+describe('action shape hardening (never trust the client)', () => {
+  it('rejects PLAY_CARD with a slot outside the lane bounds', () => {
+    const g = newGame();
+    g.players.p1.hand = ['kamenny_strazca'];
+    g.players.p1.mana = 3;
+    expect(() =>
+      applyAction(
+        g,
+        { type: 'PLAY_CARD', player: 'p1', handIndex: 0, lane: 'vanguard', slot: 99 },
+        Math.random,
+      ),
+    ).toThrow('invalidSlot');
+  });
+
+  it('rejects MOVE_UNIT whose destination slot is outside the lane bounds', () => {
+    let g = newGame();
+    place(g, 'p1', 'vanguard', 0, 'opici_kral'); // agile
+    g = inCombat(g);
+    expect(() =>
+      applyAction(
+        g,
+        {
+          type: 'MOVE_UNIT',
+          player: 'p1',
+          from: { lane: 'vanguard', slot: 0 },
+          to: { lane: 'sanctum', slot: 99 },
+        },
+        Math.random,
+      ),
+    ).toThrow('invalidSlot');
+    // The unit must stay put — a rejected move is not a partial move.
+    expect(g.players.p1.lanes.vanguard[0]?.cardId).toBe('opici_kral');
+  });
+
+  it('rejects an ATTACK whose target.player is spoofed to the attacker\u2019s own seat', () => {
+    let g = newGame();
+    place(g, 'p1', 'vanguard', 0, 'megadrak');
+    g = inCombat(g);
+    expect(() =>
+      applyAction(
+        g,
+        {
+          type: 'ATTACK',
+          player: 'p1',
+          attacker: { lane: 'vanguard', slot: 0 },
+          target: { kind: 'nexus', player: 'p1' },
+          useDice: false,
+        },
+        Math.random,
+      ),
+    ).toThrow('invalidTarget');
+    // Nothing should have happened — not even the attacker's own nexus.
+    expect(g.players.p1.nexusHp).toBe(30);
+  });
+
+  it('rejects a spoofed unit target the same way', () => {
+    let g = newGame();
+    place(g, 'p1', 'vanguard', 0, 'megadrak');
+    g = inCombat(g);
+    expect(() =>
+      applyAction(
+        g,
+        {
+          type: 'ATTACK',
+          player: 'p1',
+          attacker: { lane: 'vanguard', slot: 0 },
+          target: { kind: 'unit', player: 'p1', lane: 'vanguard', slot: 0 },
+          useDice: false,
+        },
+        Math.random,
+      ),
+    ).toThrow('invalidTarget');
+  });
+});
+
 describe('crossNeighbors', () => {
   it('returns left, right and the aligned slot in the other lane', () => {
     expect(crossNeighbors({ lane: 'vanguard', slot: 1 })).toEqual([

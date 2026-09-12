@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameState, LaneId, PlayerId } from '../game/types';
 import { sfxHit } from './sfx';
+import { triggerAttackFeedback } from '../utils/haptics';
 
 export interface Popup {
   amount: number;
@@ -74,7 +75,7 @@ export function useCombatFx(state: GameState | null) {
     // Damage / heal popups from HP diffs (uid-tracked, so agile moves don't confuse it).
     const before = snapshotUnits(prev);
     const after = snapshotUnits(state);
-    let anyDamage = false;
+    let maxDamage = 0;
     for (const [uid, was] of before) {
       const now = after.get(uid);
       const delta = was.hp - (now?.hp ?? 0);
@@ -82,7 +83,7 @@ export function useCombatFx(state: GameState | null) {
       const at = now ?? was; // dead units pop over their last slot
       const key = slotFxKey(at.player, at.lane, at.slot);
       const kind = delta > 0 ? 'damage' : 'heal';
-      if (kind === 'damage') anyDamage = true;
+      if (kind === 'damage') maxDamage = Math.max(maxDamage, delta);
       nextFx[key] = { ...nextFx[key], hit: nextFx[key]?.hit || kind === 'damage', popup: { amount: Math.abs(delta), kind } };
     }
 
@@ -90,14 +91,17 @@ export function useCombatFx(state: GameState | null) {
       const delta = prev.players[id].nexusHp - state.players[id].nexusHp;
       if (delta > 0) {
         nextNexusFx[id] = { amount: delta, kind: 'damage' };
-        anyDamage = true;
+        maxDamage = Math.max(maxDamage, delta);
       } else if (delta < 0) {
         nextNexusFx[id] = { amount: -delta, kind: 'heal' };
       }
     }
 
     if (Object.keys(nextFx).length === 0 && Object.keys(nextNexusFx).length === 0) return;
-    if (anyDamage) sfxHit();
+    if (maxDamage > 0) {
+      sfxHit();
+      void triggerAttackFeedback(maxDamage);
+    }
     setFx(nextFx);
     setNexusFx(nextNexusFx);
     clearTimeout(timer.current);

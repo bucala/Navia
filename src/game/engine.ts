@@ -93,8 +93,17 @@ export function logMsg(state: GameState, msgKey: MsgKey, params: Record<string, 
   state.log.push({ id: state.nextLogId++, kind: 'msg', msgKey, params });
 }
 
+/** True for the two real lane ids — client-supplied refs are unchecked JSON, not the SlotRef type. */
+function isLaneId(lane: unknown): lane is LaneId {
+  return lane === 'vanguard' || lane === 'sanctum';
+}
+
+/** Bounds-checked slot lookup — never throws and never treats an out-of-range slot as "empty". */
 function unitAt(player: PlayerState, ref: SlotRef): UnitState | null {
-  return player.lanes[ref.lane][ref.slot] ?? null;
+  if (!isLaneId(ref.lane)) return null;
+  const lane = player.lanes[ref.lane];
+  if (!Number.isInteger(ref.slot) || ref.slot < 0 || ref.slot >= lane.length) return null;
+  return lane[ref.slot] ?? null;
 }
 
 function cardOf(unit: UnitState): UnitCardDef {
@@ -286,6 +295,7 @@ function playCard(
     const slot = action.slot;
     if (lane === undefined || slot === undefined) throw new Error('needSlot');
     if (lane !== card.lane) throw new Error('wrongLane');
+    if (!Number.isInteger(slot) || slot < 0 || slot >= player.lanes[lane].length) throw new Error('invalidSlot');
     if (player.lanes[lane][slot]) throw new Error('slotTaken');
     player.mana -= card.cost;
     player.hand.splice(action.handIndex, 1);
@@ -373,6 +383,9 @@ function attack(
   if (!attacker) throw new Error('noUnitHere');
   if (!attacker.ready) throw new Error('unitExhausted');
   const card = cardOf(attacker);
+  // Never trust the client's target.player for the actual effect — the only legal target is the real opponent.
+  const enemyId = opponentOf(state.active);
+  if (target.player !== enemyId) throw new Error('invalidTarget');
   assertLegalTarget(state, state.active, target);
 
   // Dice rider (GDD §2.3): pay extra mana, roll, unlock the special effect on success.
@@ -409,11 +422,10 @@ function attack(
     let damage = card.attack;
     if (diceSuccess && card.dice?.effect.kind === 'berserk') damage += card.dice.effect.bonusDamage;
     logMsg(state, 'attackNexus', { card: card.id });
-    damageNexus(state, target.player, damage);
+    damageNexus(state, enemyId, damage);
     return;
   }
 
-  const enemyId = target.player;
   const primary: SlotRef = { lane: target.lane, slot: target.slot };
   const targets: SlotRef[] = [primary];
   if (diceSuccess && card.dice?.effect.kind === 'aoe') {
@@ -512,6 +524,9 @@ function moveUnit(state: GameState, from: SlotRef, to: SlotRef): void {
   const card = cardOf(unit);
   if (!card.keywords.includes('agile')) throw new Error('cantMove');
   if (unit.movedThisTurn) throw new Error('alreadyMoved');
+  if (!isLaneId(to.lane) || !Number.isInteger(to.slot) || to.slot < 0 || to.slot >= player.lanes[to.lane].length) {
+    throw new Error('invalidSlot');
+  }
   if (to.lane === from.lane) throw new Error('mustChangeLane');
   if (player.lanes[to.lane][to.slot]) throw new Error('targetSlotTaken');
   player.lanes[to.lane][to.slot] = unit;

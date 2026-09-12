@@ -4,6 +4,7 @@
  * the server validates the seat and owns all dice rolls.
  */
 import type { Action, GameState, PlayerId } from '../game/types';
+import { isValidAction } from '../game/validateAction';
 
 export type ClientMessage =
   /**
@@ -32,8 +33,28 @@ export type ServerMessage =
 
 export function parseClientMessage(raw: string): ClientMessage | null {
   try {
-    const msg = JSON.parse(raw) as ClientMessage;
-    if (msg && (msg.type === 'JOIN_ROOM' || msg.type === 'ACTION')) return msg;
+    const msg = JSON.parse(raw) as Record<string, unknown>;
+    if (!msg || typeof msg !== 'object') return null;
+
+    if (msg.type === 'JOIN_ROOM') {
+      const { token, name, playerId, secret, deckId } = msg;
+      if (
+        typeof token === 'string' &&
+        typeof name === 'string' &&
+        (playerId === undefined || typeof playerId === 'string') &&
+        (secret === undefined || typeof secret === 'string') &&
+        (deckId === undefined || typeof deckId === 'string')
+      ) {
+        return { type: 'JOIN_ROOM', token, name, playerId, secret, deckId };
+      }
+      return null;
+    }
+
+    if (msg.type === 'ACTION') {
+      const { action } = msg;
+      if (isValidAction(action)) return { type: 'ACTION', action };
+      return null;
+    }
   } catch {
     // fall through
   }
