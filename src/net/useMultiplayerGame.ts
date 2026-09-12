@@ -4,7 +4,7 @@
  * only re-renders when the authoritative ROOM_STATE arrives.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Action, GameState, PlayerId } from '../game/types';
+import type { Action, PlayerId, PublicGameState } from '../game/types';
 import { wsUrl } from './api';
 import { activeDeckId, ensureProfile } from './profile';
 import type { ClientMessage, SeatsInfo, ServerMessage } from './protocol';
@@ -25,7 +25,7 @@ function playerToken(roomId: string): string {
 export function useMultiplayerGame(roomId: string, playerName: string, onError: (message: string) => void) {
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [seat, setSeat] = useState<PlayerId | null>(null);
-  const [state, setState] = useState<GameState | null>(null);
+  const [state, setState] = useState<PublicGameState | null>(null);
   const [seats, setSeats] = useState<SeatsInfo>({ p1: null, p2: null });
   /** True between sending an action and the server's reply. */
   const [pending, setPending] = useState(false);

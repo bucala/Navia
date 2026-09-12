@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { applyAction, createGame, crossNeighbors, effectiveThreshold } from './engine';
-import { getUnitCard } from './cards';
+import { getCard, getUnitCard } from './cards';
 import { d6seq } from './dice.test';
 import type { GameState, LaneId, PlayerId, UnitState } from './types';
 
 function newGame(): GameState {
-  return createGame(Math.random);
+  return createGame(() => 0);
 }
 
 /** Test helper: put a unit straight onto the board, ready to act. */
@@ -38,13 +38,26 @@ function inCombat(state: GameState): GameState {
 }
 
 describe('game setup and turn flow', () => {
-  it('starts with 30 HP nexuses and mana 1 for the first player', () => {
+  it('starts with 30 HP nexuses and compensates the player going second', () => {
     const g = newGame();
     expect(g.players.p1.nexusHp).toBe(30);
     expect(g.players.p2.nexusHp).toBe(30);
     expect(g.players.p1.maxMana).toBe(1);
     expect(g.players.p1.hand).toHaveLength(5); // 4 starting + 1 drawn
-    expect(g.players.p2.hand).toHaveLength(4);
+    expect(g.players.p2.hand).toHaveLength(5); // one extra opening card for going second
+    expect(g.startingPlayer).toBe('p1');
+  });
+
+  it('randomizes which seat takes the first turn', () => {
+    expect(createGame(() => 0).active).toBe('p1');
+    expect(createGame(() => 0.99).active).toBe('p2');
+  });
+
+  it('automatically mulligans a dead opening hand when an early play exists', () => {
+    const g = newGame();
+    for (const player of Object.values(g.players)) {
+      expect(player.hand.some((cardId) => getCard(cardId).cost <= 2)).toBe(true);
+    }
   });
 
   it('ramps mana by 1 per turn up to the cap and refills it', () => {
@@ -289,6 +302,7 @@ describe('dice-boosted attacks', () => {
     place(g, 'p2', 'vanguard', 0, 'kamenny_strazca', { armor: 1 }); // armor absorbs the bolt
     place(g, 'p2', 'sanctum', 2, 'nebesky_vrabec'); // 2 HP
     g.players.p1.mana = 4;
+    g = inCombat(g);
     g = applyAction(g, { type: 'ACTIVATE', player: 'p1', unit: { lane: 'sanctum', slot: 0 } }, d6seq(5));
     const guard = g.players.p2.lanes.vanguard[0]!;
     expect(guard.armor).toBe(0);
@@ -300,6 +314,7 @@ describe('dice-boosted attacks', () => {
     let g = newGame();
     place(g, 'p1', 'vanguard', 0, 'gorila', { hp: 2, armor: 0 });
     g.players.p1.mana = 3;
+    g = inCombat(g);
     g = applyAction(
       g,
       { type: 'ACTIVATE', player: 'p1', unit: { lane: 'vanguard', slot: 0 } },
@@ -310,6 +325,19 @@ describe('dice-boosted attacks', () => {
     expect(gorila.armor).toBe(3);
     const dice = g.log.filter((e) => e.kind === 'dice').at(-1)!;
     expect(dice.kind === 'dice' && dice.rolls).toEqual([2, 6]);
+  });
+
+  it('rejects activated abilities outside the combat phase', () => {
+    const g = newGame();
+    place(g, 'p1', 'vanguard', 0, 'gorila');
+    g.players.p1.mana = 3;
+    expect(() =>
+      applyAction(
+        g,
+        { type: 'ACTIVATE', player: 'p1', unit: { lane: 'vanguard', slot: 0 } },
+        d6seq(6),
+      ),
+    ).toThrow('combatPhaseOnly');
   });
 });
 
@@ -330,7 +358,7 @@ describe('Pekelné zaklínadlo (push-your-luck spell)', () => {
     expect(g.players.p1.nexusHp).toBe(19);
   });
 
-  it('redirects remaining chain damage to the enemy nexus once the target dies', () => {
+  it('stops damaging once the declared unit target dies', () => {
     let g = newGame();
     place(g, 'p2', 'vanguard', 0, 'lavovy_skriatok'); // 1 HP
     g.players.p1.hand = ['pekelne_zaklinadlo'];
@@ -341,7 +369,33 @@ describe('Pekelné zaklínadlo (push-your-luck spell)', () => {
       d6seq(4, 4, 1), // two successes, then a safe stop
     );
     expect(g.players.p2.lanes.vanguard[0]).toBeNull();
-    expect(g.players.p2.nexusHp).toBe(28); // second success spills onto the nexus
+    expect(g.players.p2.nexusHp).toBe(30);
+  });
+});
+
+describe('anti-stall rules', () => {
+  it('applies escalating fatigue when the active player cannot draw', () => {
+    let g = newGame();
+    g.active = 'p2';
+    g.players.p1.deck = [];
+    g.players.p1.nexusHp = 3;
+
+    g = applyAction(g, { type: 'END_TURN', player: 'p2' }, Math.random);
+    expect(g.players.p1.fatigue).toBe(1);
+    expect(g.players.p1.nexusHp).toBe(2);
+    g = applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random);
+    g.players.p1.deck = [];
+    g = applyAction(g, { type: 'END_TURN', player: 'p2' }, Math.random);
+    expect(g.players.p1.nexusHp).toBe(0);
+    expect(g.winner).toBe('p2');
+  });
+
+  it('resolves a game that reaches the hard turn limit', () => {
+    const g = newGame();
+    g.turn = 80;
+    const next = applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random);
+    expect(next.winner).toBe('p2');
+    expect(next.log.some((event) => event.kind === 'msg' && event.msgKey === 'turnLimit')).toBe(true);
   });
 });
 

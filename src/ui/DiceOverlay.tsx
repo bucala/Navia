@@ -7,7 +7,12 @@ export function DiceOverlay({ event }: { event: Extract<LogEvent, { kind: 'dice'
   const { lang, t } = useLang();
   const isAdvantagePair = event.rolls.length === 2;
   return (
-    <div className="pointer-events-none fixed inset-0 z-40 flex flex-col items-center justify-center bg-black/50">
+    <div
+      role="status"
+      aria-live="assertive"
+      aria-atomic="true"
+      className="pointer-events-none fixed inset-0 z-40 flex flex-col items-center justify-center bg-black/50"
+    >
       <p className="mb-5 text-lg font-semibold text-amber-100 drop-shadow">{diceLabel(lang, event)}</p>
       <div className="flex max-w-lg flex-wrap justify-center gap-3">
         {event.rolls.map((roll, i) => (

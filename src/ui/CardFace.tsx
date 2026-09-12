@@ -15,15 +15,20 @@ interface Props {
   selected?: boolean;
   affordable?: boolean;
   onClick?: () => void;
+  interactive?: boolean;
 }
 
 /** A card in hand — full-bleed art on top, name banner, rules text and stats. */
-export function CardFace({ cardId, selected = false, affordable = true, onClick }: Props) {
+export function CardFace({ cardId, selected = false, affordable = true, onClick, interactive = true }: Props) {
   const { lx, t } = useLang();
   const card = getCard(cardId);
   return (
     <button
+      type="button"
       onClick={onClick}
+      disabled={!interactive}
+      aria-pressed={selected}
+      aria-label={`${lx(card.name)}. ${t('a11y_card_cost', { n: card.cost })}. ${lx(card.text)}`}
       title={lx(card.text)}
       className={`card-frame card-frame--${card.rarity} relative flex h-full min-h-16 max-w-48 aspect-[5/7] shrink-0 origin-bottom flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-all duration-300 ${FACTION_BG[card.faction]} ${
         selected
@@ -40,13 +45,13 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
         </span>
       </div>
 
-      <span className="truncate px-1 pt-0.5 text-center text-[10px] font-semibold text-amber-100">
+      <span className="truncate px-1 pt-0.5 text-center text-[11px] font-semibold text-amber-100 sm:text-xs">
         {lx(card.name)}
       </span>
-      <span className="line-clamp-4 flex-1 px-1.5 pt-0.5 text-[8px] leading-tight text-slate-300">
+      <span className="line-clamp-4 flex-1 px-1.5 pt-0.5 text-[10px] leading-tight text-slate-200 sm:text-[11px]">
         {lx(card.text)}
       </span>
-      <div className="flex items-center justify-between bg-black/40 px-1.5 py-0.5 text-[11px] font-bold">
+      <div className="flex items-center justify-between bg-black/40 px-1.5 py-0.5 text-xs font-bold">
         {card.type === 'unit' ? (
           <>
             <span className="flex items-center gap-0.5 text-orange-300"><AttackIcon className="h-2.5 w-2.5" /> {card.attack}</span>

@@ -1,10 +1,11 @@
 /**
- * Anonymous player profile (GDD §5.2 — D1 accounts). The client keeps a
- * playerId+secret pair in localStorage; /api/profile logs in or mints a
- * new account. Everything degrades gracefully when the backend is
- * unreachable (local-only play stays unranked).
+ * Anonymous player profile (GDD §5.2 — D1 accounts). Browsers retain the
+ * playerId+secret pair in same-origin storage; Android encrypts it with a
+ * device-bound Keystore key. Everything degrades gracefully when the backend
+ * is unreachable (local-only play stays unranked).
  */
 import { useCallback, useEffect, useState } from 'react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { currentLang, errorText } from '../i18n';
 import { apiUrl } from './api';
 
@@ -19,20 +20,85 @@ export interface Profile {
 
 const CREDS_KEY = 'pantheon-profile';
 const ACTIVE_DECK_KEY = 'pantheon-active-deck';
+const PLAYER_NAME_KEY = 'pantheon-name';
 
-function storedCredentials(): { playerId: string; secret: string } | null {
+/** The summoner's display name, shared by the menu, settings, and games. */
+export function getPlayerName(fallback = ''): string {
+  return localStorage.getItem(PLAYER_NAME_KEY) ?? fallback;
+}
+
+export function setPlayerName(name: string): void {
+  localStorage.setItem(PLAYER_NAME_KEY, name);
+}
+
+interface Credentials {
+  playerId: string;
+  secret: string;
+}
+
+interface SecureCredentialsPlugin {
+  getCredentials(): Promise<{ value?: string }>;
+  setCredentials(options: { value: string }): Promise<void>;
+}
+
+const SecureCredentials = registerPlugin<SecureCredentialsPlugin>('SecureCredentials');
+
+function parseCredentials(raw: string | null | undefined): Credentials | null {
+  if (!raw) return null;
   try {
-    const raw = localStorage.getItem(CREDS_KEY);
-    return raw ? (JSON.parse(raw) as { playerId: string; secret: string }) : null;
+    const value = JSON.parse(raw) as Record<string, unknown>;
+    return typeof value.playerId === 'string' && typeof value.secret === 'string'
+      ? { playerId: value.playerId, secret: value.secret }
+      : null;
   } catch {
     return null;
   }
 }
 
+async function storedCredentials(): Promise<Credentials | null> {
+  if (Capacitor.getPlatform() !== 'android') {
+    return parseCredentials(localStorage.getItem(CREDS_KEY));
+  }
+
+  const stored = parseCredentials((await SecureCredentials.getCredentials()).value);
+  if (stored) return stored;
+
+  // One-time migration from releases that stored the secret in WebView data.
+  const legacy = parseCredentials(localStorage.getItem(CREDS_KEY));
+  if (legacy) {
+    await saveCredentials(legacy);
+    localStorage.removeItem(CREDS_KEY);
+  }
+  return legacy;
+}
+
+async function saveCredentials(credentials: Credentials): Promise<void> {
+  const value = JSON.stringify(credentials);
+  if (Capacitor.getPlatform() === 'android') {
+    await SecureCredentials.setCredentials({ value });
+    localStorage.removeItem(CREDS_KEY);
+  } else {
+    localStorage.setItem(CREDS_KEY, value);
+  }
+}
+
+/**
+ * Concurrent callers (App, DeckBuilder, settings) share one queue so two
+ * first-run mounts cannot each observe "no credentials" and mint separate
+ * anonymous accounts that then overwrite each other in storage.
+ */
+let ensureQueue: Promise<unknown> = Promise.resolve();
+
 /** Login-or-register. Returns null when the backend is unreachable. */
-export async function ensureProfile(name?: string): Promise<Profile | null> {
+export function ensureProfile(name?: string): Promise<Profile | null> {
+  const result = ensureQueue.then(() => ensureProfileInner(name));
+  ensureQueue = result.catch(() => undefined);
+  return result;
+}
+
+async function ensureProfileInner(name?: string): Promise<Profile | null> {
   try {
-    const creds = storedCredentials();
+    const creds = await storedCredentials();
     const res = await fetch(apiUrl('/api/profile'), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -42,7 +108,7 @@ export async function ensureProfile(name?: string): Promise<Profile | null> {
     const data = (await res.json()) as Omit<Profile, 'secret'> & { secret?: string };
     const secret = data.secret ?? creds?.secret;
     if (!secret) return null;
-    localStorage.setItem(CREDS_KEY, JSON.stringify({ playerId: data.playerId, secret }));
+    await saveCredentials({ playerId: data.playerId, secret });
     return { ...data, secret };
   } catch {
     return null;

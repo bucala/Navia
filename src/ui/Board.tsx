@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getCard, getUnitCard } from '../game/cards';
 import { effectiveThreshold, opponentOf } from '../game/engine';
-import type { Action, GameState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
+import type { Action, GameViewState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { CardArt } from './CardArt';
 import { ArmorIcon, AttackIcon, HpIcon, ManaIcon, NexusHeartIcon } from './icons';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
-import { slotFxKey, useCombatFx, type Popup } from './useCombatFx';
+import { slotFxKey, useCombatFx } from './useCombatFx';
+import { FloatingPopup } from './FloatingPopup';
 import { useLang } from '../i18n';
 
 type Selection =
@@ -17,7 +18,7 @@ type Selection =
   | { mode: 'dicePrompt'; attacker: SlotRef; target: TargetRef };
 
 interface Props {
-  state: GameState;
+  state: GameViewState;
   dispatch: (action: Action) => boolean;
   /** Whose seat this client renders — locally the active player, online the assigned seat. */
   viewpoint: PlayerId;
@@ -27,19 +28,6 @@ interface Props {
 
 function sameSlot(a: SlotRef, b: SlotRef): boolean {
   return a.lane === b.lane && a.slot === b.slot;
-}
-
-function NexusPopup({ popup }: { popup?: Popup }) {
-  if (!popup) return null;
-  return (
-    <span
-      className={`animate-popup pointer-events-none absolute inset-x-0 -top-2 z-10 text-center text-xl font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
-        popup.kind === 'damage' ? 'text-red-400' : 'text-emerald-300'
-      }`}
-    >
-      {popup.kind === 'damage' ? `−${popup.amount}` : `+${popup.amount}`}
-    </span>
-  );
 }
 
 function ManaBar({ mana, maxMana, label }: { mana: number; maxMana: number; label: string }) {
@@ -72,6 +60,14 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const act = (action: Action) => {
     if (dispatch(action)) reset();
   };
+  useEffect(() => {
+    if (selection.mode !== 'dicePrompt') return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') reset();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selection.mode]);
 
   // ── Selection-derived helpers ─────────────────────────────────────────────
 
@@ -195,6 +191,12 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
                 highlight={highlight}
                 enemySide={owner === 'foe'}
                 fx={fx[slotFxKey(player.id, lane, slot)]}
+                interactive={
+                  canAct &&
+                  (owner === 'me'
+                    ? Boolean(unit) || canPlaceAt(lane, slot) || canMoveTo(lane, slot)
+                    : isAttackTarget(lane, slot))
+                }
                 onClick={() => (owner === 'me' ? clickMySlot(lane, slot) : clickFoeSlot(lane, slot))}
               />
             );
@@ -205,10 +207,11 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
     );
   };
 
-  const dicePromptCard =
+  const dicePromptUnit =
     selection.mode === 'dicePrompt'
-      ? getUnitCard(me.lanes[selection.attacker.lane][selection.attacker.slot]!.cardId)
+      ? me.lanes[selection.attacker.lane][selection.attacker.slot]
       : null;
+  const dicePromptCard = dicePromptUnit ? getUnitCard(dicePromptUnit.cardId) : null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto w-full max-w-full">
@@ -220,7 +223,10 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         </div>
         <ManaBar mana={foe.mana} maxMana={foe.maxMana} label={t('mana_label', { m: foe.mana, max: foe.maxMana })} />
         <button
+          type="button"
           onClick={clickFoeNexus}
+          disabled={!nexusTargetable}
+          aria-label={t('a11y_nexus', { name: foe.name, hp: foe.nexusHp })}
           className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${
             nexusTargetable
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
@@ -229,7 +235,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           title={t('nexus_title')}
         >
           <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {foe.nexusHp}</span>
-          <NexusPopup popup={nexusFx[foe.id]} />
+          <FloatingPopup popup={nexusFx[foe.id]} className="-top-2" />
         </button>
       </div>
 
@@ -313,7 +319,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             </div>
           </div>
           {!selectedUnit.ready && <span className="text-slate-500 italic">{t('action_exhausted')}</span>}
-          {selectedUnitCard.dice?.activation && selectedUnit.ready && (
+          {selectedUnitCard.dice?.activation && selectedUnit.ready && state.phase === 'combat' && (
             <button
               onClick={() => act({ type: 'ACTIVATE', player: me.id, unit: selection.ref })}
               disabled={me.mana < selectedUnitCard.dice.manaCost}
@@ -355,7 +361,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
           <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
             <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {me.nexusHp}</span>
-            <NexusPopup popup={nexusFx[me.id]} />
+            <FloatingPopup popup={nexusFx[me.id]} className="-top-2" />
           </span>
         </div>
         <div className="relative z-10 flex flex-1 min-h-0 items-stretch w-max max-w-full mx-auto gap-3 sm:gap-4 overflow-x-auto overflow-y-auto pt-14 pb-4 px-4">
@@ -366,6 +372,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
               cardId={cardId}
               selected={selection.mode === 'hand' && selection.index === i}
               affordable={canAct && getCard(cardId).cost <= me.mana && state.phase === 'main'}
+              interactive={canAct && state.phase === 'main'}
               onClick={() => clickHandCard(i)}
             />
           ))}
@@ -384,8 +391,13 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       {/* Dice rider prompt */}
       {selection.mode === 'dicePrompt' && dicePromptCard?.dice && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/60">
-          <div className="w-80 rounded-xl border border-slate-600 bg-slate-900 p-4 text-center shadow-2xl">
-            <p className="mb-1 font-semibold text-amber-100">{lx(dicePromptCard.name)}</p>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dice-prompt-title"
+            className="w-80 rounded-xl border border-slate-600 bg-slate-900 p-4 text-center shadow-2xl"
+          >
+            <p id="dice-prompt-title" className="mb-1 font-semibold text-amber-100">{lx(dicePromptCard.name)}</p>
             <p className="mb-3 text-xs text-slate-300">
               {t('dice_prompt', {
                 label: lx(dicePromptCard.dice.label),
@@ -395,6 +407,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
             </p>
             <div className="flex justify-center gap-2">
               <button
+                autoFocus
                 onClick={() =>
                   act({ type: 'ATTACK', player: me.id, attacker: selection.attacker, target: selection.target, useDice: false })
                 }

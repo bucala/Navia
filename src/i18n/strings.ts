@@ -89,8 +89,8 @@ export const STRINGS = {
   rules_kw_flying: { sk: 'Letec — jednotka Nebeského zboru patriaca do Sanctum.', en: 'Flyer — a Celestial Chorus unit that belongs in the Sanctum.' },
   rules_win_title: { sk: '🏆 Víťazstvo', en: '🏆 Victory' },
   rules_win_body: {
-    sk: 'Zápas končí okamžite, keď niektorému hráčovi klesne Nexus na 0 HP. Veľa šťastia, Vyvolávač!',
-    en: 'The match ends the instant either player\'s Nexus drops to 0 HP. Good luck, Summoner!',
+    sk: 'Zápas končí, keď niektorému hráčovi klesne Nexus na 0 HP, keď vyčerpá balíček a podľahne únave, alebo pri bezpečnostnom limite 80 ťahov. V online hre sa po dvoch vypršaniach času zápas vzdáva.',
+    en: 'The match ends when a Nexus reaches 0 HP, an empty deck causes lethal fatigue, or the 80-turn safety limit is reached. Online, running out of time twice forfeits the match.',
   },
 
   // ── Multiplayer submenu ──
@@ -217,14 +217,27 @@ export const STRINGS = {
   rank_empty: { sk: 'Zatiaľ sa nehral žiadny hodnotený zápas.', en: 'No ranked match has been played yet.' },
   rank_player: { sk: 'Hráč', en: 'Player' },
   rank_wl: { sk: 'V / P', en: 'W / L' },
+  a11y_empty_slot: { sk: 'Prázdny slot', en: 'Empty slot' },
+  a11y_unit_slot: { sk: '{name}, útok {attack}, zdravie {hp}, brnenie {armor}', en: '{name}, attack {attack}, health {hp}, armor {armor}' },
+  a11y_place_here: { sk: 'Umiestni kartu sem', en: 'Place the card here' },
+  a11y_attack_here: { sk: 'Zaútoč na tento cieľ', en: 'Attack this target' },
+  a11y_move_here: { sk: 'Presuň jednotku sem', en: 'Move the unit here' },
+  a11y_card_cost: { sk: 'Cena {n} many', en: 'Costs {n} mana' },
+  a11y_nexus: { sk: 'Nexus hráča {name}, {hp} zdravia', en: "{name}'s Nexus, {hp} health" },
+  update_ready: { sk: 'Je dostupná nová verzia hry.', en: 'A new game version is available.' },
+  update_apply: { sk: 'Aktualizovať', en: 'Update' },
 
   // ── Engine log messages ──
   log_gameStart: { sk: 'Zápas začína — na ťahu je {player}.', en: 'The match begins — {player} goes first.' },
   log_turnStart: { sk: 'Ťah {n} — na rade je {player}.', en: 'Turn {n} — {player} is up.' },
+  log_fatigue: { sk: '💀 {player} nemá čo ťahať a utrpí {n} únavy.', en: '💀 {player} has no card to draw and takes {n} fatigue.' },
+  log_turnLimit: { sk: '⏳ Limit ťahov rozhodol zápas. Víťazí {player}.', en: '⏳ The turn limit decides the match. {player} wins.' },
+  log_turnTimedOut: { sk: '⌛ Hráčovi {player} vypršal čas. Ťah sa automaticky končí.', en: '⌛ {player} ran out of time. The turn ends automatically.' },
+  log_timeoutForfeit: { sk: '⌛ {player} víťazí po opakovanom vypršaní času súpera.', en: '⌛ {player} wins after the opponent repeatedly runs out of time.' },
   log_summon: { sk: '{player} povoláva {card} ({lane}).', en: '{player} summons {card} ({lane}).' },
   log_enterCombat: { sk: '{player} vstupuje do bojovej fázy.', en: '{player} enters the combat phase.' },
   log_nexusDamage: { sk: 'Nexus hráča {player} utrpel {n} poškodenie ({hp} HP).', en: "{player}'s Nexus takes {n} damage ({hp} HP)." },
-  log_winner: { sk: '🏆 {player} víťazí — Nexus súpera padol!', en: "🏆 {player} wins — the opponent's Nexus has fallen!" },
+  log_winner: { sk: '🏆 {player} víťazí!', en: '🏆 {player} wins!' },
   log_unitDamage: { sk: '{card} utrpel {n} poškodenie.', en: '{card} takes {n} damage.' },
   log_unitDamageAbsorbed: { sk: '{card} utrpel {n} poškodenie ({a} pohltilo brnenie).', en: '{card} takes {n} damage ({a} absorbed by armor).' },
   log_exterminate: { sk: 'Vyhubenie: {card} je okamžite zničený (štíty ignorované).', en: 'Extermination: {card} is destroyed instantly (shields ignored).' },
@@ -286,9 +299,11 @@ export const STRINGS = {
   err_quickPlay: { sk: 'Vyhľadávanie súpera zlyhalo: {msg}', en: 'Matchmaking failed: {msg}' },
   err_enterCode: { sk: 'Zadaj kód miestnosti.', en: 'Enter a room code.' },
   err_deckTooSmall: { sk: 'Balíček musí mať aspoň {n} kariet.', en: 'A deck needs at least {n} cards.' },
+  err_deckInvalid: { sk: 'Balíček musí byť zoznam platných kariet.', en: 'The deck must be a list of valid cards.' },
   err_deckTooBig: { sk: 'Balíček môže mať najviac {n} kariet.', en: 'A deck can have at most {n} cards.' },
   err_deckUnknownCard: { sk: 'Neznáma karta: {card}.', en: 'Unknown card: {card}.' },
   err_deckTooManyCopies: { sk: 'Karta {card} môže byť v balíčku najviac {n}×.', en: '{card} can appear in a deck at most {n}×.' },
+  err_deckNotFound: { sk: 'Balíček sa nenašiel alebo patrí inému hráčovi.', en: 'The deck was not found or belongs to another player.' },
 } satisfies Record<string, LocalizedText>;
 
 export type StringKey = keyof typeof STRINGS;

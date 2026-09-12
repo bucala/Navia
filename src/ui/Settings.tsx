@@ -1,28 +1,25 @@
 import { useState } from 'react';
 import { useLang, type Lang } from '../i18n';
-import { ensureProfile } from '../net/profile';
-import { isMuted, setMuted } from './sfx';
+import { ensureProfile, getPlayerName, setPlayerName } from '../net/profile';
+import { setMuted, useMuted } from './sfx';
 
 /** ⚙ Nastavenia — language, sound and the summoner's name. */
 export function Settings({ onBack }: { onBack: () => void }) {
   const { lang, setLang, t } = useLang();
-  const [muted, setMutedState] = useState(isMuted);
-  const [name, setName] = useState(() => localStorage.getItem('pantheon-name') ?? '');
+  const muted = useMuted();
+  const [name, setName] = useState(() => getPlayerName());
   const [saved, setSaved] = useState(false);
 
   const saveName = async () => {
     const trimmed = name.trim() || t('you');
-    localStorage.setItem('pantheon-name', trimmed);
+    setPlayerName(trimmed);
     await ensureProfile(trimmed); // sync the rename to the D1 profile when online
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };
 
   const pickLang = (next: Lang) => setLang(next);
-  const toggleSound = (next: boolean) => {
-    setMuted(!next);
-    setMutedState(!next);
-  };
+  const toggleSound = (next: boolean) => setMuted(!next);
 
   const choice = (active: boolean) =>
     `rounded-lg border px-4 py-2 text-sm font-semibold transition ${

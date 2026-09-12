@@ -55,7 +55,11 @@ export async function handleApi(request: Request, env: Env): Promise<Response | 
   if (!path.startsWith('/api/profile') && !path.startsWith('/api/decks')) return null;
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
-  const body = (await request.json().catch(() => ({}))) as Credentials & {
+  const rawBody = await request.json().catch(() => null);
+  if (typeof rawBody !== 'object' || rawBody === null || Array.isArray(rawBody)) {
+    return json({ error: 'invalidRequest' }, 400);
+  }
+  const body = rawBody as Credentials & {
     name?: string;
     deckId?: string;
     deckName?: string;
@@ -103,18 +107,21 @@ export async function handleApi(request: Request, env: Env): Promise<Response | 
   }
 
   if (path === '/api/decks/save') {
-    const cards = body.cards ?? [];
+    const cards: unknown = body.cards;
     const error = validateDeck(cards);
     if (error) return json({ error: error.code, params: error.params }, 400);
     const name = body.deckName?.trim().slice(0, 30) || 'Bez názvu';
     const deckId = body.deckId ?? crypto.randomUUID();
-    await env.DB.prepare(
+    const saved = await env.DB.prepare(
       `INSERT INTO decks (id, player_id, name, cards, updated_at) VALUES (?, ?, ?, ?, datetime('now'))
        ON CONFLICT(id) DO UPDATE SET name = excluded.name, cards = excluded.cards, updated_at = excluded.updated_at
        WHERE decks.player_id = excluded.player_id`,
     )
       .bind(deckId, player.id, name, JSON.stringify(cards))
       .run();
+    // The conflict guard skips updates to decks owned by someone else — a
+    // zero-row write must not look like a successful save.
+    if (saved.meta.changes !== 1) return json({ error: 'deckNotFound' }, 404);
     return json({ deckId, name });
   }
 

@@ -40,9 +40,19 @@ jobs:
 
       - run: npm ci
 
+      - name: Unit tests
+        run: npm test
+
+      - name: Validate production backend URL
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+        run: |
+          node -e "const value=process.env.VITE_API_BASE; if (!value) throw new Error('Repository variable VITE_API_BASE is required'); const url=new URL(value); if (url.protocol !== 'https:') throw new Error('VITE_API_BASE must use HTTPS');"
+
       - name: Web build (production)
         env:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+          VITE_PUBLIC_APP_URL: ${{ vars.VITE_PUBLIC_APP_URL || vars.VITE_API_BASE }}
         run: npm run build
 
       - uses: actions/setup-java@v4
@@ -78,6 +88,10 @@ jobs:
       - name: Debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+
+      - name: Android unit tests and lint
+        working-directory: android
+        run: ./gradlew testDebugUnitTest lintDebug --no-daemon
 
       - name: Decode signing keystore
         id: signing

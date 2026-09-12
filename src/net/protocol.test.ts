@@ -31,6 +31,8 @@ describe('parseClientMessage', () => {
   it('rejects JOIN_ROOM with a non-string token or name', () => {
     expect(parseClientMessage(JSON.stringify({ type: 'JOIN_ROOM', token: 123, name: 'x' }))).toBeNull();
     expect(parseClientMessage(JSON.stringify({ type: 'JOIN_ROOM', token: 'abc', name: null }))).toBeNull();
+    expect(parseClientMessage(JSON.stringify({ type: 'JOIN_ROOM', token: '', name: 'x' }))).toBeNull();
+    expect(parseClientMessage(JSON.stringify({ type: 'JOIN_ROOM', token: 'x'.repeat(129), name: 'x' }))).toBeNull();
   });
 
   it('rejects JOIN_ROOM with a non-string optional credential', () => {

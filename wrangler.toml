@@ -19,6 +19,10 @@ class_name = "GameRoom"
 name = "MATCHMAKER"
 class_name = "Matchmaker"
 
+[[durable_objects.bindings]]
+name = "RATING_COORDINATOR"
+class_name = "RatingCoordinator"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["GameRoom"]
@@ -27,13 +31,22 @@ new_sqlite_classes = ["GameRoom"]
 tag = "v2"
 new_sqlite_classes = ["Matchmaker"]
 
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["RatingCoordinator"]
+
 # Účty, ELO, balíčky (GDD §5.2). Lokálne funguje hneď (wrangler dev);
 # pred nasadením spusti `wrangler d1 create pantheon-db` a vlož database_id.
+# `npm run deploy` zámerne zlyhá, kým tu ostáva all-zero placeholder.
 [[d1_databases]]
 binding = "DB"
 database_name = "pantheon-db"
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
+
+# Voliteľné ďalšie webové originy oddelené čiarkou. Capacitor localhost je
+# povolený priamo vo Workeri; produkčný same-origin frontend funguje bez vars.
+# CORS_ALLOWED_ORIGINS = "https://play.example.com"
 
 [observability]
 enabled = true

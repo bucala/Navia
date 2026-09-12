@@ -10,12 +10,15 @@ export const DECK_MAX = 25;
 export const MAX_COPIES = 2;
 
 export interface DeckError {
-  code: 'deckTooSmall' | 'deckTooBig' | 'deckUnknownCard' | 'deckTooManyCopies';
+  code: 'deckInvalid' | 'deckTooSmall' | 'deckTooBig' | 'deckUnknownCard' | 'deckTooManyCopies';
   params: Record<string, string | number>;
 }
 
 /** Returns an error descriptor, or null when the deck is legal. */
-export function validateDeck(cards: string[]): DeckError | null {
+export function validateDeck(cards: unknown): DeckError | null {
+  if (!Array.isArray(cards) || cards.some((card) => typeof card !== 'string')) {
+    return { code: 'deckInvalid', params: {} };
+  }
   if (cards.length < DECK_MIN) return { code: 'deckTooSmall', params: { n: DECK_MIN } };
   if (cards.length > DECK_MAX) return { code: 'deckTooBig', params: { n: DECK_MAX } };
   const counts = new Map<string, number>();

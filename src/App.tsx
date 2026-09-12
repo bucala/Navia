@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLang } from './i18n';
 import type { StringKey } from './i18n/strings';
 import { useProfile } from './net/profile';
@@ -10,7 +10,8 @@ import { Leaderboard } from './ui/Leaderboard';
 import { LocalGame } from './ui/LocalGame';
 import { OnlineGame } from './ui/OnlineGame';
 import { Settings } from './ui/Settings';
-import { isMuted, setMuted } from './ui/sfx';
+import { setMuted, useMuted } from './ui/sfx';
+import { activateUpdate, subscribeToUpdate } from './pwa';
 
 type Screen =
   | 'menu'
@@ -72,13 +73,23 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(() =>
     new URLSearchParams(window.location.search).get('room') ? 'online' : 'menu',
   );
-  const [muted, setMutedState] = useState(isMuted);
+  const muted = useMuted();
   const { profile } = useProfile();
-  const toggleMute = () => {
-    setMuted(!muted);
-    setMutedState(!muted);
+  const [onlineCleanup, setOnlineCleanup] = useState<(() => void) | null>(null);
+  const [updateReady, setUpdateReady] = useState(false);
+  useEffect(() => subscribeToUpdate(() => setUpdateReady(true)), []);
+  const toggleMute = () => setMuted(!muted);
+  const toMenu = () => {
+    if (screen === 'online' && onlineCleanup) {
+      onlineCleanup();
+      return;
+    }
+    setScreen('menu');
   };
-  const toMenu = () => setScreen('menu');
+  const finishOnlineExit = useCallback(() => setScreen('menu'), []);
+  const registerOnlineCleanup = useCallback((cleanup: (() => void) | null) => {
+    setOnlineCleanup(cleanup ? () => cleanup : null);
+  }, []);
 
   return (
     <div className="app-bg flex h-[100dvh] flex-col text-slate-100">
@@ -98,6 +109,7 @@ export default function App() {
           <button
             onClick={toggleMute}
             title={t(muted ? 'mute_on' : 'mute_off')}
+            aria-label={t(muted ? 'mute_on' : 'mute_off')}
             className="rounded border border-amber-900/30 bg-stone-900 p-1.5 hover:bg-stone-800"
           >
             <img
@@ -183,12 +195,22 @@ export default function App() {
 
       {screen === 'single' && <AiGame key="single" />}
       {screen === 'local' && <LocalGame key="local" />}
-      {screen === 'online' && <OnlineGame onExit={toMenu} />}
+      {screen === 'online' && (
+        <OnlineGame onExit={finishOnlineExit} registerCleanup={registerOnlineCleanup} />
+      )}
       {screen === 'codex' && <Codex onBack={toMenu} />}
       {screen === 'decks' && <DeckBuilder onBack={toMenu} />}
       {screen === 'ranking' && <Leaderboard onBack={toMenu} />}
       {screen === 'settings' && <Settings onBack={toMenu} />}
       {screen === 'rules' && <HowToPlay onBack={toMenu} />}
+      {updateReady && (
+        <div role="status" className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg border border-amber-600 bg-stone-950 px-4 py-3 text-sm text-amber-100 shadow-2xl">
+          <span>{t('update_ready')}</span>
+          <button onClick={activateUpdate} className="rounded bg-amber-700 px-3 py-1.5 font-semibold hover:bg-amber-600">
+            {t('update_apply')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

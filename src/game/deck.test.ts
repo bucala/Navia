@@ -18,6 +18,12 @@ describe('validateDeck', () => {
     const tooMany = [...STARTER_DECK.slice(0, DECK_MIN - MAX_COPIES - 1), 'gorila', 'gorila', 'gorila'];
     expect(validateDeck(tooMany)?.code).toBe('deckTooManyCopies');
   });
+
+  it('rejects malformed runtime payloads instead of throwing', () => {
+    expect(validateDeck(null)?.code).toBe('deckInvalid');
+    expect(validateDeck({ cards: STARTER_DECK })?.code).toBe('deckInvalid');
+    expect(validateDeck([...STARTER_DECK.slice(0, -1), 42])?.code).toBe('deckInvalid');
+  });
 });
 
 describe('eloDelta', () => {

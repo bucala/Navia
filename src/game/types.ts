@@ -136,15 +136,27 @@ export interface PlayerState {
   nexusHp: number;
   mana: number;
   maxMana: number;
+  /** Increasing Nexus damage when this player tries to draw from an empty deck. */
+  fatigue: number;
   deck: string[];
   hand: string[];
   lanes: Record<LaneId, (UnitState | null)[]>;
 }
 
+/**
+ * State shape consumed by the UI. It deliberately excludes the ordered deck,
+ * which is server-private information that no renderer needs.
+ */
+export interface PlayerViewState extends Omit<PlayerState, 'deck'> {}
+
 /** Message keys resolved to the client's language by the UI (src/i18n). */
 export type MsgKey =
   | 'gameStart'
   | 'turnStart'
+  | 'fatigue'
+  | 'turnLimit'
+  | 'turnTimedOut'
+  | 'timeoutForfeit'
   | 'summon'
   | 'enterCombat'
   | 'nexusDamage'
@@ -196,12 +208,34 @@ export type LogEvent =
 export interface GameState {
   players: Record<PlayerId, PlayerState>;
   active: PlayerId;
+  /** Used for deterministic turn-limit tie breaking. */
+  startingPlayer: PlayerId;
   turn: number;
+  /** Set by the authoritative online room; omitted in local games. */
+  turnDeadline?: number;
   phase: Phase;
   winner: PlayerId | null;
   log: LogEvent[];
   nextUid: number;
   nextLogId: number;
+}
+
+/** Common renderable shape shared by local games and seat-specific online views. */
+export interface GameViewState extends Omit<GameState, 'players'> {
+  players: Record<PlayerId, PlayerViewState>;
+}
+
+/** Sentinel used to preserve an opponent hand's size without exposing card ids. */
+export const HIDDEN_CARD_ID = '__hidden_card__';
+
+/** Public player state sent over the network; ordered deck contents never leave the server. */
+export interface PublicPlayerState extends PlayerViewState {
+  deckCount: number;
+}
+
+/** Seat-specific state sent by GameRoom to one connected player. */
+export interface PublicGameState extends Omit<GameState, 'players'> {
+  players: Record<PlayerId, PublicPlayerState>;
 }
 
 export type SlotRef = { lane: LaneId; slot: number };

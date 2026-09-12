@@ -11,8 +11,11 @@
 import {
   BURN_TICK_DAMAGE,
   MAX_MANA,
+  MAX_MATCH_TURNS,
   NEXUS_HP,
+  OPENING_PLAYABLE_COST,
   SANCTUM_SLOTS,
+  SECOND_PLAYER_HAND_BONUS,
   STARTING_HAND,
   VANGUARD_SLOTS,
 } from './constants';
@@ -43,16 +46,39 @@ function shuffle<T>(items: T[], rng: Rng): T[] {
   return arr;
 }
 
-function createPlayer(id: PlayerId, name: string, rng: Rng, deckList?: string[]): PlayerState {
+function createPlayer(
+  id: PlayerId,
+  name: string,
+  rng: Rng,
+  openingHandSize: number,
+  deckList?: string[],
+): PlayerState {
   const deck = shuffle(deckList ?? STARTER_DECK, rng);
+  const hand = deck.splice(0, openingHandSize);
+  // Automatic mulligan: when the deck permits it, swap an expensive opener
+  // for a card that can be played by turn two.
+  if (
+    hand.length > 0 &&
+    !hand.some((cardId) => getCard(cardId).cost <= OPENING_PLAYABLE_COST)
+  ) {
+    const playableIndex = deck.findIndex(
+      (cardId) => getCard(cardId).cost <= OPENING_PLAYABLE_COST,
+    );
+    if (playableIndex >= 0) {
+      const expensiveIndex = hand.reduce((best, cardId, index) =>
+        getCard(cardId).cost > getCard(hand[best]).cost ? index : best, 0);
+      [hand[expensiveIndex], deck[playableIndex]] = [deck[playableIndex], hand[expensiveIndex]];
+    }
+  }
   return {
     id,
     name,
     nexusHp: NEXUS_HP,
     mana: 0,
     maxMana: 0,
+    fatigue: 0,
     deck,
-    hand: deck.splice(0, STARTING_HAND),
+    hand,
     lanes: {
       vanguard: Array<UnitState | null>(VANGUARD_SLOTS).fill(null),
       sanctum: Array<UnitState | null>(SANCTUM_SLOTS).fill(null),
@@ -65,12 +91,27 @@ export function createGame(
   names: [string, string] = ['Hráč 1', 'Hráč 2'],
   decks?: [string[] | undefined, string[] | undefined],
 ): GameState {
+  const active: PlayerId = rng() < 0.5 ? 'p1' : 'p2';
+  const second = opponentOf(active);
   const state: GameState = {
     players: {
-      p1: createPlayer('p1', names[0], rng, decks?.[0]),
-      p2: createPlayer('p2', names[1], rng, decks?.[1]),
+      p1: createPlayer(
+        'p1',
+        names[0],
+        rng,
+        STARTING_HAND + (second === 'p1' ? SECOND_PLAYER_HAND_BONUS : 0),
+        decks?.[0],
+      ),
+      p2: createPlayer(
+        'p2',
+        names[1],
+        rng,
+        STARTING_HAND + (second === 'p2' ? SECOND_PLAYER_HAND_BONUS : 0),
+        decks?.[1],
+      ),
     },
-    active: 'p1',
+    active,
+    startingPlayer: active,
     turn: 1,
     phase: 'main',
     winner: null,
@@ -79,7 +120,7 @@ export function createGame(
     nextLogId: 1,
   };
   startTurn(state);
-  logMsg(state, 'gameStart', { player: state.players.p1.name });
+  logMsg(state, 'gameStart', { player: state.players[active].name });
   return state;
 }
 
@@ -124,8 +165,8 @@ export function effectiveThreshold(unit: UnitState): number {
 
 function damageNexus(state: GameState, player: PlayerId, amount: number): void {
   const p = state.players[player];
-  p.nexusHp -= amount;
-  logMsg(state, 'nexusDamage', { player: p.name, n: amount, hp: Math.max(0, p.nexusHp) });
+  p.nexusHp = Math.max(0, p.nexusHp - amount);
+  logMsg(state, 'nexusDamage', { player: p.name, n: amount, hp: p.nexusHp });
   if (p.nexusHp <= 0 && !state.winner) {
     state.winner = opponentOf(player);
     logMsg(state, 'winner', { player: state.players[state.winner].name });
@@ -225,6 +266,12 @@ function startTurn(state: GameState): void {
   // Draw one card.
   const drawn = player.deck.shift();
   if (drawn) player.hand.push(drawn);
+  else {
+    player.fatigue = (player.fatigue ?? 0) + 1;
+    logMsg(state, 'fatigue', { player: player.name, n: player.fatigue });
+    damageNexus(state, player.id, player.fatigue);
+    if (state.winner) return;
+  }
 
   // Static effects (GDD §2.2): burn ticks on the active player's units.
   for (const lane of ['vanguard', 'sanctum'] as const) {
@@ -270,12 +317,44 @@ export function applyAction(prev: GameState, action: Action, rng: Rng): GameStat
     case 'END_TURN': {
       state.active = opponentOf(state.active);
       state.turn++;
+      if (state.turn > MAX_MATCH_TURNS) {
+        resolveTurnLimit(state);
+        break;
+      }
       startTurn(state);
-      logMsg(state, 'turnStart', { n: state.turn, player: state.players[state.active].name });
+      if (!state.winner) {
+        logMsg(state, 'turnStart', { n: state.turn, player: state.players[state.active].name });
+      }
       break;
     }
   }
   return state;
+}
+
+function boardScore(player: PlayerState): number {
+  const units = [...player.lanes.vanguard, ...player.lanes.sanctum];
+  return (
+    player.nexusHp * 100 +
+    units.reduce(
+      (total, unit) => total + (unit ? unit.hp + unit.armor + cardOf(unit).attack : 0),
+      0,
+    ) +
+    player.hand.length
+  );
+}
+
+function resolveTurnLimit(state: GameState): void {
+  const p1Score = boardScore(state.players.p1);
+  const p2Score = boardScore(state.players.p2);
+  // Exact ties favour the player who went second, compensating for initiative.
+  state.winner =
+    p1Score === p2Score
+      ? opponentOf(state.startingPlayer ?? 'p1')
+      : p1Score > p2Score
+        ? 'p1'
+        : 'p2';
+  logMsg(state, 'turnLimit', { player: state.players[state.winner].name });
+  logMsg(state, 'winner', { player: state.players[state.winner].name });
 }
 
 function playCard(
@@ -349,17 +428,15 @@ function castInfernalChain(
     success: chain.successes > 0,
   });
 
-  const enemyId = opponentOf(state.active);
   for (const roll of chain.rolls) {
     if (roll >= 3 && roll <= 5) {
-      // Successful link: damage the target (or the enemy Nexus once it died) and heal the caster.
-      const targetUnit = unitAt(state.players[enemyId], target);
+      // The chain remains attached to its declared unit; it never redirects
+      // later links into a different target.
+      const targetUnit = unitAt(state.players[target.player], target);
       if (targetUnit) {
-        damageUnit(state, enemyId, target, card.spell.damagePerSuccess);
-      } else {
-        damageNexus(state, enemyId, card.spell.damagePerSuccess);
+        damageUnit(state, target.player, target, card.spell.damagePerSuccess);
+        player.nexusHp = Math.min(NEXUS_HP, player.nexusHp + card.spell.healPerSuccess);
       }
-      player.nexusHp = Math.min(NEXUS_HP, player.nexusHp + card.spell.healPerSuccess);
     }
   }
   if (chain.outcome === 'overload') {
@@ -465,6 +542,7 @@ function attack(
 }
 
 function activate(state: GameState, ref: SlotRef, rng: Rng): void {
+  if (state.phase !== 'combat') throw new Error('combatPhaseOnly');
   const player = state.players[state.active];
   const unit = unitAt(player, ref);
   if (!unit) throw new Error('noUnitHere');

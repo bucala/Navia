@@ -5,7 +5,7 @@
  * flashes and floating damage/heal popups (from HP diffs by unit uid).
  */
 import { useEffect, useRef, useState } from 'react';
-import type { GameState, LaneId, PlayerId } from '../game/types';
+import type { GameViewState, LaneId, PlayerId } from '../game/types';
 import { sfxHit } from './sfx';
 import { triggerAttackFeedback } from '../utils/haptics';
 
@@ -34,7 +34,7 @@ interface UnitSnapshot {
   slot: number;
 }
 
-function snapshotUnits(state: GameState): Map<number, UnitSnapshot> {
+function snapshotUnits(state: GameViewState): Map<number, UnitSnapshot> {
   const units = new Map<number, UnitSnapshot>();
   for (const player of Object.values(state.players)) {
     for (const lane of ['vanguard', 'sanctum'] as const) {
@@ -46,16 +46,19 @@ function snapshotUnits(state: GameState): Map<number, UnitSnapshot> {
   return units;
 }
 
-export function useCombatFx(state: GameState | null) {
+export function useCombatFx(state: GameViewState | null) {
   const [fx, setFx] = useState<FxMap>({});
   const [nexusFx, setNexusFx] = useState<Partial<Record<PlayerId, Popup>>>({});
-  const prevRef = useRef<GameState | null>(null);
+  const prevRef = useRef<GameViewState | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     const prev = prevRef.current;
     prevRef.current = state;
     if (!state || !prev || prev === state) return;
+    // A rematch resets turn/log ids and unit uids — diffing against the
+    // finished game would spawn false damage and Nexus-heal popups.
+    if (state.turn < prev.turn || (prev.winner && !state.winner)) return;
 
     const nextFx: FxMap = {};
     const nextNexusFx: Partial<Record<PlayerId, Popup>> = {};
@@ -110,6 +113,7 @@ export function useCombatFx(state: GameState | null) {
       setNexusFx({});
     }, 950);
   }, [state]);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   return { fx, nexusFx };
 }

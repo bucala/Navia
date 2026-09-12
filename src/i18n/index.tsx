@@ -3,7 +3,7 @@
  * The language lives in localStorage and a React context; `translate`
  * also works outside React (server error mapping, non-hook helpers).
  */
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { CARDS } from '../game/cards';
 import type { LocalizedText, LogEvent } from '../game/types';
 import { STRINGS, type StringKey } from './strings';
@@ -69,6 +69,9 @@ const LangContext = createContext<LangContextValue>({ lang: 'sk', setLang: () =>
 
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(currentLang);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
   const setLang = useCallback((next: Lang) => {
     localStorage.setItem(LANG_KEY, next);
     setLangState(next);

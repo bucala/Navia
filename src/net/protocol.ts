@@ -3,7 +3,7 @@
  * Durable Object (GDD §5.3). The engine's Action type is the payload;
  * the server validates the seat and owns all dice rolls.
  */
-import type { Action, GameState, PlayerId } from '../game/types';
+import type { Action, PlayerId, PublicGameState } from '../game/types';
 import { isValidAction } from '../game/validateAction';
 
 export type ClientMessage =
@@ -26,8 +26,8 @@ export interface SeatsInfo {
 export type ServerMessage =
   /** Which seat this connection plays. */
   | { type: 'ASSIGNED'; seat: PlayerId }
-  /** Authoritative game state; null until both players joined. */
-  | { type: 'ROOM_STATE'; state: GameState | null; seats: SeatsInfo }
+  /** Authoritative seat-specific game view; null until both players joined. */
+  | { type: 'ROOM_STATE'; state: PublicGameState | null; seats: SeatsInfo }
   /** Rejected action or protocol problem ("Nedostatok many", …). */
   | { type: 'ERROR'; message: string };
 
@@ -40,10 +40,13 @@ export function parseClientMessage(raw: string): ClientMessage | null {
       const { token, name, playerId, secret, deckId } = msg;
       if (
         typeof token === 'string' &&
+        token.length > 0 &&
+        token.length <= 128 &&
         typeof name === 'string' &&
-        (playerId === undefined || typeof playerId === 'string') &&
-        (secret === undefined || typeof secret === 'string') &&
-        (deckId === undefined || typeof deckId === 'string')
+        name.length <= 100 &&
+        (playerId === undefined || (typeof playerId === 'string' && playerId.length <= 128)) &&
+        (secret === undefined || (typeof secret === 'string' && secret.length <= 128)) &&
+        (deckId === undefined || (typeof deckId === 'string' && deckId.length <= 128))
       ) {
         return { type: 'JOIN_ROOM', token, name, playerId, secret, deckId };
       }

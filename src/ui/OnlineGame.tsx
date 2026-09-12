@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { errorText, useLang } from '../i18n';
-import { apiUrl } from '../net/api';
+import { apiUrl, publicAppUrl } from '../net/api';
+import { getPlayerName, setPlayerName as persistPlayerName } from '../net/profile';
 import { useMultiplayerGame } from '../net/useMultiplayerGame';
 import { Board } from './Board';
 import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
@@ -18,19 +19,43 @@ function setRoomInUrl(roomId: string | null): void {
   window.history.replaceState(null, '', url);
 }
 
+function TurnClock({ deadline }: { deadline?: number }) {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    if (!deadline) return;
+    setNow(Date.now());
+    const interval = setInterval(() => setNow(Date.now()), 1_000);
+    return () => clearInterval(interval);
+  }, [deadline]);
+  if (!deadline) return null;
+  const seconds = Math.max(0, Math.ceil((deadline - now) / 1_000));
+  return (
+    <span aria-live={seconds <= 15 ? 'polite' : 'off'} className={seconds <= 15 ? 'text-red-300' : 'text-slate-400'}>
+      {seconds}s
+    </span>
+  );
+}
+
 /** Lobby → waiting room → online match. */
-export function OnlineGame({ onExit }: { onExit: () => void }) {
+export function OnlineGame({
+  onExit,
+  registerCleanup,
+}: {
+  onExit: () => void;
+  registerCleanup: (cleanup: (() => void) | null) => void;
+}) {
   const { t } = useLang();
-  const [playerName, setPlayerName] = useState(() => localStorage.getItem('pantheon-name') ?? '');
+  const [playerName, setPlayerName] = useState(() => getPlayerName());
   const [joinCode, setJoinCode] = useState('');
   const [roomId, setRoomId] = useState<string | null>(roomFromUrl);
   const [quickMatch, setQuickMatch] = useState(false);
+  const [queueTicket, setQueueTicket] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const { toast, showToast } = useToast();
 
   const rememberName = () => {
     const name = playerName.trim() || t('you');
-    localStorage.setItem('pantheon-name', name);
+    persistPlayerName(name);
     return name;
   };
 
@@ -57,8 +82,13 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
     try {
       const res = await fetch(apiUrl('/api/matchmaking/join'), { method: 'POST' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { roomId: found } = (await res.json()) as { roomId: string; matched: boolean };
+      const { roomId: found, queueTicket: ticket } = (await res.json()) as {
+        roomId: string;
+        matched: boolean;
+        queueTicket?: string;
+      };
       setQuickMatch(true);
+      setQueueTicket(ticket ?? null);
       setRoomInUrl(found);
       setRoomId(found);
     } catch (e) {
@@ -81,17 +111,24 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
 
   const leave = () => {
     // Free the queue slot if we bail out of a quick match before it starts.
-    if (quickMatch && roomId) {
+    if (quickMatch && roomId && queueTicket) {
       void fetch(apiUrl('/api/matchmaking/cancel'), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ roomId }),
+        body: JSON.stringify({ roomId, ticket: queueTicket }),
       }).catch(() => {});
     }
     setRoomInUrl(null);
     setRoomId(null);
     onExit();
   };
+  const leaveRef = useRef(leave);
+  leaveRef.current = leave;
+
+  useEffect(() => {
+    registerCleanup(() => leaveRef.current());
+    return () => registerCleanup(null);
+  }, [registerCleanup]);
 
   if (!roomId) {
     return (
@@ -146,6 +183,7 @@ export function OnlineGame({ onExit }: { onExit: () => void }) {
       roomId={roomId}
       playerName={playerName.trim() || t('you')}
       quickMatch={quickMatch}
+      queueTicket={queueTicket}
       onLeave={leave}
     />
   );
@@ -155,11 +193,13 @@ function OnlineMatch({
   roomId,
   playerName,
   quickMatch,
+  queueTicket,
   onLeave,
 }: {
   roomId: string;
   playerName: string;
   quickMatch: boolean;
+  queueTicket: string | null;
   onLeave: () => void;
 }) {
   const { lang, t } = useLang();
@@ -176,22 +216,23 @@ function OnlineMatch({
   // explicit user action (onLeave) — never effect cleanup, which would fire a
   // spurious cancel on StrictMode's dev double-mount. Closed tabs are handled
   // by the server-side TTL.
-  const statusRef = useRef(status);
-  statusRef.current = status;
   useEffect(() => {
-    if (!quickMatch) return;
+    // Only an open queue entry needs heartbeats — once matched/playing or
+    // closed, the interval would just keep an abandoned entry alive.
+    if (!quickMatch || !queueTicket || status === 'playing' || status === 'closed') return;
     const interval = setInterval(() => {
-      if (statusRef.current === 'playing') return;
       void fetch(apiUrl('/api/matchmaking/heartbeat'), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ roomId }),
+        body: JSON.stringify({ roomId, ticket: queueTicket }),
       }).catch(() => {});
     }, 30_000);
     return () => clearInterval(interval);
-  }, [quickMatch, roomId]);
+  }, [quickMatch, queueTicket, roomId, status]);
 
-  const inviteLink = `${window.location.origin}/?room=${roomId}`;
+  const inviteUrl = new URL(publicAppUrl('/'));
+  inviteUrl.searchParams.set('room', roomId);
+  const inviteLink = inviteUrl.toString();
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(inviteLink);
@@ -266,6 +307,7 @@ function OnlineMatch({
         ) : (
           <span>{t('opp_turn', { name: foeName })}</span>
         )}
+        <TurnClock deadline={state.turnDeadline} />
         <span className="text-slate-500">{t('room_label', { id: roomId })}</span>
       </div>
       <div className="flex min-h-0 flex-1 overflow-hidden">

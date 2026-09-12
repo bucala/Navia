@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GameRoom } from './GameRoom';
 import type { Env } from './env';
-import type { GameState } from '../game/types';
+import { HIDDEN_CARD_ID, type GameState } from '../game/types';
 import type { ServerMessage } from '../net/protocol';
 
 /**
@@ -13,17 +13,33 @@ import type { ServerMessage } from '../net/protocol';
  * like the real Durable Object runtime does after `fetch()` accepts a
  * connection.
  */
-function fakeCtx(): { ctx: DurableObjectState; sockets: FakeWebSocket[] } {
+function fakeCtx(): {
+  ctx: DurableObjectState;
+  sockets: FakeWebSocket[];
+  map: Map<string, unknown>;
+  alarms: number[];
+} {
   const map = new Map<string, unknown>();
   const sockets: FakeWebSocket[] = [];
+  const alarms: number[] = [];
   const storage = {
     get: async (key: string) => map.get(key),
-    put: async (key: string, value: unknown) => {
-      map.set(key, value);
+    put: async (keyOrEntries: string | Record<string, unknown>, value?: unknown) => {
+      if (typeof keyOrEntries === 'string') map.set(keyOrEntries, value);
+      else for (const [key, entry] of Object.entries(keyOrEntries)) map.set(key, entry);
     },
     delete: async (key: string) => map.delete(key),
+    deleteAll: async () => map.clear(),
+    setAlarm: async (time: number | Date) => {
+      alarms.push(Number(time));
+    },
   };
-  return { ctx: { storage, getWebSockets: () => sockets } as unknown as DurableObjectState, sockets };
+  return {
+    ctx: { storage, getWebSockets: () => sockets } as unknown as DurableObjectState,
+    sockets,
+    map,
+    alarms,
+  };
 }
 
 class FakeWebSocket {
@@ -100,6 +116,38 @@ describe('GameRoom', () => {
     expect(started?.seats).toEqual({ p1: 'Alica', p2: 'Bob' });
     // Both sockets are re-broadcast the freshly created game.
     expect(roomState(ws1.sent)?.state).not.toBeNull();
+    const p1View = roomState(ws1.sent)?.state;
+    const p2View = roomState(ws2.sent)?.state;
+    expect(p1View).toBeDefined();
+    expect(p2View).toBeDefined();
+    if (!p1View || !p2View) throw new Error('room state views were not broadcast');
+    expect(p1View.players.p1.hand).not.toContain(HIDDEN_CARD_ID);
+    expect(p1View.players.p2.hand).toEqual(
+      Array<string>(p1View.players.p2.hand.length).fill(HIDDEN_CARD_ID),
+    );
+    expect(p2View.players.p2.hand).not.toContain(HIDDEN_CARD_ID);
+    expect(p2View.players.p1.hand).toEqual(
+      Array<string>(p2View.players.p1.hand.length).fill(HIDDEN_CARD_ID),
+    );
+    expect('deck' in (p1View?.players.p1 ?? {})).toBe(false);
+    expect('deck' in (p1View?.players.p2 ?? {})).toBe(false);
+  });
+
+  it('serializes simultaneous joins so distinct players cannot claim the same seat', async () => {
+    const { ctx, sockets } = fakeCtx();
+    const { env } = fakeEnv();
+    const room = new GameRoom(ctx, env);
+    const ws1 = new FakeWebSocket();
+    const ws2 = new FakeWebSocket();
+    sockets.push(ws1, ws2);
+
+    await Promise.all([
+      room.webSocketMessage(ws1 as unknown as WebSocket, joinMsg('t1', 'Alica')),
+      room.webSocketMessage(ws2 as unknown as WebSocket, joinMsg('t2', 'Bob')),
+    ]);
+
+    expect(ws1.sent).toContainEqual({ type: 'ASSIGNED', seat: 'p1' });
+    expect(ws2.sent).toContainEqual({ type: 'ASSIGNED', seat: 'p2' });
   });
 
   it('rejoining with the same token returns the same seat instead of stealing a new one', async () => {
@@ -200,6 +248,7 @@ describe('GameRoom', () => {
     // already recorded — as if this exact winning move had been processed
     // once already (e.g. a duplicated message after a reconnect).
     const game = (await ctx.storage.get('game')) as GameState;
+    game.active = 'p1';
     game.phase = 'combat';
     game.players.p1.lanes.vanguard[0] = {
       uid: game.nextUid++,
@@ -234,5 +283,47 @@ describe('GameRoom', () => {
     expect(roomState(ws1.sent)?.state?.winner).toBe('p1');
     // ...but recordResult's guard must stop it before it ever asks D1 anything.
     expect(dbCalls).toEqual([]);
+  });
+
+  it('deletes an inactive waiting room when its alarm fires', async () => {
+    const { ctx, map } = fakeCtx();
+    const { env } = fakeEnv();
+    const room = new GameRoom(ctx, env);
+    await ctx.storage.put('lastActivity', Date.now() - 10 * 60_000);
+    await ctx.storage.put('meta', {
+      tokens: {},
+      names: { p1: null, p2: null },
+      profiles: {},
+      decks: {},
+    });
+
+    await room.alarm();
+
+    expect(map.size).toBe(0);
+  });
+
+  it('ends an expired turn and forfeits after a second timeout', async () => {
+    const { ctx, sockets } = fakeCtx();
+    const { env } = fakeEnv();
+    const room = new GameRoom(ctx, env);
+    const ws1 = new FakeWebSocket();
+    const ws2 = new FakeWebSocket();
+    sockets.push(ws1, ws2);
+    await room.webSocketMessage(ws1 as unknown as WebSocket, joinMsg('t1', 'Alica'));
+    await room.webSocketMessage(ws2 as unknown as WebSocket, joinMsg('t2', 'Bob'));
+
+    let game = (await ctx.storage.get('game')) as GameState;
+    game.active = 'p1';
+    game.turnDeadline = Date.now() - 1;
+    await ctx.storage.put('game', game);
+    await room.alarm();
+    expect(((await ctx.storage.get('game')) as GameState).active).toBe('p2');
+
+    game = (await ctx.storage.get('game')) as GameState;
+    game.active = 'p1';
+    game.turnDeadline = Date.now() - 1;
+    await ctx.storage.put('game', game);
+    await room.alarm();
+    expect(((await ctx.storage.get('game')) as GameState).winner).toBe('p2');
   });
 });

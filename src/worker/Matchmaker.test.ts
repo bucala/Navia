@@ -27,6 +27,7 @@ function request(action: 'join' | 'heartbeat' | 'cancel', body?: unknown): Reque
 interface JoinBody {
   roomId: string;
   matched: boolean;
+  queueTicket?: string;
 }
 
 describe('Matchmaker', () => {
@@ -60,7 +61,7 @@ describe('Matchmaker', () => {
     const mm = new Matchmaker(ctx);
     const first = (await (await mm.fetch(request('join'))).json()) as JoinBody;
     // Simulate the seeker's tab having been closed ~90s+ ago.
-    await ctx.storage.put('waiting', { roomId: first.roomId, seenAt: Date.now() - 200_000 });
+    await ctx.storage.put('waiting', { roomId: first.roomId, ticketId: 'stale', seenAt: Date.now() - 200_000 });
     const second = (await (await mm.fetch(request('join'))).json()) as JoinBody;
     expect(second.matched).toBe(false);
     expect(second.roomId).not.toBe(first.roomId);
@@ -70,35 +71,49 @@ describe('Matchmaker', () => {
     const ctx = fakeCtx();
     const mm = new Matchmaker(ctx);
     const first = (await (await mm.fetch(request('join'))).json()) as JoinBody;
-    const res = await mm.fetch(request('heartbeat', { roomId: first.roomId }));
+    const res = await mm.fetch(request('heartbeat', { roomId: first.roomId, ticket: first.queueTicket }));
     expect(await res.json()).toEqual({ ok: true });
     expect(await ctx.storage.get('waiting')).toMatchObject({ roomId: first.roomId });
   });
 
-  it('heartbeat never clobbers a different seeker\u2019s entry', async () => {
+  it('heartbeat without a valid signed ticket never creates or changes an entry', async () => {
     const ctx = fakeCtx();
     const mm = new Matchmaker(ctx);
     const first = (await (await mm.fetch(request('join'))).json()) as JoinBody;
-    // A stray heartbeat for some other room must not steal the waiting slot.
-    await mm.fetch(request('heartbeat', { roomId: 'SOMEOTHERROOM' }));
+    const response = await mm.fetch(request('heartbeat', { roomId: 'SOMEOTHERROOM', ticket: 'forged' }));
+    expect(response.status).toBe(401);
     expect(await ctx.storage.get('waiting')).toMatchObject({ roomId: first.roomId });
   });
 
-  it('heartbeat and cancel reject a request with no roomId', async () => {
+  it('heartbeat and cancel require both a room id and signed ticket', async () => {
     const mm = new Matchmaker(fakeCtx());
     const res = await mm.fetch(request('heartbeat', {}));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(401);
   });
 
-  it('cancel only clears a matching waiting entry', async () => {
+  it('cancel only clears the entry owned by its signed ticket', async () => {
     const ctx = fakeCtx();
     const mm = new Matchmaker(ctx);
     const first = (await (await mm.fetch(request('join'))).json()) as JoinBody;
 
-    await mm.fetch(request('cancel', { roomId: 'NOT-THE-SAME' }));
+    await mm.fetch(request('cancel', { roomId: 'NOT-THE-SAME', ticket: first.queueTicket }));
     expect(await ctx.storage.get('waiting')).toBeDefined();
 
-    await mm.fetch(request('cancel', { roomId: first.roomId }));
+    await mm.fetch(request('cancel', { roomId: first.roomId, ticket: first.queueTicket }));
+    expect(await ctx.storage.get('waiting')).toBeUndefined();
+  });
+
+  it('does not upsert a consumed queue entry from a later heartbeat', async () => {
+    const ctx = fakeCtx();
+    const mm = new Matchmaker(ctx);
+    const first = (await (await mm.fetch(request('join'))).json()) as JoinBody;
+    await mm.fetch(request('join'));
+
+    const response = await mm.fetch(
+      request('heartbeat', { roomId: first.roomId, ticket: first.queueTicket }),
+    );
+
+    expect(response.status).toBe(409);
     expect(await ctx.storage.get('waiting')).toBeUndefined();
   });
 

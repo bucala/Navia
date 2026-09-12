@@ -4,16 +4,35 @@
  * are satisfied. Muting is persisted in localStorage.
  */
 
+import { useSyncExternalStore } from 'react';
+
 let ctx: AudioContext | null = null;
 let muted = typeof localStorage !== 'undefined' && localStorage.getItem('pantheon-muted') === '1';
+
+const muteListeners = new Set<() => void>();
 
 export function isMuted(): boolean {
   return muted;
 }
 
 export function setMuted(value: boolean): void {
+  if (muted === value) return;
   muted = value;
   localStorage.setItem('pantheon-muted', value ? '1' : '0');
+  for (const listener of muteListeners) listener();
+}
+
+/** Reactive mute state shared by the header toggle and Settings. */
+export function useMuted(): boolean {
+  return useSyncExternalStore(
+    (listener) => {
+      muteListeners.add(listener);
+      return () => {
+        muteListeners.delete(listener);
+      };
+    },
+    isMuted,
+  );
 }
 
 function audio(): AudioContext | null {

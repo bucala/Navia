@@ -12,8 +12,9 @@ body {
   color: #1a140e;
 }
 
-/* A game, not a document: no text/object selection or image dragging… */
-body {
+/* Buttons and art should not drag/select accidentally; rules and logs remain
+   selectable for accessibility and copying. */
+button {
   user-select: none;
   -webkit-user-select: none;
 }
@@ -354,4 +355,22 @@ textarea,
   z-index: 0;
   pointer-events: none;
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+/* Keep every interaction visible to keyboard and switch-control users. */
+:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -3,6 +3,7 @@ import { chooseAiAction } from '../game/ai';
 import { applyAction, createGame } from '../game/engine';
 import type { Action, GameState } from '../game/types';
 import { errorText, useLang } from '../i18n';
+import { getPlayerName } from '../net/profile';
 import { Board } from './Board';
 import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
 import { LogPanel } from './LogPanel';
@@ -11,7 +12,7 @@ import { LogPanel } from './LogPanel';
 export function AiGame() {
   const { lang, t } = useLang();
   const makeGame = useCallback(
-    () => createGame(Math.random, [localStorage.getItem('pantheon-name') || t('you'), t('ai_name')]),
+    () => createGame(Math.random, [getPlayerName() || t('you'), t('ai_name')]),
     [t],
   );
   const [state, setState] = useState<GameState>(makeGame);
