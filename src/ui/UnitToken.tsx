@@ -3,6 +3,7 @@ import { getUnitCard } from '../game/cards';
 import type { Faction, UnitState } from '../game/types';
 import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
+import { ArmorIcon, AttackIcon, BurnIcon, HpIcon } from './icons';
 import type { SlotFx } from './useCombatFx';
 
 export type SlotHighlight = 'none' | 'place' | 'attack' | 'move' | 'selected';
@@ -59,13 +60,13 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick }: Pr
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-1 pb-0.5 pt-3 text-center">
               <p className="truncate text-[9px] leading-tight text-slate-200">{lx(card.name)}</p>
               <div className="flex justify-center gap-1 text-[10px] font-bold">
-                <span className="text-orange-300">⚔{card.attack}</span>
-                {unit.armor > 0 && <span className="text-slate-300">🛡{unit.armor}</span>}
-                <span className="text-red-400">🩸{unit.hp}</span>
+                <span className="flex items-center gap-0.5 text-orange-300"><AttackIcon className="h-2.5 w-2.5" />{card.attack}</span>
+                {unit.armor > 0 && <span className="flex items-center gap-0.5 text-slate-300"><ArmorIcon className="h-2.5 w-2.5" />{unit.armor}</span>}
+                <span className="flex items-center gap-0.5 text-red-400"><HpIcon className="h-2.5 w-2.5" />{unit.hp}</span>
               </div>
             </div>
             {unit.burn > 0 && (
-              <span className="absolute right-0.5 top-0.5 rounded-full bg-red-900/90 px-1 text-[9px]">🔥{unit.burn}</span>
+              <span className="absolute right-0.5 top-0.5 flex items-center gap-0.5 rounded-full bg-red-900/90 px-1 text-[9px]"><BurnIcon className="h-2.5 w-2.5" />{unit.burn}</span>
             )}
             {unit.ready && (
               <span className="absolute left-1.5 top-1.5 flex h-2.5 w-2.5">

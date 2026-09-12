@@ -213,7 +213,7 @@ function OnlineMatch({
           {t('retry')}
         </button>
         <button onClick={onLeave} className="navia-back-btn">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
       </div>
     );
@@ -241,7 +241,7 @@ function OnlineMatch({
         </div>
         <p className="text-xs text-slate-500">{t('waiting_share')}</p>
         <button onClick={onLeave} className="navia-back-btn">
-          ← {t('back_menu')}
+          {t('back_menu')}
         </button>
         {toast && <Toast message={toast} />}
       </div>

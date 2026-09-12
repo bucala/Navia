@@ -52,8 +52,14 @@ export function AiGame() {
   return (
     <div className={`flex min-h-0 flex-1 flex-col ${shake ? 'shake' : ''}`}>
       {!myTurn && !state.winner && (
-        <div className="flex items-center justify-center bg-slate-900/80 py-1 text-xs font-semibold text-slate-400">
-          <span className="animate-pulse">🔮 {t('ai_thinking')}</span>
+        <div className="flex items-center justify-center gap-1.5 bg-slate-900/80 py-1 text-xs font-semibold text-slate-400">
+          <img
+            src="/art/icons/icon-crystal-ball.svg"
+            alt=""
+            aria-hidden="true"
+            className="h-4 w-4 animate-pulse"
+          />
+          <span className="animate-pulse">{t('ai_thinking')}</span>
         </div>
       )}
       <div className="flex min-h-0 flex-1 overflow-hidden">

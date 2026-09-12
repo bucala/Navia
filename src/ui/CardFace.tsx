@@ -2,6 +2,7 @@ import { getCard } from '../game/cards';
 import type { Faction } from '../game/types';
 import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
+import { ArmorIcon, AttackIcon, HpIcon } from './icons';
 
 const FACTION_BG: Record<Faction, string> = {
   lava: 'from-red-950 to-orange-950',
@@ -24,14 +25,14 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
     <button
       onClick={onClick}
       title={lx(card.text)}
-      className={`card-frame card-frame--${card.rarity} relative flex h-40 w-28 shrink-0 flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-all duration-300 sm:h-44 sm:w-30 md:h-52 md:w-34 lg:h-60 lg:w-40 ${FACTION_BG[card.faction]} ${
+      className={`card-frame card-frame--${card.rarity} relative flex h-full min-h-16 max-w-48 aspect-[5/7] shrink-0 origin-bottom flex-col overflow-hidden rounded-xl bg-gradient-to-b transition-all duration-300 ${FACTION_BG[card.faction]} ${
         selected
-          ? '-translate-y-4 scale-110 sm:-translate-y-6 sm:scale-115 md:-translate-y-8 md:scale-120 lg:scale-125 z-20 shadow-[0_0_35px_rgba(245,158,11,0.95)] ring-4 ring-amber-400 border-amber-400 animate-pulse'
+          ? '-translate-y-4 scale-110 z-20 shadow-[0_0_18px_rgba(245,158,11,0.9)] ring-4 ring-amber-400 border-amber-400 animate-pulse'
           : 'hover:-translate-y-2 hover:scale-105 hover:z-10 hover:shadow-[0_4px_15px_rgba(0,0,0,0.5)]'
       } ${affordable ? '' : 'opacity-40 grayscale'}`}
     >
       {/* Art fills the top half of the card. */}
-      <div className="relative h-16 w-full shrink-0 sm:h-20 md:h-24 lg:h-28">
+      <div className="relative h-[44%] w-full shrink-0">
         <CardArt cardId={cardId} className="h-full w-full" glyphClass="text-5xl" />
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/70 to-transparent" />
         <span className="absolute left-1 top-1 flex h-7 w-7 rotate-45 items-center justify-center rounded-sm border border-cyan-200 bg-gradient-to-br from-cyan-400 to-blue-700 shadow-lg">
@@ -48,9 +49,9 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick 
       <div className="flex items-center justify-between bg-black/40 px-1.5 py-0.5 text-[11px] font-bold">
         {card.type === 'unit' ? (
           <>
-            <span className="text-orange-300">⚔ {card.attack}</span>
-            {card.armor > 0 && <span className="text-slate-300">🛡 {card.armor}</span>}
-            <span className="text-red-400">🩸 {card.maxHp}</span>
+            <span className="flex items-center gap-0.5 text-orange-300"><AttackIcon className="h-2.5 w-2.5" /> {card.attack}</span>
+            {card.armor > 0 && <span className="flex items-center gap-0.5 text-slate-300"><ArmorIcon className="h-2.5 w-2.5" /> {card.armor}</span>}
+            <span className="flex items-center gap-0.5 text-red-400"><HpIcon className="h-2.5 w-2.5" /> {card.maxHp}</span>
           </>
         ) : (
           <span className="mx-auto uppercase tracking-widest text-fuchsia-300">{t('spell_badge')}</span>

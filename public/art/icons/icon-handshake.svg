@@ -1,0 +1,14 @@
+<!-- multi_local — pass & play, two hands meeting. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="icoBronze" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8c07a"/>
+      <stop offset="100%" stop-color="#9c6b2e"/>
+    </linearGradient>
+  </defs>
+  <path d="M4 20 L16 14 L24 20 L20 26 L12 22 Z" fill="url(#icoBronze)" stroke="#3a2a18" stroke-width="1"/>
+  <path d="M44 20 L32 14 L24 20 L28 26 L36 22 Z" fill="url(#icoBronze)" stroke="#3a2a18" stroke-width="1"/>
+  <rect x="20" y="19" width="8" height="7" rx="2" fill="url(#icoBronze)" stroke="#3a2a18" stroke-width="1"/>
+  <path d="M16 14 L12 8" stroke="url(#icoBronze)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 14 L36 8" stroke="url(#icoBronze)" stroke-width="3" stroke-linecap="round"/>
+</svg>

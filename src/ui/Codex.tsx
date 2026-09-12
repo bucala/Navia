@@ -4,6 +4,7 @@ import { LORE } from '../game/lore';
 import type { Faction } from '../game/types';
 import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
+import { ArmorIcon, AttackIcon, HpIcon } from './icons';
 
 const FACTION_CHIP: Record<Faction, string> = {
   lava: 'bg-red-950 text-red-200 border-red-700',
@@ -64,7 +65,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
         })}
         <div className="mt-auto p-3 border-t border-slate-900/60 bg-slate-950/50">
           <button onClick={onBack} className="navia-back-btn w-full justify-center">
-            ← {t('back_menu')}
+            {t('back_menu')}
           </button>
         </div>
       </aside>
@@ -74,7 +75,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
         <div className="mx-auto w-full max-w-4xl p-4 md:p-8">
           <div className="mb-4 flex items-center justify-between md:hidden">
             <button onClick={onBack} className="navia-back-btn">
-              ← {t('header_menu')}
+              {t('header_menu')}
             </button>
           </div>
 
@@ -102,9 +103,9 @@ export function Codex({ onBack }: { onBack: () => void }) {
                 <div className="flex items-center justify-around bg-slate-900/80 rounded-xl py-1.5 px-4 mt-2 text-xs font-bold border border-slate-800/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
                   {card.type === 'unit' ? (
                     <>
-                      <span className="text-orange-400 flex items-center gap-1.5 drop-shadow">⚔️ <span className="text-sm font-extrabold">{card.attack}</span></span>
-                      {card.armor > 0 && <span className="text-slate-300 flex items-center gap-1.5 drop-shadow">🛡️ <span className="text-sm font-extrabold">{card.armor}</span></span>}
-                      <span className="text-red-500 flex items-center gap-1.5 drop-shadow">🩸 <span className="text-sm font-extrabold">{card.maxHp}</span></span>
+                      <span className="text-orange-400 flex items-center gap-1.5 drop-shadow"><AttackIcon className="h-4 w-4" /> <span className="text-sm font-extrabold">{card.attack}</span></span>
+                      {card.armor > 0 && <span className="text-slate-300 flex items-center gap-1.5 drop-shadow"><ArmorIcon className="h-4 w-4" /> <span className="text-sm font-extrabold">{card.armor}</span></span>}
+                      <span className="text-red-500 flex items-center gap-1.5 drop-shadow"><HpIcon className="h-4 w-4" /> <span className="text-sm font-extrabold">{card.maxHp}</span></span>
                     </>
                   ) : (
                     <span className="mx-auto uppercase tracking-wider text-fuchsia-300 font-extrabold text-[10px]">{t('spell_badge')}</span>
@@ -128,9 +129,13 @@ export function Codex({ onBack }: { onBack: () => void }) {
                 </span>
                 {card.type === 'unit' && (
                   <>
-                    <span className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-1 text-slate-200 shadow-sm">
-                      ⚔ {card.attack} · 🩸 {card.maxHp}
-                      {card.armor > 0 ? ` · 🛡 ${card.armor}` : ''}
+                    <span className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/90 px-3 py-1 text-slate-200 shadow-sm">
+                      <AttackIcon className="h-3 w-3" /> {card.attack} · <HpIcon className="h-3 w-3" /> {card.maxHp}
+                      {card.armor > 0 && (
+                        <>
+                          · <ArmorIcon className="h-3 w-3" /> {card.armor}
+                        </>
+                      )}
                     </span>
                     <span className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-1 text-slate-200 shadow-sm">
                       {t(card.lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum')}
@@ -160,8 +165,9 @@ export function Codex({ onBack }: { onBack: () => void }) {
           <div className="mt-8 flex items-center justify-center gap-4">
             <button
               onClick={() => step(-1)}
-              className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
+              className="flex items-center gap-1.5 rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
             >
+              <span aria-hidden="true" className="icon-mask icon-mask--chevron-left h-3 w-3 bg-slate-200" />
               {t('codex_prev')}
             </button>
             <span className="text-xs text-slate-500">
@@ -169,9 +175,10 @@ export function Codex({ onBack }: { onBack: () => void }) {
             </span>
             <button
               onClick={() => step(1)}
-              className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
+              className="flex items-center gap-1.5 rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
             >
               {t('codex_next')}
+              <span aria-hidden="true" className="icon-mask icon-mask--chevron-right h-3 w-3 bg-slate-200" />
             </button>
           </div>
         </div>
