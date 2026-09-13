@@ -45,8 +45,7 @@ Kompletné pravidlá a pôvodný návrh sú v
 
 | Kódex | Rebríček |
 | --- | --- |
-| ![Kódex kariet](docs/screenshots/codex.jpg) | ![Online rebríček](docs/screenshots/leaderboard.jpg) |
-
+| ![Kódex kariet](docs/screenshots/codex.jpg) | ![Webová stránka](docs/screenshots/web.jpg)
 ## Frakcie a postavy
 
 | Frakcia | Štýl | Príklady |
