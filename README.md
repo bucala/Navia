@@ -39,13 +39,13 @@ Kompletné pravidlá a pôvodný návrh sú v
 
 ## Galéria
 
-| Hlavné menu | Herná plocha |
+| Hlavné menu | Herná plocha | Kódex |
 | --- | --- |
-| ![Hlavné menu Navia](docs/screenshots/menu.jpg) | ![Herná plocha Navia](docs/screenshots/board.jpg) |
+| ![Hlavné menu Navia](docs/screenshots/menu.jpg) | ![Herná plocha Navia](docs/screenshots/board.jpg) | ![Kódex kariet](docs/screenshots/codex.jpg) | 
 
-| Kódex | Rebríček |
+| Webová stránka |
 | --- | --- |
-| ![Kódex kariet](docs/screenshots/codex.jpg) | ![Webová stránka](docs/screenshots/web.jpg)
+| ![Webová stránka](docs/screenshots/web.jpg) | 
 ## Frakcie a postavy
 
 | Frakcia | Štýl | Príklady |
