@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getCard, getUnitCard } from '../game/cards';
 import { effectiveThreshold, opponentOf, wallBlocks } from '../game/engine';
+import { NEXUS_DANGER_HP } from '../game/constants';
+import { nextStepHint } from '../game/hints';
 import type { Action, GameViewState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { CardArt } from './CardArt';
 import { CardBack } from './Card3D';
-import { CardPreview, deckSize, DrawPile, SpellBolt, usePreviewGesture, type PreviewTarget } from './BoardFx';
+import { CardPreview, deckSize, DrawPile, SpellBolt, TurnBanner, usePreviewGesture, type PreviewTarget } from './BoardFx';
 import { ArmorIcon, AttackIcon, HpIcon, ManaIcon, NexusHeartIcon } from './icons';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx } from './useCombatFx';
@@ -29,6 +31,8 @@ interface Props {
   canAct: boolean;
   /** Opens the match log; rendered in the player bar on phones only. */
   onShowLog?: () => void;
+  /** False while something covers the board (hot-seat hand-off) — the turn banner waits. */
+  announceTurns?: boolean;
 }
 
 function sameSlot(a: SlotRef, b: SlotRef): boolean {
@@ -91,7 +95,7 @@ function OpponentHand({ count, label }: { count: number; label: string }) {
 }
 
 /** The arena, rendered from the given seat's perspective. */
-export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) {
+export function Board({ state, dispatch, viewpoint, canAct, onShowLog, announceTurns = true }: Props) {
   const { t, lx } = useLang();
   const laneLabel = (lane: LaneId) => t(lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum');
   const [selection, setSelection] = useState<Selection>({ mode: 'idle' });
@@ -153,6 +157,9 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
 
   const canMoveTo = (lane: LaneId, slot: number): boolean =>
     selection.mode === 'move' && lane !== selection.ref.lane && !me.lanes[lane][slot];
+
+  // Pulse the button that moves the turn along once nothing else is left to do.
+  const hint = canAct ? nextStepHint(state, me.id) : null;
 
   // ── Click handlers ────────────────────────────────────────────────────────
 
@@ -283,7 +290,7 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
           onClick={clickFoeNexus}
           disabled={!nexusTargetable}
           aria-label={t('a11y_nexus', { name: foe.name, hp: foe.nexusHp })}
-          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${nexusFx[foe.id]?.kind === 'damage' ? 'animate-hit' : ''} ${
+          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${nexusFx[foe.id]?.kind === 'damage' ? 'animate-hit' : ''} ${foe.nexusHp <= NEXUS_DANGER_HP ? 'nexus-danger' : ''} ${
             nexusTargetable
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
               : 'border-slate-700 bg-slate-900 text-red-300'
@@ -347,7 +354,8 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
               <button
                 onClick={() => act({ type: 'ENTER_COMBAT', player: me.id })}
                 disabled={!canAct}
-                className="rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40 shadow"
+                title={hint === 'combat' ? t('hint_combat') : undefined}
+                className={`rounded bg-red-800 px-3 py-1 text-xs font-semibold text-red-100 hover:bg-red-700 disabled:opacity-40 shadow ${hint === 'combat' ? 'btn-hint' : ''}`}
               >
                 {t('btn_combat')}
               </button>
@@ -355,7 +363,8 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
             <button
               onClick={() => act({ type: 'END_TURN', player: me.id })}
               disabled={!canAct}
-              className="rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40 shadow"
+              title={hint === 'end' ? t('hint_end_turn') : undefined}
+              className={`rounded bg-slate-700 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-slate-600 disabled:opacity-40 shadow ${hint === 'end' ? 'btn-hint' : ''}`}
             >
               {t('btn_endturn')}
             </button>
@@ -364,6 +373,8 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
           {renderLane('me', 'vanguard')}
           {renderLane('me', 'sanctum')}
         </div>
+
+        <TurnBanner state={state} viewpoint={viewpoint} enabled={announceTurns} />
 
         {/* Selected-unit action bar — an overlay, so it never resizes the board. */}
         {selection.mode === 'unit' && selectedUnit && selectedUnitCard && (
@@ -438,7 +449,10 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
           <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
           <span className="flex items-center gap-3">
             <DrawPile count={deckSize(me)} label={t('deck_pile', { n: deckSize(me) })} />
-            <span className={`relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300 ${nexusFx[me.id]?.kind === 'damage' ? 'animate-hit' : ''}`}>
+            <span
+              title={me.nexusHp <= NEXUS_DANGER_HP ? t('nexus_danger') : undefined}
+              className={`relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300 ${nexusFx[me.id]?.kind === 'damage' ? 'animate-hit' : ''} ${me.nexusHp <= NEXUS_DANGER_HP ? 'nexus-danger' : ''}`}
+            >
               <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {me.nexusHp}</span>
               <FloatingPopup popup={nexusFx[me.id]} className="-top-2" />
             </span>

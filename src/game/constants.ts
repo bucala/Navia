@@ -5,6 +5,8 @@ export const VANGUARD_SLOTS = 4;
 export const SANCTUM_SLOTS = 4;
 
 export const NEXUS_HP = 30;
+/** At or below this the Nexus badge pulses as a warning. */
+export const NEXUS_DANGER_HP = 10;
 export const MAX_MANA = 10;
 export const STARTING_HAND = 4;
 /** The player going second receives one extra opening card. */

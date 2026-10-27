@@ -11,7 +11,7 @@ export function prefersReducedMotion(): boolean {
 export function CardBack({ className = '' }: { className?: string }) {
   return (
     <img
-      src="/art/frames/card-back.svg"
+      src="/art/frames/card-back.webp"
       alt=""
       aria-hidden="true"
       draggable={false}

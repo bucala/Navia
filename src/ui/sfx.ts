@@ -134,3 +134,22 @@ export function sfxSpell(): void {
   noise(0.45, 600, 1.2, 0.08, 0, 3000);
   tone(220, 660, 0.35, 'sawtooth', 0.025);
 }
+
+/** Your turn begins: a low war horn with a bright overtone. */
+export function sfxTurnStart(): void {
+  tone(147, 147, 0.7, 'sawtooth', 0.03);
+  tone(220, 222, 0.6, 'sine', 0.06, 0.04);
+  tone(440, 444, 0.45, 'sine', 0.02, 0.08);
+}
+
+/** Victory fanfare: a rising major arpeggio that rings out. */
+export function sfxVictory(): void {
+  [523, 659, 784, 1047].forEach((f, i) => tone(f, f, i === 3 ? 0.9 : 0.22, 'triangle', 0.07, i * 0.14));
+  noise(0.9, 4000, 0.7, 0.03, 0.42, 8000);
+}
+
+/** Defeat: a slow, falling minor phrase. */
+export function sfxDefeat(): void {
+  [392, 311, 262].forEach((f, i) => tone(f, f * 0.97, i === 2 ? 1.1 : 0.4, 'sine', 0.08, i * 0.38));
+  tone(98, 70, 1.4, 'sawtooth', 0.025, 0.76);
+}

@@ -46,7 +46,10 @@ Sieni Božstiev. Generuje ich `npm run portraits` podľa tabuľky stredov hláv 
 
 ## Rub karty
 
-`frames/card-back.svg` je jednotná zadná strana všetkých kariet (otáčanie v
-ruke, súperova ruka, Sieň Božstiev).
+`frames/card-back.webp` je jednotná zadná strana všetkých kariet (otáčanie v
+ruke, súperova ruka, kôpky na ťahanie, Sieň Božstiev): kamenná doska s
+vyrytými runami a lávovými žilami, v strede logo Navia. Generuje ju
+`npm run card-back` (`scripts/generate-card-back.mjs`) — logo berie z
+`public/icons/icon-512.png`, takže po zmene ikony stačí skript spustiť znova.
 
 Neskôr sa tieto súbory presunú do Cloudflare R2 (viď GDD §5.2).

@@ -13,6 +13,7 @@ import {
   WinnerOverlay,
 } from './feedback';
 import { LogPanel, useLogPanelState } from './LogPanel';
+import { useMatchStats } from './useMatchStats';
 
 function roomFromUrl(): string | null {
   const room = new URLSearchParams(window.location.search).get('room');
@@ -218,6 +219,7 @@ function OnlineMatch({
   const { status, seat, state, seats, pending, sendAction } = useMultiplayerGame(roomId, playerName, onServerError);
   const { diceEvent, shake } = useDiceFeedback(state);
   const [logOpen, setLogOpen] = useLogPanelState();
+  const stats = useMatchStats(state);
   const [copied, setCopied] = useState(false);
 
   // Quick match: keep the queue entry alive while waiting. Cancelling is an
@@ -328,7 +330,7 @@ function OnlineMatch({
       {toast && <Toast message={toast} />}
       <GameOverlays diceEvent={diceEvent} />
       {state.winner && (
-        <WinnerOverlay name={state.players[state.winner].name} onNewGame={onLeave} backToMenu />
+        <WinnerOverlay state={state} viewpoint={seat} stats={stats} onNewGame={onLeave} backToMenu />
       )}
     </div>
   );

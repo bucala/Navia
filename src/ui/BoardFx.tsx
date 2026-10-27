@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type PointerEvent, type MouseEvent } from 'react';
 import { getUnitCard } from '../game/cards';
-import type { PlayerId, PlayerViewState, UnitState } from '../game/types';
+import type { GameViewState, PlayerId, PlayerViewState, UnitState } from '../game/types';
 import { useLang } from '../i18n';
 import { CardBack } from './Card3D';
 import { CardFace } from './CardFace';
 import { ArmorIcon, BurnIcon, HpIcon } from './icons';
+import { sfxTurnStart } from './sfx';
 import type { SpellFx } from './useCombatFx';
 
 /** Cards left to draw — local games keep the deck, online views only its size. */
@@ -82,6 +83,46 @@ export function SpellBolt({ spell, viewpoint }: { spell: SpellFx | null; viewpoi
         </span>
       ))}
     </>
+  );
+}
+
+const BANNER_MS = 1500;
+
+/**
+ * Ribbon sweeping across the arena whenever the turn passes — who is up and
+ * which turn it is. Waits while `enabled` is false (the hot-seat hand-off
+ * screen covers the board), then announces the turn it missed.
+ */
+export function TurnBanner({ state, viewpoint, enabled }: { state: GameViewState; viewpoint: PlayerId; enabled: boolean }) {
+  const { t } = useLang();
+  const [banner, setBanner] = useState<{ id: number; mine: boolean; name: string; turn: number } | null>(null);
+  const announced = useRef<string | null>(null);
+  const activeName = state.players[state.active].name;
+
+  useEffect(() => {
+    if (!enabled || state.winner) return;
+    const key = `${state.turn}:${state.active}`;
+    if (announced.current === key) return;
+    announced.current = key;
+    const mine = state.active === viewpoint;
+    setBanner({ id: Date.now(), mine, name: activeName, turn: state.turn });
+    if (mine) sfxTurnStart();
+  }, [enabled, state.turn, state.active, state.winner, viewpoint, activeName]);
+
+  useEffect(() => {
+    if (!banner) return;
+    const timer = setTimeout(() => setBanner(null), BANNER_MS);
+    return () => clearTimeout(timer);
+  }, [banner]);
+
+  if (!banner) return null;
+  return (
+    <div key={banner.id} className="turn-banner" role="status" aria-live="polite">
+      <div className={`turn-banner__ribbon ${banner.mine ? '' : 'turn-banner__ribbon--foe'}`}>
+        <p className="turn-banner__title">{t(banner.mine ? 'banner_your_turn' : 'banner_foe_turn')}</p>
+        <p className="turn-banner__sub">{t('banner_sub', { n: banner.turn, name: banner.name })}</p>
+      </div>
+    </div>
   );
 }
 
