@@ -41,7 +41,7 @@ export const MEGADRAK = define<UnitCardDef>({
     en: 'Lava ∞: attacks ignite. Acid ∞: attacks permanently shred armor. Extermination: kills tokens instantly. Dice 3+ (2 mana): the attack also hits adjacent slots in a cross.',
   },
   glyph: '🐉',
-  art: '/art/megadrak.jpg',
+  art: '/art/megadrak.webp',
 });
 
 export const PEKELNE_ZAKLINADLO = define<CardDef>({
@@ -62,7 +62,7 @@ export const PEKELNE_ZAKLINADLO = define<CardDef>({
     en: 'Roll the die: on 3–5 deal 2 damage to the target, restore 1 HP and roll again. On 1–2 the chain ends safely. On 6 the chain ends and your Nexus takes 3 damage (Overload).',
   },
   glyph: '🔥',
-  art: '/art/pekelne_zaklinadlo.jpg',
+  art: '/art/pekelne_zaklinadlo.webp',
 });
 
 export const LAVOVY_SKRIATOK = define<UnitCardDef>({
@@ -83,7 +83,74 @@ export const LAVOVY_SKRIATOK = define<UnitCardDef>({
     en: 'Token. Lava ∞: attacks ignite the target.',
   },
   glyph: '👺',
-  art: '/art/lavovy_skriatok.jpg',
+  art: '/art/lavovy_skriatok.webp',
+});
+
+export const SALAMANDRA = define<UnitCardDef>({
+  type: 'unit',
+  id: 'salamandra',
+  name: { sk: 'Salamandra, Duch Výhne', en: 'Salamander, Spirit of the Forge' },
+  faction: 'lava',
+  rarity: 'common',
+  cost: 2,
+  attack: 2,
+  maxHp: 3,
+  armor: 0,
+  lane: 'vanguard',
+  keywords: ['lavaTouch'],
+  text: {
+    sk: 'Láva ∞: útoky zapaľujú cieľ.',
+    en: 'Lava ∞: attacks ignite the target.',
+  },
+  glyph: '🦎',
+  art: '/art/salamandra.webp',
+});
+
+export const OHNIVAK = define<UnitCardDef>({
+  type: 'unit',
+  id: 'ohnivak',
+  name: { sk: 'Vták Ohnivák', en: 'The Firebird' },
+  faction: 'lava',
+  rarity: 'rare',
+  cost: 3,
+  attack: 2,
+  maxHp: 3,
+  armor: 0,
+  lane: 'sanctum',
+  keywords: ['flying', 'lavaTouch'],
+  text: {
+    sk: 'Letec. Láva ∞: útoky zapaľujú cieľ.',
+    en: 'Flyer. Lava ∞: attacks ignite the target.',
+  },
+  glyph: '🪶',
+  art: '/art/ohnivak.webp',
+});
+
+export const MESHA = define<UnitCardDef>({
+  type: 'unit',
+  id: 'mesha',
+  name: { sk: 'Meša, Agniho Baran', en: 'Mesha, Ram of Agni' },
+  faction: 'lava',
+  rarity: 'rare',
+  cost: 4,
+  attack: 3,
+  maxHp: 5,
+  armor: 0,
+  lane: 'vanguard',
+  keywords: ['lavaTouch'],
+  dice: {
+    label: { sk: 'Plameňový náraz', en: 'Flame Charge' },
+    threshold: 4,
+    manaCost: 1,
+    activation: false,
+    effect: { kind: 'cleave' },
+  },
+  text: {
+    sk: 'Láva ∞: útoky zapaľujú. Kocka 4+ (1 mana): náraz zasiahne aj susedov cieľa v tej istej línii.',
+    en: 'Lava ∞: attacks ignite. Dice 4+ (1 mana): the charge also hits the target’s neighbours in the same lane.',
+  },
+  glyph: '🐏',
+  art: '/art/mesha.webp',
 });
 
 // ── Frakcia: Prírodný a Zemský Pakt (Obrana a Stabilita) ────────────────────
@@ -112,7 +179,7 @@ export const MAHAKAPI = define<UnitCardDef>({
     en: 'Advantage: rolls 2× D6 and keeps the better result. Dice 5+ (1 mana): heals 3 HP and gains 3 armor.',
   },
   glyph: '🦍',
-  art: '/art/gorila.jpg',
+  art: '/art/gorila.webp',
 });
 
 export const KAMENNY_STRAZCA = define<UnitCardDef>({
@@ -136,7 +203,7 @@ export const KAMENNY_STRAZCA = define<UnitCardDef>({
     en: 'A steadfast defender of the vanguard.',
   },
   glyph: '🗿',
-  art: '/art/kamenny_strazca.jpg',
+  art: '/art/kamenny_strazca.webp',
 });
 
 export const ZLATY_GRYF = define<UnitCardDef>({
@@ -163,7 +230,7 @@ export const ZLATY_GRYF = define<UnitCardDef>({
     en: 'Dice 3+ (2 mana): each of your Vanguard units heals 2 HP and gains 1 armor.',
   },
   glyph: '🦅',
-  art: '/art/zlaty_gryf.jpg',
+  art: '/art/zlaty_gryf.webp',
 });
 
 export const MEDVEBOR = define<UnitCardDef>({
@@ -190,7 +257,7 @@ export const MEDVEBOR = define<UnitCardDef>({
     en: 'Dice 4+ (2 mana): the axe also hits the units left and right of the target in the same lane.',
   },
   glyph: '🐻',
-  art: '/art/medvebor.jpg',
+  art: '/art/medvebor.webp',
 });
 
 export const MAHISA = define<UnitCardDef>({
@@ -217,7 +284,7 @@ export const MAHISA = define<UnitCardDef>({
     en: 'Dice 4+ (1 mana): the charging bull deals +3 bonus damage to the target.',
   },
   glyph: '🐃',
-  art: '/art/mahisa.jpg',
+  art: '/art/mahisa.webp',
 });
 
 export const CHEPRI = define<UnitCardDef>({
@@ -244,7 +311,7 @@ export const CHEPRI = define<UnitCardDef>({
     en: 'Flyer. Dice 3+ (1 mana): the chitin shell renews — heals 2 HP and gains 2 armor.',
   },
   glyph: '🪲',
-  art: '/art/chepri.jpg',
+  art: '/art/chepri.webp',
 });
 
 export const KHADGA = define<UnitCardDef>({
@@ -271,7 +338,7 @@ export const KHADGA = define<UnitCardDef>({
     en: 'Dice 3+ (1 mana): raises the runic shield — heals 1 HP and gains 2 armor.',
   },
   glyph: '🦏',
-  art: '/art/khadga.jpg',
+  art: '/art/khadga.webp',
 });
 
 // ── Frakcia: Nebeský Zbor (Mobilita a Podfuky) ──────────────────────────────
@@ -300,7 +367,7 @@ export const PAPAGAJ = define<UnitCardDef>({
     en: 'Flyer. Acid ∞: attacks permanently shred armor. Stability — Dice 1+ (1 mana): 1 extra acid stack; the roll cannot fail.',
   },
   glyph: '🦜',
-  art: '/art/papagaj.jpg',
+  art: '/art/papagaj.webp',
 });
 
 export const BOJOVY_KOHUT = define<UnitCardDef>({
@@ -327,7 +394,7 @@ export const BOJOVY_KOHUT = define<UnitCardDef>({
     en: 'Berserker — Dice (1 mana): +4 damage. The requirement drops as he bleeds: full HP 5+, each missing HP lowers it by 1 (minimum 2+).',
   },
   glyph: '🐓',
-  art: '/art/bojovy_kohut.jpg',
+  art: '/art/bojovy_kohut.webp',
 });
 
 export const OPICI_KRAL = define<UnitCardDef>({
@@ -347,7 +414,7 @@ export const OPICI_KRAL = define<UnitCardDef>({
     en: 'Agile: once per turn during combat he may hop between Vanguard and Sanctum (dodging AoE attacks).',
   },
   glyph: '🐒',
-  art: '/art/wukong.jpg',
+  art: '/art/wukong.webp',
 });
 
 export const CUAUHTLI = define<UnitCardDef>({
@@ -374,7 +441,7 @@ export const CUAUHTLI = define<UnitCardDef>({
     en: 'Flyer. Dice 3+ (1 mana): a dive from the sky deals +2 bonus damage to the target.',
   },
   glyph: '🦅',
-  art: '/art/cuauhtli.jpg',
+  art: '/art/cuauhtli.webp',
 });
 
 export const RYSOSLAV = define<UnitCardDef>({
@@ -401,7 +468,7 @@ export const RYSOSLAV = define<UnitCardDef>({
     en: 'Dice 4+ (2 mana): calls down a storm — every enemy unit on the board takes 1 damage.',
   },
   glyph: '🐆',
-  art: '/art/rysoslav.jpg',
+  art: '/art/rysoslav.webp',
 });
 
 export const NEBESKY_VRABEC = define<UnitCardDef>({
@@ -421,7 +488,7 @@ export const NEBESKY_VRABEC = define<UnitCardDef>({
     en: 'Flyer. A swift scout of the Celestial Chorus.',
   },
   glyph: '🐦',
-  art: '/art/nebesky_vrabec.jpg',
+  art: '/art/nebesky_vrabec.webp',
 });
 
 /** Shared test deck — both players run this list unless they pick their own. */

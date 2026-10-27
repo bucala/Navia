@@ -43,7 +43,7 @@ of Destiny*; hra sa dnes všade volá jednotne **Navia**, s tagline
 - Presvedčiť náhodného návštevníka (fanúšika CCG/stolových hier), aby si
   hru **hneď vyskúšal** — hlavné CTA vedie priamo do hry v prehliadači
   (PWA, žiadna inštalácia potrebná).
-- Ukázať kvalitu a hĺbku hry: kockový systém, taktické línie, 16 kariet
+- Ukázať kvalitu a hĺbku hry: kockový systém, taktické línie, 19 kariet
   postavených na skutočných mytológiách, ELO rebríček, deckbuilding.
 - Osloviť aj vývojársku/open-source komunitu — projekt je plne open source
   (MIT licencia), postavený na Cloudflare Workers/Durable Objects/D1 +
@@ -182,7 +182,7 @@ Použi ako krátke citácie/popisky pod portrétmi (skráť podľa potreby):
 - `public/art/branding/navia-mark.svg` — štvorcová značka/favicon.
 - `public/icons/icon-{16…512}.png` — hotová sada rastrových ikon.
 - `docs/screenshots/*.jpg` — 5 aktuálnych screenshotov appky (1920×1200).
-- `public/art/*.jpg` — AI portréty jednotlivých postáv (pre galériu hrdinov).
+- `public/art/*.webp` — AI portréty jednotlivých postáv (pre galériu hrdinov).
 - `public/art/frames/*.svg` — ornamentálne rámy/textúry (kamenná textúra,
   rámy kariet podľa vzácnosti, ornamenty) — dajú sa použiť ako dekoratívne
   prvky/pozadia na stránke pre konzistentný vizuál s appkou.

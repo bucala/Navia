@@ -13,18 +13,19 @@
     "deploy": "npm run build && npm run validate:deploy && wrangler d1 migrations apply pantheon-db --remote && wrangler deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "portraits": "node scripts/generate-portraits.mjs"
   },
   "dependencies": {
-    "@capacitor/android": "^8.4.1",
-    "@capacitor/core": "^8.4.1",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
     "@capacitor/haptics": "^8.0.2",
     "framer-motion": "^12.42.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.4.1",
+    "@capacitor/cli": "^8.5.3",
     "@cloudflare/workers-types": "^4.20260701.1",
     "@tailwindcss/vite": "^4.1.0",
     "@types/react": "^18.3.12",

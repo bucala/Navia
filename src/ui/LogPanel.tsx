@@ -22,11 +22,27 @@ function DiceLine({ event }: { event: Extract<LogEvent, { kind: 'dice' }> }) {
   );
 }
 
-/** Right-side match log. Collapsible into a slim tab so the board can use the freed width. */
-export function LogPanel({ state }: { state: GameViewState }) {
+/** Open by default on desktop (side panel), closed on phones (bottom sheet). */
+export function useLogPanelState() {
+  return useState(() => window.matchMedia('(min-width: 1024px)').matches);
+}
+
+/**
+ * Right-side match log. Collapsible into a slim tab so the board can use the
+ * freed width. On phones the closed log has no floating button (it covered
+ * hand cards) — Board shows the opener in the player bar instead.
+ */
+export function LogPanel({
+  state,
+  open,
+  onOpenChange: setOpen,
+}: {
+  state: GameViewState;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const { lang, t } = useLang();
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     bottomRef.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
@@ -47,10 +63,9 @@ export function LogPanel({ state }: { state: GameViewState }) {
           onClick={() => setOpen(true)}
           title={t('log_show')}
           aria-label={t('log_show')}
-          className="fixed bottom-3 right-3 z-20 rounded-lg border border-slate-700 bg-slate-950/95 px-3 py-2 text-xs font-semibold text-slate-200 shadow-xl hover:bg-slate-900 lg:static lg:flex lg:w-7 lg:shrink-0 lg:flex-col lg:items-center lg:justify-center lg:rounded-none lg:border-y-0 lg:border-r-0 lg:px-0 lg:py-0"
+          className="hidden w-7 shrink-0 flex-col items-center justify-center border-l border-slate-700 bg-slate-950/95 text-slate-200 hover:bg-slate-900 lg:flex"
         >
-          <span className="lg:hidden">{t('log_title')}</span>
-          <span aria-hidden="true" className="icon-mask icon-mask--chevron-left hidden h-3 w-3 bg-current lg:inline-block" />
+          <span aria-hidden="true" className="icon-mask icon-mask--chevron-left h-3 w-3 bg-current" />
         </button>
       </>
     );

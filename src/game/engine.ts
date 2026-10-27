@@ -15,6 +15,7 @@ import {
   NEXUS_HP,
   OPENING_PLAYABLE_COST,
   SANCTUM_SLOTS,
+  SECOND_PLAYER_CATCH_UP_TURNS,
   SECOND_PLAYER_HAND_BONUS,
   STARTING_HAND,
   VANGUARD_SLOTS,
@@ -112,6 +113,7 @@ export function createGame(
     },
     active,
     startingPlayer: active,
+    catchUpManaTurns: SECOND_PLAYER_CATCH_UP_TURNS,
     turn: 1,
     phase: 'main',
     winner: null,
@@ -119,7 +121,8 @@ export function createGame(
     nextUid: 1,
     nextLogId: 1,
   };
-  startTurn(state);
+  // The starting player skips the turn-one draw (initiative is its own reward).
+  startTurn(state, { draw: false });
   logMsg(state, 'gameStart', { player: state.players[active].name });
   return state;
 }
@@ -151,7 +154,7 @@ function cardOf(unit: UnitState): UnitCardDef {
   return getUnitCard(unit.cardId);
 }
 
-function laneHasUnits(player: PlayerState, lane: LaneId): boolean {
+function laneHasUnits(player: Pick<PlayerState, 'lanes'>, lane: LaneId): boolean {
   return player.lanes[lane].some((u) => u !== null);
 }
 
@@ -244,33 +247,53 @@ export function crossNeighbors(ref: SlotRef): SlotRef[] {
   return [...laneNeighbors(ref), { lane: otherLane, slot: ref.slot }];
 }
 
-/** The vanguard wall: while it stands, sanctum and Nexus cannot be attacked. */
-function assertLegalTarget(state: GameState, attacker: PlayerId, target: TargetRef): void {
+/**
+ * The vanguard wall: while it stands, sanctum and Nexus cannot be attacked.
+ * Flyers soar over it to strike sanctum units — the Nexus stays protected.
+ */
+export function wallBlocks(
+  defender: Pick<PlayerState, 'lanes'>,
+  target: { kind: 'nexus' } | { kind: 'unit'; lane: LaneId },
+  attackerCard: UnitCardDef,
+): boolean {
+  if (!laneHasUnits(defender, 'vanguard')) return false;
+  if (target.kind === 'nexus') return true;
+  return target.lane === 'sanctum' && !attackerCard.keywords.includes('flying');
+}
+
+function assertLegalTarget(state: GameState, attacker: PlayerId, target: TargetRef, attackerCard: UnitCardDef): void {
   const defender = state.players[opponentOf(attacker)];
-  if (target.kind === 'nexus' || target.lane === 'sanctum') {
-    if (laneHasUnits(defender, 'vanguard')) {
-      throw new Error('wallProtects');
-    }
+  if (wallBlocks(defender, target, attackerCard)) {
+    throw new Error('wallProtects');
   }
   if (target.kind === 'unit' && !unitAt(defender, target)) {
     throw new Error('targetEmpty');
   }
 }
 
-function startTurn(state: GameState): void {
+function startTurn(state: GameState, { draw = true }: { draw?: boolean } = {}): void {
   const player = state.players[state.active];
   player.maxMana = Math.min(MAX_MANA, player.maxMana + 1);
   player.mana = player.maxMana;
   state.phase = 'main';
 
-  // Draw one card.
-  const drawn = player.deck.shift();
-  if (drawn) player.hand.push(drawn);
-  else {
-    player.fatigue = (player.fatigue ?? 0) + 1;
-    logMsg(state, 'fatigue', { player: player.name, n: player.fatigue });
-    damageNexus(state, player.id, player.fatigue);
-    if (state.winner) return;
+  // Catch-up for the player going second: temporary mana above the cap.
+  if (state.active !== state.startingPlayer && (state.catchUpManaTurns ?? 0) > 0) {
+    state.catchUpManaTurns = (state.catchUpManaTurns ?? 0) - 1;
+    player.mana += 1;
+    logMsg(state, 'catchUpMana', { player: player.name });
+  }
+
+  // Draw one card (skipped only on the starting player's first turn).
+  if (draw) {
+    const drawn = player.deck.shift();
+    if (drawn) player.hand.push(drawn);
+    else {
+      player.fatigue = (player.fatigue ?? 0) + 1;
+      logMsg(state, 'fatigue', { player: player.name, n: player.fatigue });
+      damageNexus(state, player.id, player.fatigue);
+      if (state.winner) return;
+    }
   }
 
   // Static effects (GDD §2.2): burn ticks on the active player's units.
@@ -463,7 +486,7 @@ function attack(
   // Never trust the client's target.player for the actual effect — the only legal target is the real opponent.
   const enemyId = opponentOf(state.active);
   if (target.player !== enemyId) throw new Error('invalidTarget');
-  assertLegalTarget(state, state.active, target);
+  assertLegalTarget(state, state.active, target, card);
 
   // Dice rider (GDD §2.3): pay extra mana, roll, unlock the special effect on success.
   let diceSuccess = false;

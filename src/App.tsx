@@ -42,6 +42,14 @@ const MAIN_MENU: MenuItem[] = [
   { icon: '/art/icons/icon-gear.svg', label: 'menu_settings', desc: 'menu_settings_desc', screen: 'settings' },
 ];
 
+/** Ember particles over the logo: [left %, delay s, duration s, size px, sideways drift px]. */
+const EMBERS: [number, number, number, number, number][] = [
+  [18, 0, 3.4, 7, -14], [27, 1.1, 2.8, 5, 10], [36, 2.3, 3.8, 8, -8], [44, 0.6, 3.1, 5, 16],
+  [52, 1.8, 3.6, 7, -18], [60, 0.2, 2.9, 5, 12], [68, 2.7, 3.3, 8, -10], [76, 1.4, 3.9, 5, 14],
+  [24, 3.1, 3.2, 6, 8], [57, 3.6, 2.7, 7, -12], [82, 0.9, 3.5, 5, -16], [40, 4.2, 3.0, 6, 18],
+  [32, 0.4, 3.7, 4, 6], [64, 2.1, 3.2, 6, -6], [48, 3.3, 2.9, 5, 9], [72, 4.6, 3.4, 4, -9],
+];
+
 function MenuButton({ item, onClick }: { item: MenuItem; onClick: () => void }) {
   const { t } = useLang();
   return (
@@ -158,7 +166,26 @@ export default function App() {
           />
 
           <div className="menu-panel my-auto flex w-full max-w-2xl flex-col items-center gap-3 px-5 py-6 sm:px-14 sm:py-12">
-            <img src="/art/branding/navia-logo.webp" alt="Navia" className="w-full max-w-md sm:max-w-lg" />
+            <div className="relative w-full max-w-md sm:max-w-lg">
+              {/* Embers drifting up from the burning NAVIA lettering. */}
+              <span aria-hidden="true" className="menu-embers">
+                {EMBERS.map(([left, delay, duration, size, drift], i) => (
+                  <span
+                    key={i}
+                    className="menu-ember"
+                    style={{
+                      left: `${left}%`,
+                      width: size,
+                      height: size,
+                      animationDelay: `${delay}s`,
+                      animationDuration: `${duration}s`,
+                      ['--drift' as string]: `${drift}px`,
+                    }}
+                  />
+                ))}
+              </span>
+              <img src="/art/branding/navia-logo.webp" alt="Navia" className="menu-logo relative w-full" />
+            </div>
             <img src="/art/frames/ornament-divider.svg" alt="" aria-hidden="true" className="h-3 w-40" />
             <div className="mt-6 flex w-full max-w-md flex-col gap-3">
               {MAIN_MENU.map((item) => (

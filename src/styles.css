@@ -5,7 +5,7 @@ body {
   background-color: #d6caaf;
   background-image:
     radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 252, 245, 0.55), rgba(180, 160, 130, 0.25) 100%),
-    url('/art/assets/arena_beige_texture.jpg');
+    url('/art/assets/arena_beige_texture.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -330,7 +330,7 @@ body {
   background-color: #1e1b18;
   background-image: 
     radial-gradient(circle at 50% 50%, rgba(245, 230, 210, 0.08) 0%, rgba(12, 10, 8, 0.72) 100%),
-    url('/art/assets/arena_battlefield_bg.jpg');
+    url('/art/assets/arena_battlefield_bg.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -380,6 +380,237 @@ body {
   width: 0 !important;
   height: 0 !important;
   display: none !important;
+}
+
+/* ── Main menu: breathing logo and rising embers ── */
+.menu-logo {
+  animation: logo-float 7s ease-in-out infinite;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0) rotate(-0.4deg); }
+  50% { transform: translateY(-7px) rotate(0.4deg); }
+}
+
+.menu-embers {
+  pointer-events: none;
+  position: absolute;
+  inset: 25% 0 10%;
+  z-index: 2;
+}
+
+.menu-ember {
+  position: absolute;
+  bottom: 20%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #fffbe8, #fbbf24 40%, #f97316 65%, rgba(194, 65, 12, 0) 80%);
+  box-shadow: 0 0 10px 3px rgba(249, 115, 22, 0.8), 0 0 20px 6px rgba(251, 191, 36, 0.3);
+  opacity: 0;
+  animation-name: ember-rise;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes ember-rise {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  70% { opacity: 0.9; }
+  100% { transform: translate(var(--drift, 0px), -150px) scale(0.35); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-embers {
+    display: none;
+  }
+
+  .menu-logo {
+    animation: none;
+  }
+}
+
+/* ── Spell bolt & impact bursts ── */
+.spell-bolt {
+  position: fixed;
+  z-index: 40;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle at 40% 40%, #fff7d1 0%, #ffd166 25%, #f97316 55%, rgba(194, 65, 12, 0) 72%);
+  box-shadow: 0 0 22px 8px rgba(249, 115, 22, 0.75), 0 0 48px 16px rgba(251, 191, 36, 0.35);
+  animation: bolt-fly 0.42s cubic-bezier(0.55, 0, 0.75, 0.4) both;
+}
+
+.spell-bolt::after {
+  /* Comet tail pointing back toward the caster. */
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70px;
+  height: 14px;
+  margin-top: -7px;
+  transform-origin: 0 50%;
+  transform: rotate(var(--tail, 90deg));
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.85), rgba(194, 65, 12, 0));
+  filter: blur(2px);
+}
+
+@keyframes bolt-fly {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.15); opacity: 1; }
+}
+
+.spell-burst {
+  position: fixed;
+  z-index: 40;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 247, 209, 0.95) 0%, rgba(249, 115, 22, 0.8) 30%, rgba(194, 65, 12, 0.35) 55%, transparent 70%);
+  animation: burst-pop 0.5s ease-out 0.4s both;
+}
+
+@keyframes burst-pop {
+  0% { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* Weapon impact on a unit: a white-hot flash and a crossing slash. */
+.impact-burst {
+  pointer-events: none;
+  position: absolute;
+  inset: -10%;
+  z-index: 20;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(254, 215, 170, 0.6) 25%, transparent 60%);
+  animation: burst-pop 0.45s ease-out both;
+}
+
+.impact-burst::before,
+.impact-burst::after {
+  content: '';
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 50%;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, #fff, #fbbf24, transparent);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
+  transform: rotate(-35deg);
+}
+
+.impact-burst::after {
+  transform: rotate(35deg);
+}
+
+/* ── 3D cards with real thickness ──
+   A card is a preserve-3d body holding the front face, the shared card back
+   rotated 180°, and a stack of bronze "slices" between them. Seen face-on the
+   slices hide behind the faces; tilted or mid-flip they form a solid gilded
+   edge, so the card reads as a physical object. Driven by CSS variables:
+   --rx / --ry (tilt or drag), --flip (0deg | 180deg), --card-t (thickness). */
+.card3d {
+  position: relative;
+  --rx: 0deg;
+  --ry: 0deg;
+  --flip: 0deg;
+  --card-t: 4px;
+}
+
+.card3d__body {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transform: perspective(var(--card-persp, 900px)) rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip)));
+  transition: transform 0.65s cubic-bezier(0.22, 1.15, 0.36, 1);
+  will-change: transform;
+}
+
+/* Pointer tilt follows the hand instantly; flips keep the springy ease. */
+.card3d--tracking > .card3d__body {
+  transition: transform 0.08s linear;
+}
+
+.card3d--dragging > .card3d__body {
+  transition: none;
+}
+
+.card3d__face {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card3d__front {
+  transform: translateZ(calc(var(--card-t) / 2));
+}
+
+.card3d__back {
+  transform: rotateY(180deg) translateZ(calc(var(--card-t) / 2));
+}
+
+.card3d__slice {
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5a3c1a, #d9ad62 30%, #f3d08c 50%, #d9ad62 70%, #5a3c1a);
+  transform: translateZ(calc(var(--card-t) * var(--z)));
+}
+
+/* Specular sheen that slides across the face as the card tilts. */
+.card3d__glare {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at calc(50% + var(--ry-num, 0) * 3%) calc(50% - var(--rx-num, 0) * 3%),
+    rgba(255, 236, 190, 0.32),
+    transparent 55%
+  );
+  opacity: var(--glare, 0);
+  mix-blend-mode: soft-light;
+  transition: opacity 0.3s ease;
+}
+
+/* Bronze action button used outside the main menu (pager, flip, …). */
+.navia-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid rgba(180, 130, 40, 0.5);
+  border-radius: 0.6rem;
+  background: linear-gradient(175deg, rgba(58, 43, 26, 0.95), rgba(22, 16, 10, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 3px 8px rgba(0, 0, 0, 0.4);
+  color: #fde68a;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.navia-btn:hover {
+  border-color: rgb(251 191 36 / 0.85);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.2), inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card3d__body {
+    transition: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

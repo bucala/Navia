@@ -17,6 +17,14 @@ interface MatchRow {
   elo_delta: number;
 }
 
+/**
+ * Anti-farming: only this many rated results per pair of accounts count
+ * within RATED_PAIR_WINDOW. Further games between the same two players
+ * still record the win/loss but move no ELO.
+ */
+export const RATED_PAIR_LIMIT = 3;
+const RATED_PAIR_WINDOW = '-1 day';
+
 function isResultRequest(value: unknown): value is ResultRequest {
   if (typeof value !== 'object' || value === null) return false;
   const body = value as Record<string, unknown>;
@@ -73,7 +81,15 @@ export class RatingCoordinator extends DurableObject<Env> {
       };
     }
 
-    const delta = eloDelta(winner.elo, loser.elo);
+    const recentPair = await this.env.DB.prepare(
+      `SELECT COUNT(*) AS n FROM matches
+       WHERE ((p1_id = ? AND p2_id = ?) OR (p1_id = ? AND p2_id = ?))
+         AND elo_delta > 0 AND finished_at > datetime('now', ?)`,
+    )
+      .bind(body.p1Id, body.p2Id, body.p2Id, body.p1Id, RATED_PAIR_WINDOW)
+      .first<{ n: number }>();
+    const rated = (recentPair?.n ?? 0) < RATED_PAIR_LIMIT;
+    const delta = rated ? eloDelta(winner.elo, loser.elo) : 0;
     await this.env.DB.batch([
       this.env.DB.prepare('UPDATE players SET elo = elo + ?, wins = wins + 1 WHERE id = ?').bind(
         delta,

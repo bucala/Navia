@@ -12,7 +12,7 @@ import {
   useToast,
   WinnerOverlay,
 } from './feedback';
-import { LogPanel } from './LogPanel';
+import { LogPanel, useLogPanelState } from './LogPanel';
 
 function roomFromUrl(): string | null {
   const room = new URLSearchParams(window.location.search).get('room');
@@ -217,6 +217,7 @@ function OnlineMatch({
   );
   const { status, seat, state, seats, pending, sendAction } = useMultiplayerGame(roomId, playerName, onServerError);
   const { diceEvent, shake } = useDiceFeedback(state);
+  const [logOpen, setLogOpen] = useLogPanelState();
   const [copied, setCopied] = useState(false);
 
   // Quick match: keep the queue entry alive while waiting. Cancelling is an
@@ -320,8 +321,8 @@ function OnlineMatch({
         <span className="hidden shrink-0 text-slate-500 sm:inline">{t('room_label', { id: roomId })}</span>
       </GameStatusOverlay>
       <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-        <Board state={state} dispatch={sendAction} viewpoint={seat} canAct={canAct} />
-        <LogPanel state={state} />
+        <Board state={state} dispatch={sendAction} viewpoint={seat} canAct={canAct} onShowLog={() => setLogOpen(true)} />
+        <LogPanel state={state} open={logOpen} onOpenChange={setLogOpen} />
       </div>
 
       {toast && <Toast message={toast} />}

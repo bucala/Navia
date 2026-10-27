@@ -12,14 +12,17 @@ vi.mock('cloudflare:workers', () => ({
   },
 }));
 
-import { RatingCoordinator, type ResultRequest } from './RatingCoordinator';
+import { RATED_PAIR_LIMIT, RatingCoordinator, type ResultRequest } from './RatingCoordinator';
 import type { PlayerRow } from './api';
 import type { Env } from './env';
 
 interface Match {
   resultKey: string;
+  pair: string;
   eloDelta: number;
 }
+
+const pairKey = (a: string, b: string) => [a, b].sort().join('|');
 
 function fakeEnv() {
   const players = new Map<string, PlayerRow>([
@@ -40,6 +43,11 @@ function fakeEnv() {
     }
 
     async first<T>(): Promise<T | null> {
+      if (this.query.includes('COUNT(*)') && this.query.includes('FROM matches')) {
+        const [a, b] = this.values as [string, string];
+        const n = [...matches.values()].filter((m) => m.pair === pairKey(a, b) && m.eloDelta > 0).length;
+        return { n } as T;
+      }
       if (this.query.includes('FROM matches')) {
         const match = matches.get(String(this.values[0]));
         return (match ? { elo_delta: match.eloDelta } : null) as T | null;
@@ -62,8 +70,8 @@ function fakeEnv() {
         player.elo = Math.max(0, player.elo - delta);
         player.losses++;
       } else if (this.query.includes('INSERT INTO matches')) {
-        const [resultKey, , , , , delta] = this.values as [string, string, string, string, string, number];
-        matches.set(resultKey, { resultKey, eloDelta: delta });
+        const [resultKey, , p1, p2, , delta] = this.values as [string, string, string, string, string, number];
+        matches.set(resultKey, { resultKey, pair: pairKey(p1, p2), eloDelta: delta });
       } else {
         throw new Error(`Unexpected batch query: ${this.query}`);
       }
@@ -134,6 +142,20 @@ describe('RatingCoordinator', () => {
     expect(fake.players.get('p1-id')).toMatchObject({ elo: 1031, wins: 2 });
     expect(fake.players.get('p2-id')).toMatchObject({ elo: 969, losses: 2 });
     expect(fake.batchCount()).toBe(2);
+  });
+
+  it('stops moving ELO after the per-pair daily limit (anti-farming)', async () => {
+    const fake = fakeEnv();
+    const coordinator = new RatingCoordinator({} as DurableObjectState, fake.env);
+
+    for (let i = 0; i < RATED_PAIR_LIMIT; i++) {
+      await coordinator.applyResult({ ...result, matchId: `farm-${i}` });
+    }
+    const eloAfterLimit = fake.players.get('p1-id')!.elo;
+    const extra = await coordinator.applyResult({ ...result, matchId: 'farm-extra' });
+
+    expect(extra.delta).toBe(0);
+    expect(fake.players.get('p1-id')).toMatchObject({ elo: eloAfterLimit, wins: RATED_PAIR_LIMIT + 1 });
   });
 
   it('rejects player ids that do not match the two seats', async () => {

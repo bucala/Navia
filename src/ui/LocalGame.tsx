@@ -4,7 +4,7 @@ import type { Action, GameState } from '../game/types';
 import { errorText, useLang } from '../i18n';
 import { Board } from './Board';
 import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
-import { LogPanel } from './LogPanel';
+import { LogPanel, useLogPanelState } from './LogPanel';
 
 /** Hot-seat Pass & Play — two players on one device. */
 export function LocalGame() {
@@ -15,6 +15,7 @@ export function LocalGame() {
   const [handoff, setHandoff] = useState(false);
   const { toast, showToast } = useToast();
   const { diceEvent, shake } = useDiceFeedback(state);
+  const [logOpen, setLogOpen] = useLogPanelState();
 
   const dispatch = useCallback(
     (action: Action): boolean => {
@@ -38,8 +39,8 @@ export function LocalGame() {
 
   return (
     <div className={`flex min-h-0 min-w-0 flex-1 overflow-hidden ${shake ? 'shake' : ''}`}>
-      <Board state={state} dispatch={dispatch} viewpoint={state.active} canAct />
-      <LogPanel state={state} />
+      <Board state={state} dispatch={dispatch} viewpoint={state.active} canAct onShowLog={() => setLogOpen(true)} />
+      <LogPanel state={state} open={logOpen} onOpenChange={setLogOpen} />
 
       {toast && <Toast message={toast} />}
       <GameOverlays diceEvent={diceEvent} />

@@ -84,6 +84,12 @@ Hra bude obsahovať frakcie definované zadnou stranou karty (referencia na súb
   * *Typ:* Spell (Kúzlo)
   * *Schopnosti:* Vráti 1+ HP hráčovi. Jadrom je mechanika nekonečného hodu ("3+ ∞ krát ak nehodíš 6"). Hráč hádže kockou: pri 3,4,5 sa udelí poškodenie a hádže znova. Pri 1 alebo 2 sa reťaz ukončí bez postihu. Pri 6 sa reťaz ukončí a kúzlo zraní samotného hráča (Overload).
 
+* **Salamandra, Duch Výhne** — Vanguard, Common, 2 many, 2/3. Láva ∞ (útoky zapaľujú). Lacná zapaľovacia jednotka pre začiatok hry.
+* **Vták Ohnivák** — Sanctum, Rare, 3 many, 2/3. Letec + Láva ∞: preletí ponad predný voj a zapaľuje zadnú líniu.
+* **Meša, Agniho Baran** — Vanguard, Rare, 4 many, 3/5. Láva ∞; Kocka 4+ (1 mana): náraz zasiahne aj susedov cieľa v línii (cleave).
+
+> **Letec (Flying):** jednotka môže útočiť na nepriateľské jednotky v Sanctum aj vtedy, keď súperov Vanguard stojí. Nexus zostáva chránený predným vojom.
+
 ### Frakcia: Prírodný a Zemský Pakt (Obrana a Stabilita)
 
 * **Gorila** (finálna karta v `gorila_card.png`)

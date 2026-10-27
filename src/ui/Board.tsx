@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getCard, getUnitCard } from '../game/cards';
-import { effectiveThreshold, opponentOf } from '../game/engine';
+import { effectiveThreshold, opponentOf, wallBlocks } from '../game/engine';
 import type { Action, GameViewState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { CardArt } from './CardArt';
+import { CardBack } from './Card3D';
+import { CardPreview, deckSize, DrawPile, SpellBolt, usePreviewGesture, type PreviewTarget } from './BoardFx';
 import { ArmorIcon, AttackIcon, HpIcon, ManaIcon, NexusHeartIcon } from './icons';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx } from './useCombatFx';
@@ -25,6 +27,8 @@ interface Props {
   viewpoint: PlayerId;
   /** False while it's the opponent's turn (or an action awaits the server). */
   canAct: boolean;
+  /** Opens the match log; rendered in the player bar on phones only. */
+  onShowLog?: () => void;
 }
 
 function sameSlot(a: SlotRef, b: SlotRef): boolean {
@@ -34,8 +38,12 @@ function sameSlot(a: SlotRef, b: SlotRef): boolean {
 function ManaBar({ mana, maxMana, label }: { mana: number; maxMana: number; label: string }) {
   return (
     <div className="flex items-center gap-0.5" title={label}>
-      {Array.from({ length: maxMana }, (_, i) => (
-        <span key={i} className={`h-3 w-3 rotate-45 rounded-sm ${i < mana ? 'bg-cyan-400' : 'bg-slate-700'}`} />
+      {Array.from({ length: Math.max(mana, maxMana) }, (_, i) => (
+        // Pips past the cap are the going-second catch-up bonus.
+        <span
+          key={i}
+          className={`h-3 w-3 rotate-45 rounded-sm ${i >= maxMana ? 'bg-amber-400' : i < mana ? 'bg-cyan-400' : 'bg-slate-700'}`}
+        />
       ))}
       <span className="ml-1 text-xs text-cyan-300">
         {mana}/{maxMana}
@@ -44,16 +52,57 @@ function ManaBar({ mana, maxMana, label }: { mana: number; maxMana: number; labe
   );
 }
 
+/**
+ * Stable React keys for a hand: the nth copy of a card keeps its key when
+ * other cards leave, so only freshly drawn cards mount (and flip in). The
+ * seat is part of the key so a pass-and-play handoff re-deals the new hand.
+ */
+function stableHandKeys(seat: PlayerId, hand: string[]): string[] {
+  const seen = new Map<string, number>();
+  return hand.map((cardId) => {
+    const n = seen.get(cardId) ?? 0;
+    seen.set(cardId, n + 1);
+    return `${seat}:${cardId}#${n}`;
+  });
+}
+
+/** The opponent's hidden hand as a small fan of card backs. */
+function OpponentHand({ count, label }: { count: number; label: string }) {
+  const shown = Math.min(count, 7);
+  return (
+    <span className="flex items-center gap-1.5 text-xs text-slate-400" title={label}>
+      <span aria-hidden="true" className="relative flex h-7 items-end" style={{ width: `${12 + shown * 7}px` }}>
+        {Array.from({ length: shown }, (_, i) => {
+          const spread = shown > 1 ? i / (shown - 1) - 0.5 : 0;
+          return (
+            <span
+              key={i}
+              className="absolute bottom-0 h-6 w-[17px] origin-bottom overflow-hidden rounded-[3px]"
+              style={{ left: `${i * 7}px`, transform: `rotate(${spread * 28}deg) translateY(${Math.abs(spread) * 3}px)` }}
+            >
+              <CardBack />
+            </span>
+          );
+        })}
+      </span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
 /** The arena, rendered from the given seat's perspective. */
-export function Board({ state, dispatch, viewpoint, canAct }: Props) {
+export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) {
   const { t, lx } = useLang();
   const laneLabel = (lane: LaneId) => t(lane === 'vanguard' ? 'lane_vanguard' : 'lane_sanctum');
   const [selection, setSelection] = useState<Selection>({ mode: 'idle' });
   const me = state.players[viewpoint];
   const foe = state.players[opponentOf(viewpoint)];
   const foeHasVanguard = foe.lanes.vanguard.some((u) => u !== null);
-  const { fx, nexusFx } = useCombatFx(state);
+  const { fx, nexusFx, spell } = useCombatFx(state);
+  const [preview, setPreview] = useState<PreviewTarget | null>(null);
+  const previewGesture = usePreviewGesture(setPreview);
   const handScroll = useDragScroll<HTMLDivElement>();
+  const handKeys = stableHandKeys(viewpoint, me.hand);
 
   // Drop stale selections when the turn or seat changes.
   useEffect(() => setSelection({ mode: 'idle' }), [state.active, viewpoint]);
@@ -95,8 +144,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
   const isAttackTarget = (lane: LaneId, slot: number): boolean => {
     if (!foe.lanes[lane][slot]) return false;
     if (selectedHandCard?.type === 'spell') return canAffordSelected; // spells ignore the wall
-    if (selection.mode !== 'unit' || state.phase !== 'combat' || !selectedUnit?.ready) return false;
-    return lane === 'vanguard' || !foeHasVanguard;
+    if (selection.mode !== 'unit' || state.phase !== 'combat' || !selectedUnit?.ready || !selectedUnitCard) return false;
+    return !wallBlocks(foe, { kind: 'unit', lane }, selectedUnitCard);
   };
 
   const nexusTargetable =
@@ -169,7 +218,9 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
     const player = owner === 'me' ? me : foe;
     return (
       <div className="flex min-h-0 items-center justify-center gap-1 py-1 sm:gap-2">
-        <span className="w-8 shrink-0 text-right text-[8px] uppercase tracking-widest text-slate-500 sm:w-14 sm:text-[9px] md:w-16 lg:w-20 lg:text-[10px]">
+        {/* Vertical on phones so the label fits its narrow gutter; a dark pill keeps
+            it legible over the arena decorations behind it. */}
+        <span className="relative z-10 w-4 shrink-0 self-stretch overflow-hidden text-ellipsis whitespace-nowrap rotate-180 rounded bg-slate-950/70 py-0.5 text-center text-[7px] font-semibold uppercase tracking-tight text-slate-300 [writing-mode:vertical-rl] sm:w-14 sm:self-auto sm:rotate-0 sm:px-1 sm:py-0.5 sm:text-right sm:text-[9px] sm:tracking-widest sm:[writing-mode:horizontal-tb] md:w-16 lg:w-20 lg:text-[10px]">
           {laneLabel(lane)}
         </span>
         <div className="flex h-full min-h-0 flex-1 items-stretch justify-center gap-1 sm:gap-2">
@@ -193,6 +244,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
                 highlight={highlight}
                 enemySide={owner === 'foe'}
                 fx={fx[slotFxKey(player.id, lane, slot)]}
+                slotKey={slotFxKey(player.id, lane, slot)}
+                gestureProps={unit ? previewGesture({ cardId: unit.cardId, unit }) : undefined}
                 interactive={
                   canAct &&
                   (owner === 'me'
@@ -221,7 +274,8 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       <div className="flex shrink-0 items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-200">{foe.name}</span>
-          <span className="text-xs text-slate-400">🂠 {t('cards_in_hand', { n: foe.hand.length })}</span>
+          <OpponentHand count={foe.hand.length} label={t('cards_in_hand', { n: foe.hand.length })} />
+          <DrawPile count={deckSize(foe)} label={t('deck_pile', { n: deckSize(foe) })} />
         </div>
         <ManaBar mana={foe.mana} maxMana={foe.maxMana} label={t('mana_label', { m: foe.mana, max: foe.maxMana })} />
         <button
@@ -229,7 +283,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           onClick={clickFoeNexus}
           disabled={!nexusTargetable}
           aria-label={t('a11y_nexus', { name: foe.name, hp: foe.nexusHp })}
-          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${
+          className={`relative rounded-lg border px-3 py-1 text-sm font-bold ${nexusFx[foe.id]?.kind === 'damage' ? 'animate-hit' : ''} ${
             nexusTargetable
               ? 'cursor-pointer border-red-500 bg-red-950 text-red-200 ring-2 ring-red-500'
               : 'border-slate-700 bg-slate-900 text-red-300'
@@ -245,7 +299,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
       <div className="arena-bg flex flex-1 min-h-[8rem] flex-col justify-center relative overflow-hidden">
         {/* Environmental Battlefield Assets */}
         <img
-          src="/art/assets/rune_monolith.png"
+          src="/art/assets/rune_monolith.webp"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -253,7 +307,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           className="pointer-events-none absolute left-1 sm:left-4 top-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
-          src="/art/assets/mana_crystals.png"
+          src="/art/assets/mana_crystals.webp"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -261,7 +315,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           className="pointer-events-none absolute right-1 sm:right-4 top-4 h-20 sm:h-32 md:h-40 w-auto z-0 opacity-85 drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)]"
         />
         <img
-          src="/art/assets/battle_banner.png"
+          src="/art/assets/battle_banner.webp"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -269,7 +323,7 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           className="pointer-events-none absolute left-2 sm:left-6 bottom-3 h-24 sm:h-36 md:h-44 w-auto z-0 opacity-80 drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"
         />
         <img
-          src="/art/assets/rune_altar.png"
+          src="/art/assets/rune_altar.webp"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -366,12 +420,28 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
 
       {/* Player bar + hand */}
       <div className="relative flex min-h-[12rem] min-w-0 shrink grow-0 basis-[clamp(18rem,38dvh,24rem)] flex-col overflow-hidden border-t border-slate-800 bg-slate-950/60 px-4 py-2">
-        <div className="mb-2 flex shrink-0 items-center justify-between">
-          <span className="font-semibold text-slate-200">{me.name}</span>
+        <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="truncate font-semibold text-slate-200">{me.name}</span>
+            {onShowLog && (
+              <button
+                type="button"
+                onClick={onShowLog}
+                title={t('log_show')}
+                aria-label={t('log_show')}
+                className="shrink-0 rounded-md border border-slate-700 bg-slate-900 p-1 hover:bg-slate-800 lg:hidden"
+              >
+                <img src="/art/icons/icon-scroll.svg" alt="" aria-hidden="true" className="h-4 w-4" />
+              </button>
+            )}
+          </span>
           <ManaBar mana={me.mana} maxMana={me.maxMana} label={t('mana_label', { m: me.mana, max: me.maxMana })} />
-          <span className="relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300">
-            <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {me.nexusHp}</span>
-            <FloatingPopup popup={nexusFx[me.id]} className="-top-2" />
+          <span className="flex items-center gap-3">
+            <DrawPile count={deckSize(me)} label={t('deck_pile', { n: deckSize(me) })} />
+            <span className={`relative rounded-lg border border-slate-700 bg-slate-900 px-3 py-1 text-sm font-bold text-red-300 ${nexusFx[me.id]?.kind === 'damage' ? 'animate-hit' : ''}`}>
+              <span className="inline-flex items-center gap-1"><NexusHeartIcon className="h-3.5 w-3.5" /> {me.nexusHp}</span>
+              <FloatingPopup popup={nexusFx[me.id]} className="-top-2" />
+            </span>
           </span>
         </div>
         <div
@@ -382,14 +452,17 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
         >
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
-            <CardFace
-              key={`${cardId}-${i}`}
-              cardId={cardId}
-              selected={selection.mode === 'hand' && selection.index === i}
-              affordable={canAct && getCard(cardId).cost <= me.mana && state.phase === 'main'}
-              interactive={canAct && state.phase === 'main'}
-              onClick={() => clickHandCard(i)}
-            />
+            // `contents` keeps the flex layout; the wrapper only listens for the hold preview.
+            <div key={handKeys[i]} className="contents" {...previewGesture({ cardId }, { hover: false })}>
+              <CardFace
+                cardId={cardId}
+                dealDelayMs={200 + Math.min(i, 6) * 140}
+                selected={selection.mode === 'hand' && selection.index === i}
+                affordable={canAct && getCard(cardId).cost <= me.mana && state.phase === 'main'}
+                interactive={canAct && state.phase === 'main'}
+                onClick={() => clickHandCard(i)}
+              />
+            </div>
           ))}
         </div>
         {selectedHandCard && (
@@ -449,6 +522,9 @@ export function Board({ state, dispatch, viewpoint, canAct }: Props) {
           </div>
         </div>
       )}
+
+      <SpellBolt spell={spell} viewpoint={viewpoint} />
+      <CardPreview target={preview} />
     </div>
   );
 }

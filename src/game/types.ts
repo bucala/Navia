@@ -154,6 +154,7 @@ export type MsgKey =
   | 'gameStart'
   | 'turnStart'
   | 'fatigue'
+  | 'catchUpMana'
   | 'turnLimit'
   | 'turnTimedOut'
   | 'timeoutForfeit'
@@ -210,6 +211,11 @@ export interface GameState {
   active: PlayerId;
   /** Used for deterministic turn-limit tie breaking. */
   startingPlayer: PlayerId;
+  /**
+   * Bonus mana the player going second still has coming (+1 on each of
+   * their first turns). Missing on rooms persisted before the rule existed.
+   */
+  catchUpManaTurns?: number;
   turn: number;
   /** Set by the authoritative online room; omitted in local games. */
   turnDeadline?: number;

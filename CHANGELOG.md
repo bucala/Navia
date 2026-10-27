@@ -10,7 +10,49 @@ teda dočasne odkaz mať nemusí).
 
 ## [Unreleased]
 
+### Pridané
+- Tri nové karty Lávového dvora: **Salamandra, Duch Výhne**, **Vták Ohnivák**
+  a **Meša, Agniho Baran** (aj s artom, výrezom hlavy a príbehom v Sieni
+  Božstiev).
+- Kľúčové slovo **Letec** má reálny účinok: letec smie útočiť na jednotky v
+  Sanctum aj cez stojaci Vanguard (Nexus zostáva chránený).
+
+- Karty majú objem: pri otáčaní a naklápaní je vidieť pozlátenú hranu a
+  všetky karty majú jednotný rub (`frames/card-back.svg`). Nové karty v ruke
+  sa rozdajú rubom nahor a otočia sa, myšou sa karty nakláňajú, vyvolaná
+  jednotka sa na plochu „preklopí". Súperova ruka sa zobrazuje ako vejár rubov.
+- Sieň Božstiev: veľkú kartu možno ťahaním otáčať, ťuknutím alebo tlačidlom
+  prevrátiť a na desktope sa nakláňa za myšou. Zoznam používa výrezy hláv
+  v bronzových medailónoch (na mobile ako pás nad kartou) a obsahuje všetkých
+  19 kariet, nielen tie s napísaným príbehom.
+- Kúzla a útoky majú efekty: Pekelné zaklínadlo vyšle ohnivú strelu, ktorá
+  pri cieli vybuchne, zásah zbraňou zableskne a prekríži sa sekom a zranený
+  Nexus sa otrasie.
+- Ťahacie kôpky oboch hráčov ukazujú počet zostávajúcich kariet; ťahaná
+  karta priletí z kôpky do ruky a otočí sa lícom nahor.
+- Náhľad karty: podržaním prsta (alebo prejdením myšou cez jednotku na
+  ploche) sa zobrazí veľká karta s plným textom a aktuálnym HP/brnením.
+- Zvuky otočenia karty, rozdania, vyvolania jednotky a kúzla (procedurálne,
+  bez zvukových súborov).
+- Hlavné menu: logo pomaly pláva a z ohnivého nápisu stúpajú iskry.
+- Príbehy a kultúrne odkazy pre všetkých 19 kariet (pribudlo 8: Megadrak,
+  Pekelné zaklínadlo, Lávový škriatok, Kamenný strážca, Zlatý Gryf, Papagáj,
+  Bojový Kohút, Nebeský vrabec).
+
 ### Zmenené
+- Férový štart: začínajúci hráč v prvom ťahu neťahá kartu a hráč, ktorý ide
+  druhý, má v prvých dvoch ťahoch +1 manu navyše. V 4 000 simulovaných
+  AI-vs-AI hrách klesol podiel výhier začínajúceho hráča zo ~73 % na ~52 %.
+- Arty kariet a pozadia arény sú WebP v primeranom rozlíšení (18,6 MB →
+  1,8 MB); service worker ich ukladá do cache, takže fungujú aj offline.
+- Tajné kľúče hráčov sa v D1 ukladajú len ako SHA-256 hash (migrácia 0004,
+  staré účty sa prevedú pri najbližšom prihlásení). Zakladanie účtov je
+  limitované na IP, hráč má najviac 20 balíčkov a medzi tou istou dvojicou
+  hráčov sa ELO počíta len pre 3 zápasy za 24 hodín.
+- Na mobile sa priebeh zápasu otvára tlačidlom v lište hráča namiesto
+  plávajúceho tlačidla, ktoré prekrývalo karty v ruke. Popisky línií sú
+  čitateľné aj nad dekoráciami arény a Sieň Božstiev už nemá dve tlačidlá
+  MENU.
 - README zodpovedá verzii 0.12.1, aktuálnej architektúre s tromi Durable
   Objects, 93 testom, pravidlám férového začiatku, timeoutom, PWA a Android
   build postupu.
@@ -27,6 +69,10 @@ teda dočasne odkaz mať nemusí).
   tmavého panelu.
 
 ### Opravené
+- `@capacitor/android` aktualizovaný na 8.5.3 (kritická zraniteľnosť
+  GHSA-rvm3-566m-v7fv v 8.4.1).
+- Produkčný build vždy použije produkčný React, aj keď má shell nastavené
+  `NODE_ENV=development` (inak bol bundle o ~60 % väčší).
 - CSS používa platné JPG verzie textúry a arény namiesto poškodených PNG
   duplikátov, ktoré niektoré dekódery nedokázali načítať.
 - Ruka kariet už nerozširuje herný kontajner a jej vodorovný scrollbar je

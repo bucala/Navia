@@ -25,13 +25,13 @@ Kompletné pravidlá a pôvodný návrh sú v
 | Oblasť | Stav vo verzii 0.12.1 |
 | --- | --- |
 | Herný engine | Čistý TypeScript reducer, dve línie po štyroch slotoch, fázy Main/Combat, mana, brnenie, Nexus a D6 schopnosti. |
-| Férový začiatok | Náhodne vybraný prvý hráč, automatický mulligan nehrateľnej ruky a jedna karta navyše pre druhého hráča. |
+| Férový začiatok | Náhodne vybraný prvý hráč, automatický mulligan nehrateľnej ruky; začínajúci hráč v 1. ťahu neťahá, druhý hráč má kartu navyše a v prvých dvoch ťahoch +1 manu. |
 | Ukončenie zápasu | Zničenie Nexusu, rastúca únava po vyčerpaní balíčka alebo bezpečnostný limit 80 hráčskych ťahov. |
 | Herné režimy | AI, lokálny duel, súkromná online miestnosť s pozvánkou a rýchle online párovanie. |
 | Online autorita | `GameRoom` drží stav a generuje náhodu na serveri; každý hráč dostáva iba svoju privátnu ruku. |
 | Čas online ťahu | 90-sekundový limit, automatické ukončenie zmeškaného ťahu a prehra po druhom timeout-e. |
 | Profily | Meno, ELO, výhry/prehry, vlastné balíčky a rebríček v Cloudflare D1. |
-| Karty | 16 kariet z troch frakcií, vrátane Lavy, Kyseliny, Vyhubenia, Výhody, Berserkera, Agility a Lietania. |
+| Karty | 19 kariet z troch frakcií, vrátane Lavy, Kyseliny, Vyhubenia, Výhody, Berserkera, Agility a Lietania. |
 | Jazyk a prístupnosť | Slovenčina/angličtina, klávesnicové ovládanie, sémantické dialógy, live regions a rešpektovanie `prefers-reduced-motion`. |
 | PWA a Android | Inštalovateľná PWA s bezpečnou výzvou na aktualizáciu, offline app shell a Android wrapper s haptikou a šifrovaným úložiskom prihlasovacích údajov. |
 | Vizuál | Aktuálna kamenno-pergamenová identita, Navia runová značka a ilustrovaná aréna bez posúvania rozloženia pri výbere akcie. |
