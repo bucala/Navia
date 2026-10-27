@@ -187,6 +187,8 @@ export const STRINGS = {
   codex_prev: { sk: 'Predchádzajúca', en: 'Previous' },
   codex_next: { sk: 'Ďalšia', en: 'Next' },
   codex_mana: { sk: '💎 {n} many', en: '💎 {n} mana' },
+  preview_now: { sk: 'Teraz', en: 'Now' },
+  deck_pile: { sk: 'Balíček: {n} kariet', en: 'Deck: {n} cards' },
   codex_flip: { sk: 'Otočiť kartu', en: 'Flip the card' },
   codex_flip_hint: { sk: 'Potiahni kartu do strany alebo na ňu ťukni — otočí sa.', en: 'Drag the card sideways or tap it to turn it over.' },
   codex_card_front: { sk: 'Líce karty', en: 'Card front' },

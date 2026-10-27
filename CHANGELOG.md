@@ -25,6 +25,19 @@ teda dočasne odkaz mať nemusí).
   prevrátiť a na desktope sa nakláňa za myšou. Zoznam používa výrezy hláv
   v bronzových medailónoch (na mobile ako pás nad kartou) a obsahuje všetkých
   19 kariet, nielen tie s napísaným príbehom.
+- Kúzla a útoky majú efekty: Pekelné zaklínadlo vyšle ohnivú strelu, ktorá
+  pri cieli vybuchne, zásah zbraňou zableskne a prekríži sa sekom a zranený
+  Nexus sa otrasie.
+- Ťahacie kôpky oboch hráčov ukazujú počet zostávajúcich kariet; ťahaná
+  karta priletí z kôpky do ruky a otočí sa lícom nahor.
+- Náhľad karty: podržaním prsta (alebo prejdením myšou cez jednotku na
+  ploche) sa zobrazí veľká karta s plným textom a aktuálnym HP/brnením.
+- Zvuky otočenia karty, rozdania, vyvolania jednotky a kúzla (procedurálne,
+  bez zvukových súborov).
+- Hlavné menu: logo pomaly pláva a z ohnivého nápisu stúpajú iskry.
+- Príbehy a kultúrne odkazy pre všetkých 19 kariet (pribudlo 8: Megadrak,
+  Pekelné zaklínadlo, Lávový škriatok, Kamenný strážca, Zlatý Gryf, Papagáj,
+  Bojový Kohút, Nebeský vrabec).
 
 ### Zmenené
 - Férový štart: začínajúci hráč v prvom ťahu neťahá kartu a hráč, ktorý ide

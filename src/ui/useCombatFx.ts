@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import type { GameViewState, LaneId, PlayerId } from '../game/types';
-import { sfxHit } from './sfx';
+import { sfxHit, sfxSpell, sfxSummon } from './sfx';
 import { triggerAttackFeedback } from '../utils/haptics';
 
 export interface Popup {
@@ -18,6 +18,13 @@ export interface SlotFx {
   lunge?: boolean;
   hit?: boolean;
   popup?: Popup;
+}
+
+/** A spell bolt flying from the caster's side to the slots it damaged. */
+export interface SpellFx {
+  id: number;
+  caster: PlayerId;
+  targets: string[];
 }
 
 /** Key: `${playerId}:${lane}:${slot}` */
@@ -49,6 +56,7 @@ function snapshotUnits(state: GameViewState): Map<number, UnitSnapshot> {
 export function useCombatFx(state: GameViewState | null) {
   const [fx, setFx] = useState<FxMap>({});
   const [nexusFx, setNexusFx] = useState<Partial<Record<PlayerId, Popup>>>({});
+  const [spell, setSpell] = useState<SpellFx | null>(null);
   const prevRef = useRef<GameViewState | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
 
@@ -62,11 +70,15 @@ export function useCombatFx(state: GameViewState | null) {
 
     const nextFx: FxMap = {};
     const nextNexusFx: Partial<Record<PlayerId, Popup>> = {};
+    let spellEvent: { id: number; caster: PlayerId } | null = null;
 
     // Attacker lunge + target flash from the engine's attack events.
     const lastSeen = prev.log.length ? prev.log[prev.log.length - 1].id : 0;
     for (const event of state.log) {
-      if (event.id <= lastSeen || event.kind !== 'attack') continue;
+      if (event.id <= lastSeen) continue;
+      // Spells are only cast by the player on turn (they're main-phase plays).
+      if (event.kind === 'msg' && event.msgKey === 'spellCast') spellEvent = { id: event.id, caster: state.active };
+      if (event.kind !== 'attack') continue;
       const attackerKey = slotFxKey(event.player, event.from.lane, event.from.slot);
       nextFx[attackerKey] = { ...nextFx[attackerKey], lunge: true };
       if (event.target.kind === 'unit') {
@@ -90,6 +102,9 @@ export function useCombatFx(state: GameViewState | null) {
       nextFx[key] = { ...nextFx[key], hit: nextFx[key]?.hit || kind === 'damage', popup: { amount: Math.abs(delta), kind } };
     }
 
+    // Freshly summoned units (new uids) land with a thump.
+    const summoned = [...after.keys()].some((uid) => !before.has(uid));
+
     for (const id of ['p1', 'p2'] as const) {
       const delta = prev.players[id].nexusHp - state.players[id].nexusHp;
       if (delta > 0) {
@@ -99,6 +114,16 @@ export function useCombatFx(state: GameViewState | null) {
         nextNexusFx[id] = { amount: -delta, kind: 'heal' };
       }
     }
+
+    if (spellEvent) {
+      const casterSeat = spellEvent.caster;
+      const targets = Object.entries(nextFx)
+        .filter(([key, slot]) => slot.popup?.kind === 'damage' && !key.startsWith(`${casterSeat}:`))
+        .map(([key]) => key);
+      setSpell({ ...spellEvent, targets });
+      sfxSpell();
+    }
+    if (summoned) sfxSummon();
 
     if (Object.keys(nextFx).length === 0 && Object.keys(nextNexusFx).length === 0) return;
     if (maxDamage > 0) {
@@ -111,9 +136,10 @@ export function useCombatFx(state: GameViewState | null) {
     timer.current = setTimeout(() => {
       setFx({});
       setNexusFx({});
+      setSpell(null);
     }, 950);
   }, [state]);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  return { fx, nexusFx };
+  return { fx, nexusFx, spell };
 }

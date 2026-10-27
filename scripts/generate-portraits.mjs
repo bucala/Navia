@@ -6,7 +6,7 @@
  *   npm run portraits
  */
 import sharp from 'sharp';
-import { mkdir } from 'node:fs/promises';
+import { access, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,12 +32,22 @@ export const HEADS = {
   rysoslav: ['rysoslav', 0.47, 0.15, 0.28],
   opici_kral: ['wukong', 0.56, 0.23, 0.28],
   zlaty_gryf: ['zlaty_gryf', 0.57, 0.14, 0.28],
+  // Lava Court art generated in Canva (add the WebP files to public/art/).
+  salamandra: ['salamandra', 0.53, 0.18, 0.3],
+  ohnivak: ['ohnivak', 0.5, 0.18, 0.3],
+  mesha: ['mesha', 0.47, 0.17, 0.34],
 };
 
 async function main() {
   await mkdir(outDir, { recursive: true });
   for (const [cardId, [file, cx, cy, size]] of Object.entries(HEADS)) {
     const src = path.join(root, 'public/art', `${file}.webp`);
+    try {
+      await access(src);
+    } catch {
+      console.warn('skip', cardId, '— no art yet at', path.relative(root, src));
+      continue;
+    }
     const { width, height } = await sharp(src).metadata();
     const side = Math.round(size * width);
     const left = Math.min(Math.max(0, Math.round(cx * width - side / 2)), width - side);

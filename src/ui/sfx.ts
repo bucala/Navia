@@ -86,3 +86,51 @@ export function sfxFail(): void {
 export function sfxHit(): void {
   tone(170, 50, 0.16, 'triangle', 0.12);
 }
+
+/** Band-passed noise burst — paper, cloth and air sounds. */
+function noise(duration: number, freq: number, q: number, gain: number, when = 0, sweepTo?: number): void {
+  const ac = audio();
+  if (!ac) return;
+  const start = ac.currentTime + when;
+  const buffer = ac.createBuffer(1, Math.ceil(ac.sampleRate * duration), ac.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ac.createBufferSource();
+  src.buffer = buffer;
+  const filter = ac.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.Q.value = q;
+  filter.frequency.setValueAtTime(freq, start);
+  if (sweepTo) filter.frequency.exponentialRampToValueAtTime(sweepTo, start + duration);
+  const amp = ac.createGain();
+  amp.gain.setValueAtTime(0.0001, start);
+  amp.gain.exponentialRampToValueAtTime(gain, start + duration * 0.25);
+  amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  src.connect(filter).connect(amp).connect(ac.destination);
+  src.start(start);
+  src.stop(start + duration + 0.02);
+}
+
+/** A card turning over: a quick paper swish. */
+export function sfxCardFlip(): void {
+  noise(0.16, 2400, 1.4, 0.09, 0, 900);
+}
+
+/** A card sliding off the draw pile. */
+export function sfxDeal(): void {
+  noise(0.1, 3600, 2, 0.05);
+  tone(900, 700, 0.04, 'triangle', 0.02, 0.05);
+}
+
+/** A unit slammed onto the board: low thump with a magical shimmer. */
+export function sfxSummon(): void {
+  tone(130, 55, 0.22, 'sine', 0.16);
+  noise(0.12, 500, 0.8, 0.06);
+  tone(880, 1320, 0.25, 'sine', 0.025, 0.06);
+}
+
+/** A spell bolt whooshing toward its target. */
+export function sfxSpell(): void {
+  noise(0.45, 600, 1.2, 0.08, 0, 3000);
+  tone(220, 660, 0.35, 'sawtooth', 0.025);
+}

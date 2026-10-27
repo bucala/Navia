@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { useLang } from '../i18n';
 import { Card3D, prefersReducedMotion } from './Card3D';
+import { sfxCardFlip } from './sfx';
 
 /** Degrees of spin per pixel dragged. */
 const DRAG_SPEED = 0.6;
@@ -34,6 +35,7 @@ export function CodexCard({ front, resetKey }: { front: ReactNode; resetKey: str
   };
 
   const settle = (next: number) => {
+    if (Math.round(next / 180) !== Math.round(angle.current / 180)) sfxCardFlip();
     angle.current = next;
     card()?.classList.remove('card3d--dragging', 'card3d--tracking');
     apply(next);

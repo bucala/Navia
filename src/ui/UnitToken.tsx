@@ -1,3 +1,4 @@
+import type { DOMAttributes } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getUnitCard } from '../game/cards';
 import type { Faction, UnitState } from '../game/types';
@@ -31,10 +32,14 @@ interface Props {
   fx?: SlotFx;
   onClick?: () => void;
   interactive?: boolean;
+  /** `${player}:${lane}:${slot}` — lets board effects (spell bolts) find this slot. */
+  slotKey?: string;
+  /** Hold/hover preview handlers from Board. */
+  gestureProps?: DOMAttributes<HTMLButtonElement>;
 }
 
 /** One recessed stone slot in a lane — empty, or holding an animated unit. */
-export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, interactive = false }: Props) {
+export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, interactive = false, slotKey, gestureProps }: Props) {
   const { lx, t } = useLang();
   const card = unit ? getUnitCard(unit.cardId) : null;
   const fxClasses = [
@@ -63,8 +68,13 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, inte
   return (
     <button
       type="button"
-      onClick={onClick}
-      disabled={!interactive}
+      data-slot={slotKey}
+      {...(unit ? gestureProps : undefined)}
+      // aria-disabled instead of `disabled`: disabled buttons swallow pointer
+      // events, and every occupied slot must still answer the hold preview.
+      onClick={interactive ? onClick : undefined}
+      aria-disabled={!interactive}
+      tabIndex={interactive ? undefined : -1}
       aria-label={action ? `${description}. ${action}` : description}
       aria-pressed={highlight === 'selected'}
       className={`slot-alcove relative h-full min-h-0 min-w-0 aspect-[4/5] w-auto max-w-[4rem] flex-none rounded-lg bg-slate-950/70 shadow-[inset_0_2px_10px_rgba(0,0,0,0.75)] transition sm:max-w-[5rem] md:max-w-[5.75rem] lg:max-w-[7rem] ${HIGHLIGHT_RING[highlight]}`}
@@ -103,6 +113,7 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, inte
         )}
       </AnimatePresence>
 
+      {fx?.hit && <span className="impact-burst" aria-hidden="true" />}
       <FloatingPopup popup={fx?.popup} className="top-1" />
     </button>
   );

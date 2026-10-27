@@ -5,6 +5,7 @@ import { useLang } from '../i18n';
 import { CardArt } from './CardArt';
 import { Card3D, prefersReducedMotion, useCardTilt } from './Card3D';
 import { ArmorIcon, AttackIcon, HpIcon } from './icons';
+import { sfxCardFlip, sfxDeal } from './sfx';
 
 const FACTION_BG: Record<Faction, string> = {
   lava: 'from-red-950 to-orange-950',
@@ -34,7 +35,11 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick,
 
   useEffect(() => {
     if (revealed) return;
-    const timer = setTimeout(() => setRevealed(true), dealDelayMs);
+    sfxDeal();
+    const timer = setTimeout(() => {
+      setRevealed(true);
+      sfxCardFlip();
+    }, dealDelayMs);
     return () => clearTimeout(timer);
   }, [revealed, dealDelayMs]);
 
@@ -74,14 +79,19 @@ export function CardFace({ cardId, selected = false, affordable = true, onClick,
   return (
     <button
       type="button"
-      onClick={onClick}
-      disabled={!interactive}
+      onClick={interactive ? onClick : undefined}
+      // Not `disabled`: the hand's hold-to-preview needs pointer events.
+      aria-disabled={!interactive}
+      tabIndex={interactive ? undefined : -1}
       aria-pressed={selected}
       aria-label={`${lx(card.name)}. ${t('a11y_card_cost', { n: card.cost })}. ${lx(card.text)}`}
       title={lx(card.text)}
       onPointerMove={tilt.onPointerMove}
       onPointerLeave={tilt.onPointerLeave}
-      className={`relative h-full min-h-16 max-w-48 aspect-[5/7] shrink-0 origin-bottom rounded-xl transition-transform duration-300 ${
+      // A dealt card starts up by the draw pile (player bar, top right) and
+      // slides into place while it turns face-up.
+      style={revealed ? undefined : { transform: 'translate(70%, -60%) rotate(12deg) scale(0.6)' }}
+      className={`relative h-full min-h-16 max-w-48 aspect-[5/7] shrink-0 origin-bottom rounded-xl transition-transform ${revealed ? 'duration-500' : 'duration-0'} ${
         selected
           ? '-translate-y-4 scale-110 z-20'
           : 'hover:-translate-y-2 hover:scale-105 hover:z-10'
