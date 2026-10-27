@@ -33,9 +33,9 @@ export const HEADS = {
   opici_kral: ['wukong', 0.56, 0.23, 0.28],
   zlaty_gryf: ['zlaty_gryf', 0.57, 0.14, 0.28],
   // Lava Court art generated in Canva (add the WebP files to public/art/).
-  salamandra: ['salamandra', 0.53, 0.18, 0.3],
+  salamandra: ['salamandra', 0.5, 0.17, 0.33],
   ohnivak: ['ohnivak', 0.5, 0.18, 0.3],
-  mesha: ['mesha', 0.47, 0.17, 0.34],
+  mesha: ['mesha', 0.49, 0.17, 0.44],
 };
 
 async function main() {

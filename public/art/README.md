@@ -3,8 +3,8 @@
 > Rámy kariet/plochy a značka hry sú samostatne v [`frames/`](frames/README.md)
 > a [`branding/`](branding/README.md) — tento README je len o postavičkách nižšie.
 
-Finálne AI obrázky (extrahované zo zadania) sú nasadené pre 10 postáv;
-zvyšných 6 kariet používa vygenerované placeholder „astrálne erby" a 3 nové lávové karty zatiaľ emoji —
+Finálne AI obrázky sú nasadené pre 13 postáv;
+zvyšných 6 kariet používa vygenerované placeholder „astrálne erby" —
 prepíš ich súbormi s rovnakým názvom (WebP, pomer na výšku 7:9, šírka 640 px)
 a hra ich zobrazí automaticky.
 
@@ -22,6 +22,9 @@ a hra ich zobrazí automaticky.
 | `rysoslav.webp` | Rysí šaman s runovou palicou medzi idolmi | Rysoslav, Žrec Perúna |
 | `megadrak.webp` | Červený drak (art `c7deec0195a7d165ee970e497641b1f5.jpg`) | Megadrak |
 | `bojovy_kohut.webp` | Bojový kohút s krídlami (art `552d16af...jpg`) | Bojový Kohút |
+| `salamandra.webp` | Jašterí kováč s lávovými šupinami a kladivom vo výhni | Salamandra, Duch Výhne |
+| `ohnivak.webp` | Ohnivý vták v zlatej zbroji nad slovanským hradiskom | Vták Ohnivák |
+| `mesha.webp` | Baraní bojovník v plameňoch pred Agniho chrámom | Meša, Agniho Baran |
 
 ## Zvyšné karty (art sa doplní neskôr)
 
@@ -33,9 +36,6 @@ a hra ich zobrazí automaticky.
 | `lavovy_skriatok.webp` | Lávový škriatok |
 | `kamenny_strazca.webp` | Kamenný strážca |
 | `nebesky_vrabec.webp` | Nebeský vrabec |
-| `salamandra.webp` | Salamandra, Duch Výhne — *art chýba, zobrazí sa emoji* |
-| `ohnivak.webp` | Vták Ohnivák — *art chýba, zobrazí sa emoji* |
-| `mesha.webp` | Meša, Agniho Baran — *art chýba, zobrazí sa emoji* |
 
 ## Portréty (výrezy hláv)
 

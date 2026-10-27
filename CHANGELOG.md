@@ -12,8 +12,8 @@ teda dočasne odkaz mať nemusí).
 
 ### Pridané
 - Tri nové karty Lávového dvora: **Salamandra, Duch Výhne**, **Vták Ohnivák**
-  a **Meša, Agniho Baran** (aj s príbehmi v Sieni Božstiev). Arty zatiaľ
-  chýbajú — zobrazí sa emoji.
+  a **Meša, Agniho Baran** (aj s artom, výrezom hlavy a príbehom v Sieni
+  Božstiev).
 - Kľúčové slovo **Letec** má reálny účinok: letec smie útočiť na jednotky v
   Sanctum aj cez stojaci Vanguard (Nexus zostáva chránený).
 
