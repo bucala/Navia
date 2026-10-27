@@ -9,6 +9,12 @@ export const MAX_MANA = 10;
 export const STARTING_HAND = 4;
 /** The player going second receives one extra opening card. */
 export const SECOND_PLAYER_HAND_BONUS = 1;
+/**
+ * …and +1 temporary mana on each of their first this-many turns, while the
+ * starting player skips the draw on turn one. Tuned with AI-vs-AI
+ * simulations: without it the starting player won ~73 % of games, with it ~52 %.
+ */
+export const SECOND_PLAYER_CATCH_UP_TURNS = 2;
 /** Automatic mulligan guarantees a card playable by turn two when possible. */
 export const OPENING_PLAYABLE_COST = 2;
 /** Safety cap for pathological stalled games (counts individual player turns). */

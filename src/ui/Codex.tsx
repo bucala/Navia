@@ -73,12 +73,7 @@ export function Codex({ onBack }: { onBack: () => void }) {
       {/* Detail */}
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-slate-950/30">
         <div className="mx-auto w-full max-w-4xl p-4 md:p-8">
-          <div className="mb-4 flex items-center justify-between md:hidden">
-            <button onClick={onBack} className="navia-back-btn">
-              {t('header_menu')}
-            </button>
-          </div>
-
+          {/* No in-page back button on phones — the header's MENU button is always there. */}
           <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6 md:gap-8 w-full">
             {/* Beautiful Large Full Character Card */}
             <div

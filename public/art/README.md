@@ -4,34 +4,37 @@
 > a [`branding/`](branding/README.md) — tento README je len o postavičkách nižšie.
 
 Finálne AI obrázky (extrahované zo zadania) sú nasadené pre 10 postáv;
-zvyšných 6 kariet používa vygenerované placeholder „astrálne erby" —
-prepíš ich súbormi s rovnakým názvom (pomer na výšku, ~1024 px šírka)
+zvyšných 6 kariet používa vygenerované placeholder „astrálne erby" a 3 nové lávové karty zatiaľ emoji —
+prepíš ich súbormi s rovnakým názvom (WebP, pomer na výšku 7:9, šírka 640 px)
 a hra ich zobrazí automaticky.
 
 ## Dodané party (postavy z chatu)
 
 | Súbor | Postava | Karta |
 | --- | --- | --- |
-| `wukong.jpg` | Opičí kráľ so zlatou palicou a ohnivým drakom | Wukong, Opičí Kráľ |
-| `gorila.jpg` | Obrnený sivý opičí titan v zlatej zbroji | Mahákapi, Obrnený Titan |
-| `khadga.jpg` | Nosorožec so štítom pred chrámami Angkoru | Khadga, Štít Chrámu |
-| `cuauhtli.jpg` | Orlí bojovník s aztéckymi motívmi v ruinách | Cuauhtli, Orlí Rytier |
-| `medvebor.jpg` | Medvedí bojovník v slovanskej zbroji s kolovratom | Medvebor, Velesov Šampión |
-| `mahisa.jpg` | Byvolí bojovník s tyrkysmi pred chrámovými ruinami | Mahiša, Chrámový Býk |
-| `chepri.jpg` | Chrobačí bojovník so skarabejským pancierom v džungli | Chepri, Skarabejský Strážca |
-| `rysoslav.jpg` | Rysí šaman s runovou palicou medzi idolmi | Rysoslav, Žrec Perúna |
-| `megadrak.jpg` | Červený drak (art `c7deec0195a7d165ee970e497641b1f5.jpg`) | Megadrak |
-| `bojovy_kohut.jpg` | Bojový kohút s krídlami (art `552d16af...jpg`) | Bojový Kohút |
+| `wukong.webp` | Opičí kráľ so zlatou palicou a ohnivým drakom | Wukong, Opičí Kráľ |
+| `gorila.webp` | Obrnený sivý opičí titan v zlatej zbroji | Mahákapi, Obrnený Titan |
+| `khadga.webp` | Nosorožec so štítom pred chrámami Angkoru | Khadga, Štít Chrámu |
+| `cuauhtli.webp` | Orlí bojovník s aztéckymi motívmi v ruinách | Cuauhtli, Orlí Rytier |
+| `medvebor.webp` | Medvedí bojovník v slovanskej zbroji s kolovratom | Medvebor, Velesov Šampión |
+| `mahisa.webp` | Byvolí bojovník s tyrkysmi pred chrámovými ruinami | Mahiša, Chrámový Býk |
+| `chepri.webp` | Chrobačí bojovník so skarabejským pancierom v džungli | Chepri, Skarabejský Strážca |
+| `rysoslav.webp` | Rysí šaman s runovou palicou medzi idolmi | Rysoslav, Žrec Perúna |
+| `megadrak.webp` | Červený drak (art `c7deec0195a7d165ee970e497641b1f5.jpg`) | Megadrak |
+| `bojovy_kohut.webp` | Bojový kohút s krídlami (art `552d16af...jpg`) | Bojový Kohút |
 
 ## Zvyšné karty (art sa doplní neskôr)
 
 | Súbor | Karta |
 | --- | --- |
-| `papagaj.jpg` | Papagáj |
-| `zlaty_gryf.jpg` | Zlatý Gryf |
-| `pekelne_zaklinadlo.jpg` | Pekelné zaklínadlo |
-| `lavovy_skriatok.jpg` | Lávový škriatok |
-| `kamenny_strazca.jpg` | Kamenný strážca |
-| `nebesky_vrabec.jpg` | Nebeský vrabec |
+| `papagaj.webp` | Papagáj |
+| `zlaty_gryf.webp` | Zlatý Gryf |
+| `pekelne_zaklinadlo.webp` | Pekelné zaklínadlo |
+| `lavovy_skriatok.webp` | Lávový škriatok |
+| `kamenny_strazca.webp` | Kamenný strážca |
+| `nebesky_vrabec.webp` | Nebeský vrabec |
+| `salamandra.webp` | Salamandra, Duch Výhne — *art chýba, zobrazí sa emoji* |
+| `ohnivak.webp` | Vták Ohnivák — *art chýba, zobrazí sa emoji* |
+| `mesha.webp` | Meša, Agniho Baran — *art chýba, zobrazí sa emoji* |
 
 Neskôr sa tieto súbory presunú do Cloudflare R2 (viď GDD §5.2).

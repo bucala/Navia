@@ -1,10 +1,11 @@
 // Replaced after each production build so every release installs a fresh SW.
 const CACHE_NAME = 'navia-app-__NAVIA_BUILD_ID__';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-32.png'];
-// Only build-hashed static assets are runtime-cached — arbitrary paths and
-// query variants must never fill storage.
-const RUNTIME_ASSET_PATH = /^\/(assets|icons)\/[^?]+$/;
-const MAX_RUNTIME_ENTRIES = 100;
+// Only static assets are runtime-cached — arbitrary paths and query variants
+// must never fill storage. Art isn't build-hashed, but the cache name changes
+// with every release, so a redeploy always refetches it.
+const RUNTIME_ASSET_PATH = /^\/(assets|icons|art)\/[^?]+$/;
+const MAX_RUNTIME_ENTRIES = 150;
 
 async function cachePut(cache, request, response) {
   await cache.put(request, response);

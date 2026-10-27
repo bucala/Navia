@@ -43,9 +43,24 @@ describe('game setup and turn flow', () => {
     expect(g.players.p1.nexusHp).toBe(30);
     expect(g.players.p2.nexusHp).toBe(30);
     expect(g.players.p1.maxMana).toBe(1);
-    expect(g.players.p1.hand).toHaveLength(5); // 4 starting + 1 drawn
+    expect(g.players.p1.hand).toHaveLength(4); // 4 starting, no turn-one draw for the starter
     expect(g.players.p2.hand).toHaveLength(5); // one extra opening card for going second
     expect(g.startingPlayer).toBe('p1');
+  });
+
+  it('gives the player going second +1 mana on their first two turns only', () => {
+    let g = newGame();
+    g = applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random);
+    expect(g.players.p2.maxMana).toBe(1);
+    expect(g.players.p2.mana).toBe(2);
+    g = applyAction(g, { type: 'END_TURN', player: 'p2' }, Math.random);
+    expect(g.players.p1.mana).toBe(2); // the starter never gets the bonus
+    g = applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random);
+    expect(g.players.p2.mana).toBe(3);
+    g = applyAction(g, { type: 'END_TURN', player: 'p2' }, Math.random);
+    g = applyAction(g, { type: 'END_TURN', player: 'p1' }, Math.random);
+    expect(g.players.p2.mana).toBe(3); // bonus spent: plain 3/3
+    expect(g.players.p2.maxMana).toBe(3);
   });
 
   it('randomizes which seat takes the first turn', () => {
@@ -128,6 +143,27 @@ describe('combat and the vanguard wall', () => {
         Math.random,
       ),
     ).toThrow('wallProtects');
+  });
+
+  it('lets flyers strike sanctum units over the wall, but never the nexus', () => {
+    let g = newGame();
+    place(g, 'p1', 'sanctum', 0, 'nebesky_vrabec'); // flying, attack 2
+    place(g, 'p2', 'vanguard', 0, 'kamenny_strazca');
+    place(g, 'p2', 'sanctum', 1, 'zlaty_gryf');
+    g = inCombat(g);
+    expect(() =>
+      applyAction(
+        g,
+        { type: 'ATTACK', player: 'p1', attacker: { lane: 'sanctum', slot: 0 }, target: { kind: 'nexus', player: 'p2' }, useDice: false },
+        Math.random,
+      ),
+    ).toThrow('wallProtects');
+    g = applyAction(
+      g,
+      { type: 'ATTACK', player: 'p1', attacker: { lane: 'sanctum', slot: 0 }, target: { kind: 'unit', player: 'p2', lane: 'sanctum', slot: 1 }, useDice: false },
+      Math.random,
+    );
+    expect(g.players.p2.lanes.sanctum[1]?.hp).toBe(getUnitCard('zlaty_gryf').maxHp - 2);
   });
 
   it('armor absorbs damage before HP', () => {

@@ -10,7 +10,27 @@ teda dočasne odkaz mať nemusí).
 
 ## [Unreleased]
 
+### Pridané
+- Tri nové karty Lávového dvora: **Salamandra, Duch Výhne**, **Vták Ohnivák**
+  a **Meša, Agniho Baran** (aj s príbehmi v Sieni Božstiev). Arty zatiaľ
+  chýbajú — zobrazí sa emoji.
+- Kľúčové slovo **Letec** má reálny účinok: letec smie útočiť na jednotky v
+  Sanctum aj cez stojaci Vanguard (Nexus zostáva chránený).
+
 ### Zmenené
+- Férový štart: začínajúci hráč v prvom ťahu neťahá kartu a hráč, ktorý ide
+  druhý, má v prvých dvoch ťahoch +1 manu navyše. V 4 000 simulovaných
+  AI-vs-AI hrách klesol podiel výhier začínajúceho hráča zo ~73 % na ~52 %.
+- Arty kariet a pozadia arény sú WebP v primeranom rozlíšení (18,6 MB →
+  1,8 MB); service worker ich ukladá do cache, takže fungujú aj offline.
+- Tajné kľúče hráčov sa v D1 ukladajú len ako SHA-256 hash (migrácia 0004,
+  staré účty sa prevedú pri najbližšom prihlásení). Zakladanie účtov je
+  limitované na IP, hráč má najviac 20 balíčkov a medzi tou istou dvojicou
+  hráčov sa ELO počíta len pre 3 zápasy za 24 hodín.
+- Na mobile sa priebeh zápasu otvára tlačidlom v lište hráča namiesto
+  plávajúceho tlačidla, ktoré prekrývalo karty v ruke. Popisky línií sú
+  čitateľné aj nad dekoráciami arény a Sieň Božstiev už nemá dve tlačidlá
+  MENU.
 - README zodpovedá verzii 0.12.1, aktuálnej architektúre s tromi Durable
   Objects, 93 testom, pravidlám férového začiatku, timeoutom, PWA a Android
   build postupu.
@@ -27,6 +47,10 @@ teda dočasne odkaz mať nemusí).
   tmavého panelu.
 
 ### Opravené
+- `@capacitor/android` aktualizovaný na 8.5.3 (kritická zraniteľnosť
+  GHSA-rvm3-566m-v7fv v 8.4.1).
+- Produkčný build vždy použije produkčný React, aj keď má shell nastavené
+  `NODE_ENV=development` (inak bol bundle o ~60 % väčší).
 - CSS používa platné JPG verzie textúry a arény namiesto poškodených PNG
   duplikátov, ktoré niektoré dekódery nedokázali načítať.
 - Ruka kariet už nerozširuje herný kontajner a jej vodorovný scrollbar je

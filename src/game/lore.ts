@@ -101,6 +101,39 @@ export const LORE: LoreEntry[] = [
       en: 'Legend says that when his tribe fled the archers, he stretched himself across the river and let a thousand monkeys run over his own back. His bones, they say, have been hard as stone ever since. Mahakapi now stands in the vanguard cast in golden armor, the smoke of offering fires curling around his shoulders. He does not strike out of anger — he defends. And when he makes his defensive roll, fate offers him two dice out of respect.',
     },
   },
+  {
+    cardId: 'salamandra',
+    culture: {
+      sk: 'Európska alchýmia — Paracelsus (16. storočie) opísal salamandru ako elementála ohňa, bytosť, ktorá žije v plameňoch a nespáli sa. Kováči verili, že prebýva v srdci každej výhne.',
+      en: 'European alchemy — Paracelsus (16th century) described the salamander as the elemental of fire, a creature that lives in flames without burning. Smiths believed one dwelt in the heart of every forge.',
+    },
+    story: {
+      sk: 'Keď kováč Lávového dvora prvýkrát roztavil kameň z hory Pantheonu, z taveniny vyliezla jašterica s chvostom zo žeravého uhlia. Odvtedy neodišla. Salamandra nie je veľká ani mocná — ale kam sa dotkne, tam sa oheň chytí, a ten oheň už nikto neuhasí.',
+      en: 'When a smith of the Lava Court first melted stone from the Pantheon mountain, a lizard with a tail of glowing coal crawled out of the melt. It never left. The Salamander is neither large nor mighty — but whatever it touches catches fire, and that fire no one can put out.',
+    },
+  },
+  {
+    cardId: 'ohnivak',
+    culture: {
+      sk: 'Slovanské rozprávky — Vták Ohnivák s perím, ktoré svieti ako slnko, je cieľom kráľovských synov v slovenských aj ruských rozprávkach (Žar-ptica). Jediné jeho pero dokáže rozžiariť celú komnatu.',
+      en: 'Slavic folk tales — the Firebird, whose feathers shine like the sun, is the quarry of royal princes in Slovak and Russian tales (Zhar-ptitsa). A single feather can light an entire hall.',
+    },
+    story: {
+      sk: 'Kradol zlaté jablká z kráľovskej záhrady, až kým ho najmladší kráľovič nechytil za chvost. Pero mu ostalo v ruke a vták odletel — rovno do astrálnych arén Pantheonu. Tam už nekradne. Preletí ponad predný voj a tam, kam padne jeho iskra, zostane horieť zadná línia nepriateľa.',
+      en: 'It stole golden apples from the royal garden until the youngest prince caught it by the tail. A feather stayed in his hand and the bird flew off — straight into the astral arenas of the Pantheon. It steals no more. It soars over the vanguard, and wherever its spark falls, the enemy’s back line is left burning.',
+    },
+  },
+  {
+    cardId: 'mesha',
+    culture: {
+      sk: 'Hinduistická mytológia — Agni, boh ohňa a obetného plameňa, jazdí na baranovi (méša v sanskrte). Baran je jeho vahanou, posvätným nosičom, a symbolom obetnej sily.',
+      en: 'Hindu mythology — Agni, god of fire and the sacrificial flame, rides a ram (mesha in Sanskrit). The ram is his vahana, his sacred mount, and a symbol of the offering’s power.',
+    },
+    story: {
+      sk: 'Agni posiela do arény svojho barana vždy, keď obetný oheň horí príliš slabo. Meša nemá rohy z kosti, ale z rozžeraveného bronzu, a keď sa rozbehne, za ním ostáva brázda žiary. Jeho náraz neprerazí len jedného nepriateľa — plamene sa rozlejú po celej línii.',
+      en: 'Agni sends his ram into the arena whenever the sacrificial fire burns too low. Mesha’s horns are not bone but glowing bronze, and when he charges, a furrow of embers trails behind him. His charge does not break just one foe — the flames spill along the whole line.',
+    },
+  },
 ];
 
 export function getLore(cardId: string): LoreEntry | undefined {

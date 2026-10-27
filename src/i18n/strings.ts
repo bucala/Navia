@@ -55,8 +55,8 @@ export const STRINGS = {
   },
   rules_mana_title: { sk: '💧 Ťah a mana', en: '💧 Turns & Mana' },
   rules_mana_body: {
-    sk: 'Na začiatku každého tvojho ťahu dostaneš +1 maximálnu manu (až do 10) a manu si doplníš naplno. Za manu vykladáš karty z ruky.',
-    en: 'At the start of each of your turns you gain +1 maximum mana (up to 10) and it refills fully. You spend mana to play cards from your hand.',
+    sk: 'Na začiatku každého tvojho ťahu dostaneš +1 maximálnu manu (až do 10) a manu si doplníš naplno. Za manu vykladáš karty z ruky. Férový štart: kto začína, v prvom ťahu neťahá kartu; kto ide druhý, má o kartu viac a v prvých dvoch ťahoch +1 manu navyše.',
+    en: 'At the start of each of your turns you gain +1 maximum mana (up to 10) and it refills fully. You spend mana to play cards from your hand. Fair start: whoever goes first skips their first draw; whoever goes second gets an extra card and +1 bonus mana on their first two turns.',
   },
   rules_phases_body: {
     sk: 'Ťah má dve fázy: v Hlavnej fáze vykladáš karty na plochu, v Bojovej fáze útočíš pripravenými jednotkami. Novo povolaná jednotka je pripravená útočiť až od tvojho ďalšieho ťahu.',
@@ -64,8 +64,8 @@ export const STRINGS = {
   },
   rules_lanes_title: { sk: '🛡️ Taktické línie', en: '🛡️ Tactical Lanes' },
   rules_lanes_body: {
-    sk: 'Každý hráč má dve línie: Vanguard vpredu a Sanctum vzadu. Kým má súper aspoň jednu jednotku vo Vanguarde, nemôžeš útočiť na jeho Sanctum ani na jeho Nexus — najprv musíš prebiť predný voj.',
-    en: 'Each player has two lanes: Vanguard in front and Sanctum behind it. As long as the opponent has at least one unit in the Vanguard, you cannot attack their Sanctum or Nexus — you must break through the front line first.',
+    sk: 'Každý hráč má dve línie: Vanguard vpredu a Sanctum vzadu. Kým má súper aspoň jednu jednotku vo Vanguarde, nemôžeš útočiť na jeho Sanctum ani na jeho Nexus — najprv musíš prebiť predný voj. Výnimkou sú Letci a kúzla, ktoré zasiahnu aj Sanctum.',
+    en: 'Each player has two lanes: Vanguard in front and Sanctum behind it. As long as the opponent has at least one unit in the Vanguard, you cannot attack their Sanctum or Nexus — you must break through the front line first. Flyers and spells are the exception: they can reach the Sanctum.',
   },
   rules_dice_title: { sk: '⚄ Božský hod kockou', en: '⚄ The Divine Dice Roll' },
   rules_dice_body: {
@@ -86,7 +86,7 @@ export const STRINGS = {
   rules_kw_pest: { sk: 'Vyhubenie — okamžite zabíja tokeny (jednotky s 1 HP), ignoruje ich štíty.', en: 'Extermination — instantly kills tokens (1 HP units), ignoring their shields.' },
   rules_kw_agile: { sk: 'Agilná — raz za ťah sa počas boja môže presunúť medzi Vanguardom a Sanctom.', en: 'Agile — once per turn during combat it may hop between Vanguard and Sanctum.' },
   rules_kw_berserker: { sk: 'Berserker — čím menej HP mu zostáva, tým nižšie číslo potrebuje na kocke.', en: 'Berserker — the less HP it has left, the lower the number it needs on the die.' },
-  rules_kw_flying: { sk: 'Letec — jednotka Nebeského zboru patriaca do Sanctum.', en: 'Flyer — a Celestial Chorus unit that belongs in the Sanctum.' },
+  rules_kw_flying: { sk: 'Letec — preletí ponad predný voj: smie útočiť na jednotky v Sanctum, aj keď súperov Vanguard stojí. Nexus zostáva chránený.', en: "Flyer — soars over the vanguard: may attack Sanctum units even while the opponent's Vanguard stands. The Nexus stays protected." },
   rules_win_title: { sk: '🏆 Víťazstvo', en: '🏆 Victory' },
   rules_win_body: {
     sk: 'Zápas končí, keď niektorému hráčovi klesne Nexus na 0 HP, keď vyčerpá balíček a podľahne únave, alebo pri bezpečnostnom limite 80 ťahov. V online hre sa po dvoch vypršaniach času zápas vzdáva.',
@@ -230,6 +230,7 @@ export const STRINGS = {
   // ── Engine log messages ──
   log_gameStart: { sk: 'Zápas začína — na ťahu je {player}.', en: 'The match begins — {player} goes first.' },
   log_turnStart: { sk: 'Ťah {n} — na rade je {player}.', en: 'Turn {n} — {player} is up.' },
+  log_catchUpMana: { sk: '✨ {player} ide druhý a získava v tomto ťahu +1 manu navyše.', en: '✨ {player} goes second and gains +1 extra mana this turn.' },
   log_fatigue: { sk: '💀 {player} nemá čo ťahať a utrpí {n} únavy.', en: '💀 {player} has no card to draw and takes {n} fatigue.' },
   log_turnLimit: { sk: '⏳ Limit ťahov rozhodol zápas. Víťazí {player}.', en: '⏳ The turn limit decides the match. {player} wins.' },
   log_turnTimedOut: { sk: '⌛ Hráčovi {player} vypršal čas. Ťah sa automaticky končí.', en: '⌛ {player} ran out of time. The turn ends automatically.' },
@@ -303,6 +304,8 @@ export const STRINGS = {
   err_deckTooBig: { sk: 'Balíček môže mať najviac {n} kariet.', en: 'A deck can have at most {n} cards.' },
   err_deckUnknownCard: { sk: 'Neznáma karta: {card}.', en: 'Unknown card: {card}.' },
   err_deckTooManyCopies: { sk: 'Karta {card} môže byť v balíčku najviac {n}×.', en: '{card} can appear in a deck at most {n}×.' },
+  err_deckLimit: { sk: 'Dosiahol si maximum {n} uložených balíčkov — najprv nejaký vymaž.', en: 'You have reached the limit of {n} saved decks — delete one first.' },
+  err_rateLimited: { sk: 'Príliš veľa požiadaviek — skús to o chvíľu znova.', en: 'Too many requests — try again in a moment.' },
   err_deckNotFound: { sk: 'Balíček sa nenašiel alebo patrí inému hráčovi.', en: 'The deck was not found or belongs to another player.' },
 } satisfies Record<string, LocalizedText>;
 

@@ -82,8 +82,13 @@ export function chooseAiAction(state: GameState, seat: PlayerId): Action {
     .sort((a, b) => effectiveHealth(a.unit) - effectiveHealth(b.unit));
   for (const { ref, unit } of ready) {
     const card = getUnitCard(unit.cardId);
-    const target =
-      foeVanguard.length > 0
+    // Flyers strike over the wall: pick the weakest unit they can reach.
+    const flyerPick = card.keywords.includes('flying') && foeVanguard.length > 0
+      ? occupiedSlots(state, foe.id).sort((a, b) => effectiveHealth(a.unit) - effectiveHealth(b.unit))[0]
+      : undefined;
+    const target = flyerPick
+      ? ({ kind: 'unit', player: foe.id, ...flyerPick.ref } as const)
+      : foeVanguard.length > 0
         ? ({ kind: 'unit', player: foe.id, lane: 'vanguard', slot: foeVanguard[0].slot } as const)
         : ({ kind: 'nexus', player: foe.id } as const);
     const threshold = effectiveThreshold(unit);
