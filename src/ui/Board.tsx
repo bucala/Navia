@@ -4,6 +4,7 @@ import { effectiveThreshold, opponentOf, wallBlocks } from '../game/engine';
 import type { Action, GameViewState, LaneId, PlayerId, SlotRef, TargetRef, UnitState } from '../game/types';
 import { CardFace } from './CardFace';
 import { CardArt } from './CardArt';
+import { CardBack } from './Card3D';
 import { ArmorIcon, AttackIcon, HpIcon, ManaIcon, NexusHeartIcon } from './icons';
 import { UnitSlot, type SlotHighlight } from './UnitToken';
 import { slotFxKey, useCombatFx } from './useCombatFx';
@@ -50,6 +51,44 @@ function ManaBar({ mana, maxMana, label }: { mana: number; maxMana: number; labe
   );
 }
 
+/**
+ * Stable React keys for a hand: the nth copy of a card keeps its key when
+ * other cards leave, so only freshly drawn cards mount (and flip in). The
+ * seat is part of the key so a pass-and-play handoff re-deals the new hand.
+ */
+function stableHandKeys(seat: PlayerId, hand: string[]): string[] {
+  const seen = new Map<string, number>();
+  return hand.map((cardId) => {
+    const n = seen.get(cardId) ?? 0;
+    seen.set(cardId, n + 1);
+    return `${seat}:${cardId}#${n}`;
+  });
+}
+
+/** The opponent's hidden hand as a small fan of card backs. */
+function OpponentHand({ count, label }: { count: number; label: string }) {
+  const shown = Math.min(count, 7);
+  return (
+    <span className="flex items-center gap-1.5 text-xs text-slate-400" title={label}>
+      <span aria-hidden="true" className="relative flex h-7 items-end" style={{ width: `${12 + shown * 7}px` }}>
+        {Array.from({ length: shown }, (_, i) => {
+          const spread = shown > 1 ? i / (shown - 1) - 0.5 : 0;
+          return (
+            <span
+              key={i}
+              className="absolute bottom-0 h-6 w-[17px] origin-bottom overflow-hidden rounded-[3px]"
+              style={{ left: `${i * 7}px`, transform: `rotate(${spread * 28}deg) translateY(${Math.abs(spread) * 3}px)` }}
+            >
+              <CardBack />
+            </span>
+          );
+        })}
+      </span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
 /** The arena, rendered from the given seat's perspective. */
 export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) {
   const { t, lx } = useLang();
@@ -60,6 +99,7 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
   const foeHasVanguard = foe.lanes.vanguard.some((u) => u !== null);
   const { fx, nexusFx } = useCombatFx(state);
   const handScroll = useDragScroll<HTMLDivElement>();
+  const handKeys = stableHandKeys(viewpoint, me.hand);
 
   // Drop stale selections when the turn or seat changes.
   useEffect(() => setSelection({ mode: 'idle' }), [state.active, viewpoint]);
@@ -229,7 +269,7 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
       <div className="flex shrink-0 items-center justify-between border-b border-slate-800 bg-slate-950/60 px-4 py-2">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-200">{foe.name}</span>
-          <span className="text-xs text-slate-400">🂠 {t('cards_in_hand', { n: foe.hand.length })}</span>
+          <OpponentHand count={foe.hand.length} label={t('cards_in_hand', { n: foe.hand.length })} />
         </div>
         <ManaBar mana={foe.mana} maxMana={foe.maxMana} label={t('mana_label', { m: foe.mana, max: foe.maxMana })} />
         <button
@@ -404,8 +444,9 @@ export function Board({ state, dispatch, viewpoint, canAct, onShowLog }: Props) 
           {me.hand.length === 0 && <span className="py-6 text-xs text-slate-500">{t('hand_empty')}</span>}
           {me.hand.map((cardId, i) => (
             <CardFace
-              key={`${cardId}-${i}`}
+              key={handKeys[i]}
               cardId={cardId}
+              dealDelayMs={200 + Math.min(i, 6) * 140}
               selected={selection.mode === 'hand' && selection.index === i}
               affordable={canAct && getCard(cardId).cost <= me.mana && state.phase === 'main'}
               interactive={canAct && state.phase === 'main'}

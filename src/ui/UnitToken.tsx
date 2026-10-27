@@ -73,10 +73,11 @@ export function UnitSlot({ unit, highlight, enemySide = false, fx, onClick, inte
         {unit && card && (
           <motion.div
             key={unit.uid}
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            // Summoned units turn over into place like a card slammed onto the table.
+            initial={{ rotateY: -100, scale: 1.25, y: -10, opacity: 0, transformPerspective: 500 }}
+            animate={{ rotateY: 0, scale: 1, y: 0, opacity: 1, transformPerspective: 500 }}
             exit={{ scale: 0.4, opacity: 0, rotate: 10 }}
-            transition={{ duration: 0.22 }}
+            transition={{ duration: 0.45, ease: [0.22, 1.2, 0.36, 1] }}
             title={lx(card.text)}
             className={`slot-frame slot-frame--${card.rarity} absolute inset-0 overflow-hidden rounded-lg bg-gradient-to-b ${FACTION_BG[card.faction]} ${fxClasses}`}
           >

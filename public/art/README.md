@@ -37,4 +37,16 @@ a hra ich zobrazí automaticky.
 | `ohnivak.webp` | Vták Ohnivák — *art chýba, zobrazí sa emoji* |
 | `mesha.webp` | Meša, Agniho Baran — *art chýba, zobrazí sa emoji* |
 
+## Portréty (výrezy hláv)
+
+`portraits/<cardId>.webp` sú štvorcové výrezy hláv (160 px) pre zoznam v
+Sieni Božstiev. Generuje ich `npm run portraits` podľa tabuľky stredov hláv v
+`scripts/generate-portraits.mjs` — pri novom arte tam doplň riadok
+(`[súbor, stredX, stredY, veľkosť]` ako podiel rozmerov obrázka).
+
+## Rub karty
+
+`frames/card-back.svg` je jednotná zadná strana všetkých kariet (otáčanie v
+ruke, súperova ruka, Sieň Božstiev).
+
 Neskôr sa tieto súbory presunú do Cloudflare R2 (viď GDD §5.2).

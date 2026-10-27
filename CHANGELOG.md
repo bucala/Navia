@@ -17,6 +17,15 @@ teda dočasne odkaz mať nemusí).
 - Kľúčové slovo **Letec** má reálny účinok: letec smie útočiť na jednotky v
   Sanctum aj cez stojaci Vanguard (Nexus zostáva chránený).
 
+- Karty majú objem: pri otáčaní a naklápaní je vidieť pozlátenú hranu a
+  všetky karty majú jednotný rub (`frames/card-back.svg`). Nové karty v ruke
+  sa rozdajú rubom nahor a otočia sa, myšou sa karty nakláňajú, vyvolaná
+  jednotka sa na plochu „preklopí". Súperova ruka sa zobrazuje ako vejár rubov.
+- Sieň Božstiev: veľkú kartu možno ťahaním otáčať, ťuknutím alebo tlačidlom
+  prevrátiť a na desktope sa nakláňa za myšou. Zoznam používa výrezy hláv
+  v bronzových medailónoch (na mobile ako pás nad kartou) a obsahuje všetkých
+  19 kariet, nielen tie s napísaným príbehom.
+
 ### Zmenené
 - Férový štart: začínajúci hráč v prvom ťahu neťahá kartu a hráč, ktorý ide
   druhý, má v prvých dvoch ťahoch +1 manu navyše. V 4 000 simulovaných
