@@ -18,7 +18,7 @@ teda dočasne odkaz mať nemusí).
   Sanctum aj cez stojaci Vanguard (Nexus zostáva chránený).
 
 - Karty majú objem: pri otáčaní a naklápaní je vidieť pozlátenú hranu a
-  všetky karty majú jednotný rub (`frames/card-back.svg`). Nové karty v ruke
+  všetky karty majú jednotný rub (`frames/card-back.webp`). Nové karty v ruke
   sa rozdajú rubom nahor a otočia sa, myšou sa karty nakláňajú, vyvolaná
   jednotka sa na plochu „preklopí". Súperova ruka sa zobrazuje ako vejár rubov.
 - Sieň Božstiev: veľkú kartu možno ťahaním otáčať, ťuknutím alebo tlačidlom
@@ -38,8 +38,25 @@ teda dočasne odkaz mať nemusí).
 - Príbehy a kultúrne odkazy pre všetkých 19 kariet (pribudlo 8: Megadrak,
   Pekelné zaklínadlo, Lávový škriatok, Kamenný strážca, Zlatý Gryf, Papagáj,
   Bojový Kohút, Nebeský vrabec).
+- Nový rub kariet v štýle loga: kamenná doska s vyrytými runami, lávovými
+  žilami a logom Navia v strede (`frames/card-back.webp`, generuje ho
+  `npm run card-back` z ikony aplikácie).
+- Pri striedaní ťahov preletí cez arénu stuha „Tvoj ťah" / „Ťah súpera"
+  s číslom ťahu; tvoj ťah ohlási aj zvuk rohu. Pri hre na jednom zariadení
+  počká, kým sa zavrie obrazovka odovzdania.
+- Nápoveda ďalšieho kroku: keď už nemáš čo vyložiť, rozsvieti sa tlačidlo
+  Bojová fáza (ak máš pripravené jednotky) alebo Ukončiť ťah.
+- Nexus s 10 a menej HP pulzuje na červeno ako varovanie.
+- Koniec zápasu ukáže Víťazstvo alebo Porážku z pohľadu hráča, dôvod konca
+  (padnutý Nexus, limit ťahov, vzdanie) a štatistiky oboch hráčov:
+  poškodenie Nexusu, vyvolané a zničené jednotky, zoslané kúzla a počet
+  ťahov. Víťazstvo sprevádza fanfára a iskry, porážku pochmúrny tón.
 
 ### Zmenené
+- Pravidlá, Nastavenia, Rebríček a Balíčky sa posúvajú po celej šírke
+  obrazovky: tieň panelu sa už neorezáva do tmavých pruhov po stranách a
+  posuvník je pri okraji okna. Posuvníky v celej hre majú bronzový vzhľad
+  namiesto sivých systémových.
 - Férový štart: začínajúci hráč v prvom ťahu neťahá kartu a hráč, ktorý ide
   druhý, má v prvých dvoch ťahoch +1 manu navyše. V 4 000 simulovaných
   AI-vs-AI hrách klesol podiel výhier začínajúceho hráča zo ~73 % na ~52 %.

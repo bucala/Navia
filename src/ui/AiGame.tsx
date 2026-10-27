@@ -14,6 +14,7 @@ import {
   WinnerOverlay,
 } from './feedback';
 import { LogPanel, useLogPanelState } from './LogPanel';
+import { useMatchStats } from './useMatchStats';
 
 /** Single player vs the Arena Spirit (Duch Arény). */
 export function AiGame() {
@@ -26,6 +27,7 @@ export function AiGame() {
   const { toast, showToast } = useToast();
   const { diceEvent, shake } = useDiceFeedback(state);
   const [logOpen, setLogOpen] = useLogPanelState();
+  const stats = useMatchStats(state);
 
   const myTurn = state.active === 'p1';
 
@@ -81,7 +83,7 @@ export function AiGame() {
 
       {toast && <Toast message={toast} />}
       <GameOverlays diceEvent={diceEvent} />
-      {state.winner && <WinnerOverlay name={state.players[state.winner].name} onNewGame={() => setState(makeGame())} />}
+      {state.winner && <WinnerOverlay state={state} viewpoint="p1" stats={stats} onNewGame={() => setState(makeGame())} />}
     </div>
   );
 }

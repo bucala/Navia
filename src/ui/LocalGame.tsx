@@ -5,6 +5,7 @@ import { errorText, useLang } from '../i18n';
 import { Board } from './Board';
 import { GameOverlays, Toast, useDiceFeedback, useToast, WinnerOverlay } from './feedback';
 import { LogPanel, useLogPanelState } from './LogPanel';
+import { useMatchStats } from './useMatchStats';
 
 /** Hot-seat Pass & Play — two players on one device. */
 export function LocalGame() {
@@ -16,6 +17,7 @@ export function LocalGame() {
   const { toast, showToast } = useToast();
   const { diceEvent, shake } = useDiceFeedback(state);
   const [logOpen, setLogOpen] = useLogPanelState();
+  const stats = useMatchStats(state);
 
   const dispatch = useCallback(
     (action: Action): boolean => {
@@ -39,7 +41,14 @@ export function LocalGame() {
 
   return (
     <div className={`flex min-h-0 min-w-0 flex-1 overflow-hidden ${shake ? 'shake' : ''}`}>
-      <Board state={state} dispatch={dispatch} viewpoint={state.active} canAct onShowLog={() => setLogOpen(true)} />
+      <Board
+        state={state}
+        dispatch={dispatch}
+        viewpoint={state.active}
+        canAct
+        onShowLog={() => setLogOpen(true)}
+        announceTurns={!handoff}
+      />
       <LogPanel state={state} open={logOpen} onOpenChange={setLogOpen} />
 
       {toast && <Toast message={toast} />}
@@ -61,7 +70,7 @@ export function LocalGame() {
         </div>
       )}
 
-      {state.winner && <WinnerOverlay name={state.players[state.winner].name} onNewGame={newGame} />}
+      {state.winner && <WinnerOverlay state={state} viewpoint={null} stats={stats} onNewGame={newGame} />}
     </div>
   );
 }
